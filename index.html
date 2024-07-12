@@ -9,15 +9,43 @@
         body {
             background-image: url('sua-imagem-de-fundo.jpg'); /* Certifique-se de que o caminho está correto */
             background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .container input {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 80%;
+            max-width: 300px;
+        }
+        .container button {
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+        .container a {
+            display: block;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Acesse sua Conta</h1>
+        <h1>Faça Login ou Cadastre-se</h1>
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <button id="submitUserInfo">ACESSAR OU CADASTRAR</button>
+        <button id="loginButton">Acessar</button>
+        <a href="#" id="registerLink">Cadastre-se</a>
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
@@ -26,94 +54,6 @@
         </div>
     </div>
 
-    <script type="module">
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCKw5ZcJBcTvf1onPtkzgvJqlRAsbUqauk",
-            authDomain: "robo-7937c.firebaseapp.com",
-            projectId: "robo-7937c",
-            storageBucket: "robo-7937c.appspot.com",
-            messagingSenderId: "444396924434",
-            appId: "444396924434:web:46b93323f9c22d90ac32cb"
-        };
-
-        // Importar Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-
-        // Inicializar o Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // Lida com o clique do botão "ACESSAR OU CADASTRAR"
-        document.getElementById('submitUserInfo').onclick = async function() {
-            const email = document.getElementById('userEmail').value;
-            const password = document.getElementById('userPassword').value;
-
-            // Verifica se o email e a senha estão preenchidos
-            if (email && password) {
-                try {
-                    // Tenta fazer login
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    const userDoc = await getDoc(doc(db, 'users', user.uid));
-                    
-                    // Se o usuário não tiver dados, registra
-                    if (!userDoc.exists()) {
-                        alert("Usuário não encontrado. Registrando...");
-                        await registerUser(email, user.uid); // Chama a função de registro
-                    } else {
-                        // Se o usuário já existe, exibe mensagem de boas-vindas
-                        document.getElementById('welcome-message').innerText = `Bem-vindo de volta! Vamos ganhar dinheiro hoje? 🤑`;
-                        startTrialTimer(userDoc.data().trialEnd);
-                        document.getElementById('buttons').style.display = 'block';
-                    }
-                } catch (error) {
-                    console.error("Erro ao acessar:", error);
-                    alert("Erro ao acessar: " + error.message);
-                }
-            } else {
-                alert("Por favor, preencha todos os campos.");
-            }
-        };
-
-        async function registerUser(email, userId) {
-            console.log("Tentando registrar o usuário:", email);
-
-            try {
-                const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 semana
-
-                // Armazena os dados do usuário no Firestore
-                await setDoc(doc(db, 'users', userId), {
-                    email: email,
-                    trialEnd: trialEnd
-                });
-
-                document.getElementById('welcome-message').innerText = `Registro bem-sucedido! Vamos ganhar dinheiro hoje? 🤑`;
-                startTrialTimer(trialEnd);
-                document.getElementById('buttons').style.display = 'block';
-            } catch (error) {
-                console.error("Erro ao registrar:", error);
-                alert("Erro ao registrar: " + error.message);
-            }
-        }
-
-        function startTrialTimer(trialEnd) {
-            const timerElement = document.getElementById('timer');
-            timerElement.style.display = 'block';
-            const interval = setInterval(() => {
-                const remainingTime = trialEnd - Date.now();
-                if (remainingTime <= 0) {
-                    clearInterval(interval);
-                    timerElement.innerText = "Seu período de teste terminou!";
-                } else {
-                    const daysRemaining = Math.ceil(remainingTime / (1000 * 60 * 60 * 24));
-                    timerElement.innerText = `Tempo restante: ${daysRemaining} dias`;
-                }
-            }, 1000); // Atualiza a cada segundo
-        }
-    </script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
