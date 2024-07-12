@@ -9,26 +9,6 @@
         body {
             background-image: url('https://i.imgur.com/aIo74ce.jpeg'); /* Imagem de fundo */
             background-size: cover;
-            background-position: center;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            text-align: center;
-            color: white; /* Cor do texto para contraste */
-            padding: 20px;
-        }
-        .button {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .button:hover {
-            background-color: #0056b3;
         }
     </style>
 </head>
@@ -59,7 +39,7 @@
 
         // Importar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
         // Inicializar o Firebase
@@ -70,22 +50,27 @@
         // Função para registrar um novo usuário
         async function registerUser(email, userName) {
             console.log("Tentando registrar o usuário:", userName, "com email:", email);
+            try {
+                // Cria um usuário com email e senha
+                const password = "senhaSegura"; // Substitua por uma senha gerada ou um valor que você escolher
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 semana
 
-            // Cria um usuário anônimo
-            const userCredential = await signInAnonymously(auth);
-            const user = userCredential.user;
-            const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 semana
+                // Armazena os dados do usuário no Firestore
+                await setDoc(doc(db, 'users', user.uid), {
+                    email: email,
+                    name: userName,
+                    trialEnd: trialEnd
+                });
 
-            // Armazena os dados do usuário no Firestore
-            await setDoc(doc(db, 'users', user.uid), {
-                email: email,
-                name: userName,
-                trialEnd: trialEnd
-            });
-
-            document.getElementById('welcome-message').innerText = `Oi, ${userName}! Vamos ganhar dinheiro hoje? 🤑`;
-            startTimer(trialEnd);
-            document.getElementById('buttons').style.display = 'block';
+                document.getElementById('welcome-message').innerText = `Oi, ${userName}! Vamos ganhar dinheiro hoje? 🤑`;
+                startTimer(trialEnd);
+                document.getElementById('buttons').style.display = 'block';
+            } catch (error) {
+                console.error("Erro ao registrar:", error);
+                alert("Erro ao registrar: " + error.message);
+            }
         }
 
         // Função para iniciar o temporizador
