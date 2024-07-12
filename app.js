@@ -1,10 +1,22 @@
 // Importando Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
-// Inicializar Firebase
-const db = getFirestore();
-const auth = getAuth();
+// Configuração do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCKw5ZcJBcTvf1onPtkzgvJqlRAsbUqauk",
+    authDomain: "robo-7937c.firebaseapp.com",
+    projectId: "robo-7937c",
+    storageBucket: "robo-7937c.appspot.com",
+    messagingSenderId: "444396924434",
+    appId: "1:444396924434:web:46b93323f9c22d90ac32cb"
+};
+
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 document.getElementById('loginButton').addEventListener('click', async function() {
     const userEmail = document.getElementById('userEmail').value;
