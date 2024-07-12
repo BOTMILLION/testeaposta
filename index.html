@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robo de Sinais</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body onmousemove="createMoneyTrail(event)">
+    <div class="container">
+        <header>
+            <h1>Bem-vindo ao Robo de Sinais</h1>
+            <p id="welcome-message"></p>
+            <div id="trial-info" class="trial-info">
+                <p id="trial-message">Você tem uma semana grátis para testar nossos serviços!</p>
+                <div id="timer" class="timer"></div>
+            </div>
+        </header>
+        <main>
+            <button id="jogueAgora" class="btn" onclick="playNow()">JOGUE AGORA</button>
+            <button id="cadastreSe" class="btn" onclick="redirectToLogin()">CADASTRE-SE OU FAÇA LOGIN</button>
+        </main>
+    </div>
+</body>
+</html>
