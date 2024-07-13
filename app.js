@@ -30,7 +30,7 @@ document.getElementById('loginButton').addEventListener('click', async function(
             // Tenta fazer login
             const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
             const user = userCredential.user;
-            const userName = user.displayName || "Usuário";
+            const userName = user.displayName || userEmail.split('@')[0]; // Usa o email como fallback
 
             document.getElementById('welcome-message').innerText = `Oi, ${userName}! Vamos ganhar dinheiro hoje? 🤑`;
             startTrialTimer(userEmail);
@@ -62,6 +62,12 @@ document.getElementById('registerLink').addEventListener('click', function() {
 
 async function registerUser(email, password) {
     console.log("Tentando registrar o usuário com email:", email);
+
+    // Verifica a força da senha
+    if (password.length < 6) {
+        alert("A senha deve ter pelo menos 6 caracteres.");
+        return;
+    }
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
