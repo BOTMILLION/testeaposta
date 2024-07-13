@@ -39,8 +39,7 @@
         }
         #error-message {
             color: red;
-            margin-top: 10px;
-            display: none; /* Inicialmente oculto */
+            display: none;
         }
     </style>
 </head>
@@ -49,6 +48,7 @@
         <h1>Faça Login ou Cadastre-se</h1>
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
+        <div id="error-message"></div>
         <button id="loginButton">Acessar</button>
         <a href="#" id="registerLink">Cadastre-se</a>
         <div id="welcome-message"></div>
@@ -57,7 +57,6 @@
             <a href="https://vaidebet.com/ptb/bet/main" class="button">CADASTRE-SE OU FAÇA LOGIN</a>
             <a href="https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL" class="button">JOGUE AGORA</a>
         </div>
-        <div id="error-message">A senha deve ter pelo menos 6 caracteres.</div>
     </div>
 
     <script type="module" src="app.js"></script>
