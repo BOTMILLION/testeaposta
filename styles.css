@@ -1,51 +1,38 @@
 body {
     font-family: Arial, sans-serif;
-    background: url('sua-imagem-de-fundo.jpg') no-repeat center center fixed;
+    background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
     background-size: cover;
     color: white;
     text-align: center;
-    margin: 0;
-    padding: 0;
 }
 
 .container {
     padding: 20px;
     background-color: rgba(0, 0, 0, 0.7);
     border-radius: 8px;
-    max-width: 400px;
-    margin: auto;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 input {
     padding: 10px;
-    margin: 10px 0;
-    width: 90%;
-    max-width: 300px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    color: black; /* Para o texto ficar visível */
+    margin: 10px;
+    width: 200px;
 }
 
-button, .button {
+button {
     padding: 10px 20px;
-    background-color: #28a745; /* Cor do botão principal */
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    text-decoration: none; /* Para links se parecerem com botões */
 }
 
 .button {
-    background-color: #007bff; /* Cor do botão de link */
-}
-
-button:hover, .button:hover {
-    opacity: 0.8; /* Efeito ao passar o mouse */
-}
-
-#error-message {
-    color: red;
-    margin-top: 10px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 10px;
 }
