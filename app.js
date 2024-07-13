@@ -42,7 +42,6 @@ document.getElementById('loginButton').addEventListener('click', async function(
             }
 
             const trialEndTime = userDoc.data().trialEnd.toDate();
-
             console.log("Hora do final do período de teste:", trialEndTime);
 
             if (new Date() > trialEndTime) {
