@@ -32,7 +32,8 @@ document.getElementById('loginButton').addEventListener('click', async function(
             const user = userCredential.user;
             const userName = user.displayName || userEmail.split('@')[0]; // Usa o email como fallback
 
-            document.getElementById('welcome-message').innerText = `Oi, ${userName}! Vamos ganhar dinheiro hoje? 🤑`;
+            // Mensagem de boas-vindas e informações do período de teste
+            document.getElementById('welcome-message').innerText = `Oi, ${userName}!`;
             startTrialTimer(userEmail);
             document.getElementById('timer').style.display = 'block';
 
@@ -90,10 +91,10 @@ async function registerUser(email, password) {
             trialEnd: trialEnd
         });
 
-        document.getElementById('welcome-message').innerText = `Oi, ${userName}! Vamos ganhar dinheiro hoje? 🤑`;
+        document.getElementById('welcome-message').innerText = `Oi, ${userName}!`;
         startTrialTimer(email);
         document.getElementById('timer').style.display = 'block';
-        
+
     } catch (error) {
         console.error("Erro ao registrar:", error);
         alert("Erro ao registrar: " + error.message);
