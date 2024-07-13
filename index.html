@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            background-image: url('https://i.imgur.com/aIo74ce.jpeg'); /* Certifique-se de que o caminho está correto */
+            background-image: url('https://i.imgur.com/aIo74ce.jpeg');
             background-size: cover;
             display: flex;
             justify-content: center;
@@ -37,6 +37,11 @@
             display: block;
             margin-top: 10px;
         }
+        #error-message {
+            color: red;
+            margin-top: 10px;
+            display: none; /* Inicialmente oculto */
+        }
     </style>
 </head>
 <body>
@@ -52,6 +57,7 @@
             <a href="https://vaidebet.com/ptb/bet/main" class="button">CADASTRE-SE OU FAÇA LOGIN</a>
             <a href="https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL" class="button">JOGUE AGORA</a>
         </div>
+        <div id="error-message">A senha deve ter pelo menos 6 caracteres.</div>
     </div>
 
     <script type="module" src="app.js"></script>
