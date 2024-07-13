@@ -44,10 +44,11 @@ document.getElementById('loginButton').addEventListener('click', async function(
             const trialEndTime = userDoc.data().trialEnd.toDate();
             console.log("Hora do final do período de teste:", trialEndTime);
 
+            // Verifica se o período de teste ainda está ativo
             if (new Date() > trialEndTime) {
                 alert("Seu período de teste terminou! Você não pode mais acessar o site.");
             } else {
-                startTrialTimer(userEmail);
+                startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
             }
         } catch (error) {
@@ -98,7 +99,7 @@ async function registerUser(email, password) {
         });
 
         console.log("Usuário registrado com sucesso.");
-        startTrialTimer(email);
+        startTrialTimer(email, trialEnd);
         document.getElementById('timer').style.display = 'block';
     } catch (error) {
         console.error("Erro ao registrar:", error);
@@ -106,16 +107,15 @@ async function registerUser(email, password) {
     }
 }
 
-function startTrialTimer(email) {
+function startTrialTimer(email, trialEndTime) {
     console.log("Iniciando cronômetro de teste para:", email);
-    const trialEndTime = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).getTime(); // 7 dias
-    localStorage.setItem('trialEndTime_' + email, trialEndTime); // Armazena o tempo de término do teste no localStorage
+    localStorage.setItem('trialEndTime_' + email, trialEndTime.getTime()); // Armazena o tempo de término do teste no localStorage
 
     const timerElement = document.getElementById('timer');
 
     const interval = setInterval(() => {
         const now = new Date().getTime();
-        const remainingTime = trialEndTime - now;
+        const remainingTime = trialEndTime.getTime() - now;
 
         if (remainingTime <= 0) {
             clearInterval(interval);
