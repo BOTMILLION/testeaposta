@@ -24,7 +24,7 @@ const auth = getAuth(app);
 document.getElementById('loginButton').addEventListener('click', async function() {
     const userEmail = document.getElementById('userEmail').value;
     const userPassword = document.getElementById('userPassword').value;
-    
+
     if (userEmail && userPassword) {
         try {
             // Tenta fazer login
@@ -34,7 +34,13 @@ document.getElementById('loginButton').addEventListener('click', async function(
 
             document.getElementById('welcome-message').innerText = `Oi, ${userName}! Vamos ganhar dinheiro hoje? 🤑`;
             startTrialTimer(userEmail);
-            document.getElementById('buttons').style.display = 'block';
+            document.getElementById('timer').style.display = 'block';
+
+            // Mensagem de redirecionamento
+            setTimeout(() => {
+                window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL"; // URL do jogo
+            }, 5000); // 5 segundos
+
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
                 // Se usuário não encontrado, tenta registrar
@@ -86,7 +92,8 @@ async function registerUser(email, password) {
 
         document.getElementById('welcome-message').innerText = `Oi, ${userName}! Vamos ganhar dinheiro hoje? 🤑`;
         startTrialTimer(email);
-        document.getElementById('buttons').style.display = 'block';
+        document.getElementById('timer').style.display = 'block';
+        
     } catch (error) {
         console.error("Erro ao registrar:", error);
         alert("Erro ao registrar: " + error.message);
