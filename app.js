@@ -1,6 +1,6 @@
 // Importando Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Configuração do Firebase
@@ -23,15 +23,27 @@ document.getElementById('loginButton').addEventListener('click', async function(
     const userEmail = document.getElementById('userEmail').value;
     const userPassword = document.getElementById('userPassword').value;
 
+    console.log("Email:", userEmail);
+    console.log("Senha:", userPassword);
+
     if (userEmail && userPassword) {
         try {
             // Tenta fazer login
             const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
             const user = userCredential.user;
 
+            console.log("Usuário logado:", user.uid);
+
             // Obtém o horário do final do período de teste
-            const userDoc = await doc(db, 'users', user.uid).get();
-            const trialEndTime = userDoc.data().trialEnd;
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!userDoc.exists()) {
+                console.log("Usuário não encontrado no Firestore.");
+                return;
+            }
+
+            const trialEndTime = userDoc.data().trialEnd.toDate();
+
+            console.log("Hora do final do período de teste:", trialEndTime);
 
             if (new Date() > trialEndTime) {
                 alert("Seu período de teste terminou! Você não pode mais acessar o site.");
@@ -40,10 +52,10 @@ document.getElementById('loginButton').addEventListener('click', async function(
                 document.getElementById('timer').style.display = 'block';
             }
         } catch (error) {
+            console.error("Erro ao acessar:", error);
             if (error.code === 'auth/user-not-found') {
                 await registerUser(userEmail, userPassword);
             } else {
-                console.error("Erro ao acessar:", error);
                 alert("Erro ao acessar: " + error.message);
             }
         }
@@ -85,6 +97,7 @@ async function registerUser(email, password) {
             trialEnd: trialEnd
         });
 
+        console.log("Usuário registrado com sucesso.");
         startTrialTimer(email);
         document.getElementById('timer').style.display = 'block';
     } catch (error) {
@@ -94,6 +107,7 @@ async function registerUser(email, password) {
 }
 
 function startTrialTimer(email) {
+    console.log("Iniciando cronômetro de teste para:", email);
     const trialEndTime = new Date(localStorage.getItem('trialEndTime_' + email)).getTime();
     const timerElement = document.getElementById('timer');
 
