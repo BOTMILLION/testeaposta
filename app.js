@@ -91,6 +91,7 @@ async function registerUser(email, password) {
         const userName = email.split('@')[0];
         const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
+        // Armazena os dados do usuário no Firestore
         await setDoc(doc(db, 'users', user.uid), {
             email: email,
             name: userName,
@@ -108,7 +109,9 @@ async function registerUser(email, password) {
 
 function startTrialTimer(email) {
     console.log("Iniciando cronômetro de teste para:", email);
-    const trialEndTime = new Date(localStorage.getItem('trialEndTime_' + email)).getTime();
+    const trialEndTime = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).getTime(); // 7 dias
+    localStorage.setItem('trialEndTime_' + email, trialEndTime); // Armazena o tempo de término do teste no localStorage
+
     const timerElement = document.getElementById('timer');
 
     const interval = setInterval(() => {
