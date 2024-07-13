@@ -50,9 +50,8 @@ document.getElementById('loginButton').addEventListener('click', async function(
             } else {
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
-                // Redirecionar para o jogo após login
                 setTimeout(() => {
-                    window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL"; // Substitua pela URL do seu jogo
+                    window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
                 }, 5000); // Redireciona após 5 segundos
             }
         } catch (error) {
