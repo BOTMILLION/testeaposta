@@ -50,6 +50,7 @@ document.getElementById('loginButton').addEventListener('click', async function(
             } else {
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
+                console.log("Redirecionando para o jogo...");
                 setTimeout(() => {
                     window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
                 }, 5000); // Redireciona após 5 segundos
@@ -104,6 +105,9 @@ async function registerUser(email, password) {
         console.log("Usuário registrado com sucesso.");
         startTrialTimer(email, trialEnd);
         document.getElementById('timer').style.display = 'block';
+        setTimeout(() => {
+            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+        }, 5000); // Redireciona após 5 segundos
     } catch (error) {
         console.error("Erro ao registrar:", error);
         alert("Erro ao registrar: " + error.message);
