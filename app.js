@@ -16,27 +16,31 @@ const firebaseConfig = {
 // Inicializa o Firebase
 console.log("Inicializando Firebase...");
 const app = initializeApp(firebaseConfig);
-console.log("Firebase inicializado:", app);
-
 const db = getFirestore(app);
 const auth = getAuth(app);
 
 document.getElementById('loginButton').addEventListener('click', async function() {
     const userEmail = document.getElementById('userEmail').value;
     const userPassword = document.getElementById('userPassword').value;
-    
+
     if (userEmail && userPassword) {
         try {
             // Tenta fazer login
             const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
             const user = userCredential.user;
 
-            // Inicia o cronômetro do período de teste
-            startTrialTimer(userEmail);
-            document.getElementById('timer').style.display = 'block';
+            // Obtém o horário do final do período de teste
+            const userDoc = await doc(db, 'users', user.uid).get();
+            const trialEndTime = userDoc.data().trialEnd;
+
+            if (new Date() > trialEndTime) {
+                alert("Seu período de teste terminou! Você não pode mais acessar o site.");
+            } else {
+                startTrialTimer(userEmail);
+                document.getElementById('timer').style.display = 'block';
+            }
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
-                // Se usuário não encontrado, tenta registrar
                 await registerUser(userEmail, userPassword);
             } else {
                 console.error("Erro ao acessar:", error);
@@ -62,21 +66,19 @@ document.getElementById('registerLink').addEventListener('click', function() {
 async function registerUser(email, password) {
     console.log("Tentando registrar o usuário com email:", email);
 
-    // Verifica a força da senha
     if (password.length < 6) {
-        document.getElementById('error-message').style.display = 'block'; // Exibe a mensagem de erro
+        document.getElementById('error-message').style.display = 'block';
         return;
     } else {
-        document.getElementById('error-message').style.display = 'none'; // Oculta a mensagem de erro
+        document.getElementById('error-message').style.display = 'none';
     }
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        const userName = email.split('@')[0]; // Pega parte do email antes do @ como nome do usuário
-        const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 semana
+        const userName = email.split('@')[0];
+        const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-        // Armazena os dados do usuário no Firestore
         await setDoc(doc(db, 'users', user.uid), {
             email: email,
             name: userName,
@@ -102,9 +104,8 @@ function startTrialTimer(email) {
         if (remainingTime <= 0) {
             clearInterval(interval);
             timerElement.textContent = "Seu período de teste terminou!";
-            localStorage.removeItem('trialEndTime_' + email); // Remove o tempo de teste após o término
+            localStorage.removeItem('trialEndTime_' + email);
             alert("Seu período de teste terminou! Você não pode mais acessar o site.");
-            // Redirecionar ou desabilitar botões
         } else {
             const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
             const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
