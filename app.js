@@ -65,6 +65,7 @@ async function registerUser(email, password) {
 
     // Verifica a força da senha
     if (password.length < 6) {
+        document.getElementById('error-message').innerText = "A senha deve ter pelo menos 6 caracteres."; // Mensagem de erro
         document.getElementById('error-message').style.display = 'block'; // Exibe a mensagem de erro
         return;
     } else {
