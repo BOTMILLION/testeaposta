@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
-    background-size: cover;
+    background-size: 1080px 1920px; /* Define o tamanho da imagem */
     color: white;
     text-align: center;
 }
