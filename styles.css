@@ -25,6 +25,8 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    width: 100%; /* Faz os botões ocuparem a mesma largura */
+    max-width: 300px; /* Limita a largura máxima */
 }
 
 .button {
@@ -35,4 +37,25 @@ button {
     text-decoration: none;
     border-radius: 5px;
     margin: 10px;
+    width: 100%; /* Faz os botões ocuparem a mesma largura */
+    max-width: 300px; /* Limita a largura máxima */
+}
+
+/* Estilo para o botão de pagamento */
+.payment-button {
+    display: inline-block;
+    padding: 15px 25px;
+    background-color: #ff6b6b; /* Cor chamativa */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 10px;
+    animation: pulse 1.5s infinite; /* Animação pulsante */
+}
+
+/* Animação pulsante */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
