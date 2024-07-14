@@ -29,45 +29,42 @@
             width: 80%;
             max-width: 300px;
         }
-        .container button, .container a.button {
+        .button, #paymentButton {
             padding: 10px 20px;
-            margin-top: 10px;
+            margin: 10px;
             background-color: #007bff;
             color: white;
             text-decoration: none;
             border-radius: 5px;
             display: inline-block;
             transition: background-color 0.3s ease, transform 0.3s ease;
-            width: 80%;
-            max-width: 300px;
+            width: 150px; /* Tamanho fixo para uniformidade */
         }
-        .container button:hover, .container a.button:hover {
+        .button:hover, #paymentButton:hover {
             background-color: #0056b3;
             transform: scale(1.05);
+        }
+        #paymentButton {
+            background-color: #28a745;
+            animation: pulse 1s infinite;
+        }
+        #paymentButton:hover {
+            background-color: #218838;
         }
         #error-message {
             color: red;
             display: none; /* Inicialmente escondido */
             margin-top: 5px;
         }
-        #paymentButton {
-            background-color: #28a745;
-            color: white;
-            animation: pulse 1s infinite;
-            border: none;
-            cursor: pointer;
-            padding: 10px 20px;
-            margin-top: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        #paymentButton:hover {
-            background-color: #218838;
-        }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Espaçamento entre os botões */
         }
     </style>
 </head>
@@ -77,8 +74,10 @@
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
         <div id="error-message">A senha deve ter pelo menos 6 caracteres.</div>
-        <button id="loginButton">Acessar</button>
-        <a href="#" id="registerLink" class="button">Cadastre-se</a>
+        <div class="button-container">
+            <button id="loginButton" class="button">Acessar</button>
+            <a href="#" id="registerLink" class="button">Cadastre-se</a>
+        </div>
         <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
