@@ -7,19 +7,16 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            background-image: url('https://i.imgur.com/3oDyemd.png'); /* Certifique-se de que o caminho está correto */
+            background-image: url('https://i.imgur.com/3oDyemd.png');
             background-size: cover;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            font-family: Arial, sans-serif;
-            color: white;
-            text-align: center;
         }
         .container {
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -32,46 +29,60 @@
             width: 80%;
             max-width: 300px;
         }
-        .container button, .container .button {
+        .container button, .container a.button {
             padding: 10px 20px;
             margin-top: 10px;
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
             text-decoration: none;
+            border-radius: 5px;
             display: inline-block;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .container button:hover, .container a.button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .container a {
+            display: block;
+            margin-top: 10px;
         }
         #error-message {
             color: red;
             display: none; /* Inicialmente escondido */
             margin-top: 5px;
         }
+        #paymentButton {
+            background-color: #28a745;
+            color: white;
+            animation: pulse 1s infinite;
+            border: none;
+            cursor: pointer;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <button id="paymentButton">Realizar Pagamento</button>
         <h1>Faça Login ou Cadastre-se</h1>
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
         <div id="error-message">A senha deve ter pelo menos 6 caracteres.</div>
         <button id="loginButton">Acessar</button>
-        <a href="#" id="registerLink">Cadastre-se</a>
+        <a href="#" id="registerLink" class="button">Cadastre-se</a>
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
             <a href="https://vaidebet.com/ptb/bet/main" class="button">CADASTRE-SE OU FAÇA LOGIN</a>
             <a href="https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL" class="button">JOGUE AGORA</a>
         </div>
+        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
     </div>
 
     <script type="module" src="app.js"></script>
-    <script>
-        document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://checkout.yampi.com.br/seu-link-de-checkout'; // Substitua pelo link do seu checkout Yampi
-        });
-    </script>
 </body>
 </html>
