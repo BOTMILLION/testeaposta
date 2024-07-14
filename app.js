@@ -14,6 +14,7 @@ const firebaseConfig = {
 };
 
 // Inicializa o Firebase
+console.log("Inicializando Firebase...");
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -22,12 +23,18 @@ document.getElementById('loginButton').addEventListener('click', async function(
     const userEmail = document.getElementById('userEmail').value;
     const userPassword = document.getElementById('userPassword').value;
 
+    console.log("Email:", userEmail);
+    console.log("Senha:", userPassword);
+
     if (userEmail && userPassword) {
         try {
             // Tenta fazer login
             const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
             const user = userCredential.user;
 
+            console.log("Usuário logado:", user.uid);
+
+            // Obtém o horário do final do período de teste
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (!userDoc.exists()) {
                 console.log("Usuário não encontrado no Firestore.");
@@ -35,16 +42,22 @@ document.getElementById('loginButton').addEventListener('click', async function(
             }
 
             const trialEndTime = userDoc.data().trialEnd.toDate();
+            console.log("Hora do final do período de teste:", trialEndTime);
+
+            // Verifica se o período de teste ainda está ativo
             if (new Date() > trialEndTime) {
                 alert("Seu período de teste terminou! Você não pode mais acessar o site.");
             } else {
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
+                console.log("Redirecionando para o jogo...");
                 setTimeout(() => {
+                    console.log("Redirecionando agora...");
                     window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
-                }, 5000);
+                }, 5000); // Redireciona após 5 segundos
             }
         } catch (error) {
+            console.error("Erro ao acessar:", error);
             if (error.code === 'auth/user-not-found') {
                 await registerUser(userEmail, userPassword);
             } else {
@@ -68,6 +81,8 @@ document.getElementById('registerLink').addEventListener('click', function() {
 });
 
 async function registerUser(email, password) {
+    console.log("Tentando registrar o usuário com email:", email);
+
     if (password.length < 6) {
         document.getElementById('error-message').style.display = 'block';
         return;
@@ -81,23 +96,30 @@ async function registerUser(email, password) {
         const userName = email.split('@')[0];
         const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
+        // Armazena os dados do usuário no Firestore
         await setDoc(doc(db, 'users', user.uid), {
             email: email,
             name: userName,
             trialEnd: trialEnd
         });
 
+        console.log("Usuário registrado com sucesso.");
         startTrialTimer(email, trialEnd);
         document.getElementById('timer').style.display = 'block';
         setTimeout(() => {
+            console.log("Redirecionando agora após registro...");
             window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
-        }, 5000);
+        }, 5000); // Redireciona após 5 segundos
     } catch (error) {
+        console.error("Erro ao registrar:", error);
         alert("Erro ao registrar: " + error.message);
     }
 }
 
 function startTrialTimer(email, trialEndTime) {
+    console.log("Iniciando cronômetro de teste para:", email);
+    localStorage.setItem('trialEndTime_' + email, trialEndTime.getTime()); // Armazena o tempo de término do teste no localStorage
+
     const timerElement = document.getElementById('timer');
 
     const interval = setInterval(() => {
@@ -107,6 +129,7 @@ function startTrialTimer(email, trialEndTime) {
         if (remainingTime <= 0) {
             clearInterval(interval);
             timerElement.textContent = "Seu período de teste terminou!";
+            localStorage.removeItem('trialEndTime_' + email);
             alert("Seu período de teste terminou! Você não pode mais acessar o site.");
         } else {
             const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
