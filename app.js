@@ -53,7 +53,7 @@ document.getElementById('loginButton').addEventListener('click', async function(
                 console.log("Redirecionando para o jogo...");
                 setTimeout(() => {
                     console.log("Redirecionando agora...");
-                    window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+                    window.location.href = "https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735";
                 }, 5000); // Redireciona após 5 segundos
             }
         } catch (error) {
@@ -108,7 +108,7 @@ async function registerUser(email, password) {
         document.getElementById('timer').style.display = 'block';
         setTimeout(() => {
             console.log("Redirecionando agora após registro...");
-            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+            window.location.href = "https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735";
         }, 5000); // Redireciona após 5 segundos
     } catch (error) {
         console.error("Erro ao registrar:", error);
