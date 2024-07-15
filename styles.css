@@ -1,61 +1,60 @@
 body {
     font-family: Arial, sans-serif;
     background: url('https://i.imgur.com/MKHuy9M.png') no-repeat center center fixed;
-    background-size: 1080px 1900px; /* Define o tamanho da imagem */
-    color: white;
+    background-size: cover; /* Ajusta o tamanho para cobrir toda a tela */
+    color: black; /* Altera a cor do texto para melhor visibilidade */
     text-align: center;
 }
 
 .container {
     padding: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(255, 255, 255, 0.9); /* Fundo claro para contraste */
     border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
 }
 
 input {
     padding: 10px;
     margin: 10px;
-    width: 200px;
+    width: 80%; /* Ajusta a largura para ser responsiva */
+    max-width: 300px;
 }
 
-button {
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%; /* Faz os botões ocuparem a mesma largura */
-    max-width: 300px; /* Limita a largura máxima */
-}
-
-.button {
+.button, #paymentButton {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #007bff; /* Cor padrão dos botões */
     color: white;
     text-decoration: none;
     border-radius: 5px;
     margin: 10px;
-    width: 100%; /* Faz os botões ocuparem a mesma largura */
-    max-width: 300px; /* Limita a largura máxima */
+    width: 150px; /* Tamanho fixo para uniformidade */
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-/* Estilo para o botão de pagamento */
-.payment-button {
-    display: inline-block;
-    padding: 15px 25px;
-    background-color: #ff6b6b; /* Cor chamativa */
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    margin: 10px;
-    animation: pulse 1.5s infinite; /* Animação pulsante */
+.button:hover, #paymentButton:hover {
+    background-color: #0056b3; /* Cor ao passar o mouse */
+    transform: scale(1.05); /* Efeito de escala */
+}
+
+#paymentButton {
+    background-color: #28a745; /* Cor específica para o botão de pagamento */
+}
+
+#paymentButton:hover {
+    background-color: #218838; /* Cor ao passar o mouse no botão de pagamento */
+}
+
+/* Estilo para mensagens de erro */
+#error-message {
+    color: red;
+    display: none; /* Inicialmente escondido */
+    margin-top: 5px;
 }
 
 /* Animação pulsante */
 @keyframes pulse {
     0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    50% { transform: scale(1.1); }
     100% { transform: scale(1); }
 }
