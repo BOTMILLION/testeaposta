@@ -50,11 +50,8 @@ document.getElementById('loginButton').addEventListener('click', async function(
             } else {
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
-                console.log("Redirecionando para o jogo...");
-                setTimeout(() => {
-                    console.log("Redirecionando agora...");
-                    window.location.href = "https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735";
-                }, 5000); // Redireciona após 5 segundos
+                document.getElementById('buttons').style.display = 'block';
+                console.log("Exibindo iframe com o jogo...");
             }
         } catch (error) {
             console.error("Erro ao acessar:", error);
@@ -106,10 +103,8 @@ async function registerUser(email, password) {
         console.log("Usuário registrado com sucesso.");
         startTrialTimer(email, trialEnd);
         document.getElementById('timer').style.display = 'block';
-        setTimeout(() => {
-            console.log("Redirecionando agora após registro...");
-            window.location.href = "https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735";
-        }, 5000); // Redireciona após 5 segundos
+        document.getElementById('buttons').style.display = 'block';
+        console.log("Exibindo iframe com o jogo após registro...");
     } catch (error) {
         console.error("Erro ao registrar:", error);
         alert("Erro ao registrar: " + error.message);
