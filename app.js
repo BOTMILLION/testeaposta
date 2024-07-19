@@ -19,32 +19,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Conectar ao WebSocket
-const ws = new WebSocket('wss://telegramheroku-87abbc9dd2f9.herokuapp.com/');
-
-ws.onopen = function() {
-    console.log('Conectado ao servidor WebSocket');
-};
-
-ws.onmessage = function(event) {
-    const messagesDiv = document.getElementById('messages');
-    console.log('Mensagem recebida do WebSocket:', event.data);
-    messagesDiv.innerHTML += `<p>${event.data}</p>`;
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-};
-
-ws.onclose = function() {
-    console.log('Conexão WebSocket encerrada. Tentando reconectar...');
-    setTimeout(() => {
-        ws = new WebSocket('wss://telegramheroku-87abbc9dd2f9.herokuapp.com/');
-    }, 2000);
-};
-
-ws.onerror = function(error) {
-    console.error('Erro no WebSocket:', error);
-};
-
-// Função para lidar com login e cadastro
 document.getElementById('loginButton').addEventListener('click', async function() {
     const userEmail = document.getElementById('userEmail').value;
     const userPassword = document.getElementById('userPassword').value;
@@ -76,10 +50,10 @@ document.getElementById('loginButton').addEventListener('click', async function(
             } else {
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
-                console.log("Redirecionando para o jogo...");
+                console.log("Redirecionando para a nova página...");
                 setTimeout(() => {
                     console.log("Redirecionando agora...");
-                    window.location.href = "https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735";
+                    window.location.href = "https://botmillion.github.io/telm/";
                 }, 5000); // Redireciona após 5 segundos
             }
         } catch (error) {
@@ -134,7 +108,7 @@ async function registerUser(email, password) {
         document.getElementById('timer').style.display = 'block';
         setTimeout(() => {
             console.log("Redirecionando agora após registro...");
-            window.location.href = "https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735";
+            window.location.href = "https://botmillion.github.io/telm/";
         }, 5000); // Redireciona após 5 segundos
     } catch (error) {
         console.error("Erro ao registrar:", error);
