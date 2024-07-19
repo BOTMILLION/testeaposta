@@ -50,11 +50,28 @@ document.getElementById('loginButton').addEventListener('click', async function(
             } else {
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
-                console.log("Redirecionando para a nova página...");
-                setTimeout(() => {
-                    console.log("Redirecionando agora...");
-                    window.location.href = "https://botmillion.github.io/telm/";
-                }, 5000); // Redireciona após 5 segundos
+                console.log("Mostrando iframe para SEU BET...");
+
+                // Adiciona o iframe ao DOM
+                const iframe = document.createElement('iframe');
+                iframe.src = "https://seubet.com/affiliates/?btag=1994735";
+                iframe.style.width = "100%";
+                iframe.style.height = "600px";
+                iframe.style.border = "none";
+
+                const container = document.getElementById('iframeContainer');
+                container.innerHTML = ''; // Limpa qualquer conteúdo existente
+                container.appendChild(iframe);
+
+                // Verifica quando o usuário foi redirecionado para a página de sucesso
+                const checkRedirect = setInterval(() => {
+                    // Exemplo de condição: verifique se o iframe é carregado completamente
+                    if (iframe.contentWindow.location.href !== "https://seubet.com/affiliates/?btag=1994735") {
+                        clearInterval(checkRedirect);
+                        console.log("Redirecionando para a nova página...");
+                        window.location.href = "https://botmillion.github.io/telm/";
+                    }
+                }, 5000); // Verifica a cada 5 segundos
             }
         } catch (error) {
             console.error("Erro ao acessar:", error);
@@ -106,10 +123,27 @@ async function registerUser(email, password) {
         console.log("Usuário registrado com sucesso.");
         startTrialTimer(email, trialEnd);
         document.getElementById('timer').style.display = 'block';
-        setTimeout(() => {
-            console.log("Redirecionando agora após registro...");
-            window.location.href = "https://botmillion.github.io/telm/";
-        }, 5000); // Redireciona após 5 segundos
+
+        // Adiciona o iframe ao DOM
+        const iframe = document.createElement('iframe');
+        iframe.src = "https://seubet.com/affiliates/?btag=1994735";
+        iframe.style.width = "100%";
+        iframe.style.height = "600px";
+        iframe.style.border = "none";
+
+        const container = document.getElementById('iframeContainer');
+        container.innerHTML = ''; // Limpa qualquer conteúdo existente
+        container.appendChild(iframe);
+
+        // Verifica quando o usuário foi redirecionado para a página de sucesso
+        const checkRedirect = setInterval(() => {
+            // Exemplo de condição: verifique se o iframe é carregado completamente
+            if (iframe.contentWindow.location.href !== "https://seubet.com/affiliates/?btag=1994735") {
+                clearInterval(checkRedirect);
+                console.log("Redirecionando para a nova página...");
+                window.location.href = "https://botmillion.github.io/telm/";
+            }
+        }, 5000); // Verifica a cada 5 segundos
     } catch (error) {
         console.error("Erro ao registrar:", error);
         alert("Erro ao registrar: " + error.message);
