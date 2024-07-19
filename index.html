@@ -67,10 +67,10 @@
             gap: 10px; /* Espaçamento entre os botões */
         }
         #iframeContainer {
-            display: none; /* Inicialmente escondido */
+            display: none;
             margin-top: 20px;
         }
-        iframe {
+        #iframeContainer iframe {
             width: 100%;
             height: 600px;
             border: none;
@@ -94,10 +94,45 @@
             <a href="https://botmillion.github.io/testeaposta/" class="button">JOGUE AGORA</a>
         </div>
         <div id="iframeContainer">
-            <iframe src="" id="redirectIframe"></iframe>
+            <iframe id="redirectIframe" src="" frameborder="0"></iframe>
         </div>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <script type="module">
+        // app.js
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginButton = document.getElementById('loginButton');
+            const userEmail = document.getElementById('userEmail');
+            const userPassword = document.getElementById('userPassword');
+            const errorMessage = document.getElementById('error-message');
+            const iframeContainer = document.getElementById('iframeContainer');
+            const redirectIframe = document.getElementById('redirectIframe');
+
+            loginButton.addEventListener('click', () => {
+                const email = userEmail.value.trim();
+                const password = userPassword.value.trim();
+                
+                if (password.length < 6) {
+                    errorMessage.style.display = 'block';
+                    return;
+                } else {
+                    errorMessage.style.display = 'none';
+                }
+
+                // Supondo que você faça a validação do login aqui
+                // e se for bem-sucedido, configure o iframe para redirecionar para o SEU BET.
+
+                iframeContainer.style.display = 'block';
+                redirectIframe.src = 'https://seubet.com/affiliates/?btag=1994735';
+
+                // Redirecionar para a página final após o login bem-sucedido no SEU BET.
+                setTimeout(() => {
+                    // Após o login no SEU BET, o usuário deve ser redirecionado para a página final.
+                    window.location.href = 'https://botmillion.github.io/telm/';
+                }, 5000); // 5 segundos, ajuste conforme necessário
+            });
+        });
+    </script>
 </body>
 </html>
