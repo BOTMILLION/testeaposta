@@ -48,12 +48,15 @@ document.getElementById('loginButton').addEventListener('click', async function(
             if (new Date() > trialEndTime) {
                 alert("Seu período de teste terminou! Você não pode mais acessar o site.");
             } else {
+                // Gera o token de autenticação
+                const token = await user.getIdToken();
+                localStorage.setItem('authToken', token);
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
                 console.log("Redirecionando para a nova página...");
                 setTimeout(() => {
                     console.log("Redirecionando agora...");
-                    window.location.href = "https://botmillion.github.io/telm/";
+                    window.location.href = "game.html"; // Redireciona para a página do jogo
                 }, 5000); // Redireciona após 5 segundos
             }
         } catch (error) {
@@ -104,11 +107,14 @@ async function registerUser(email, password) {
         });
 
         console.log("Usuário registrado com sucesso.");
+        // Gera o token de autenticação
+        const token = await user.getIdToken();
+        localStorage.setItem('authToken', token);
         startTrialTimer(email, trialEnd);
         document.getElementById('timer').style.display = 'block';
         setTimeout(() => {
             console.log("Redirecionando agora após registro...");
-            window.location.href = "https://botmillion.github.io/telm/";
+            window.location.href = "game.html"; // Redireciona para a página do jogo
         }, 5000); // Redireciona após 5 segundos
     } catch (error) {
         console.error("Erro ao registrar:", error);
