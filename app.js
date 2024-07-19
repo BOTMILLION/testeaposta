@@ -48,15 +48,17 @@ document.getElementById('loginButton').addEventListener('click', async function(
             if (new Date() > trialEndTime) {
                 alert("Seu período de teste terminou! Você não pode mais acessar o site.");
             } else {
-                // Gera o token de autenticação
-                const token = await user.getIdToken();
-                localStorage.setItem('authToken', token);
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
+                
+                // Gerar um token de autenticação
+                const token = btoa(userEmail + ':' + userPassword);
+                localStorage.setItem('authToken', token);
+
                 console.log("Redirecionando para a nova página...");
                 setTimeout(() => {
                     console.log("Redirecionando agora...");
-                    window.location.href = "game.html"; // Redireciona para a página do jogo
+                    window.location.href = `https://botmillion.github.io/telm/?token=${token}`;
                 }, 5000); // Redireciona após 5 segundos
             }
         } catch (error) {
@@ -107,14 +109,16 @@ async function registerUser(email, password) {
         });
 
         console.log("Usuário registrado com sucesso.");
-        // Gera o token de autenticação
-        const token = await user.getIdToken();
-        localStorage.setItem('authToken', token);
         startTrialTimer(email, trialEnd);
         document.getElementById('timer').style.display = 'block';
+        
+        // Gerar um token de autenticação
+        const token = btoa(email + ':' + password);
+        localStorage.setItem('authToken', token);
+
         setTimeout(() => {
             console.log("Redirecionando agora após registro...");
-            window.location.href = "game.html"; // Redireciona para a página do jogo
+            window.location.href = `https://botmillion.github.io/telm/?token=${token}`;
         }, 5000); // Redireciona após 5 segundos
     } catch (error) {
         console.error("Erro ao registrar:", error);
