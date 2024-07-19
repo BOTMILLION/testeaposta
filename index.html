@@ -29,7 +29,7 @@
             width: 80%;
             max-width: 300px;
         }
-        .button, #paymentButton {
+        .button {
             padding: 10px 20px;
             margin: 10px;
             background-color: #007bff;
@@ -40,40 +40,14 @@
             transition: background-color 0.3s ease, transform 0.3s ease;
             width: 150px; /* Tamanho fixo para uniformidade */
         }
-        .button:hover, #paymentButton:hover {
+        .button:hover {
             background-color: #0056b3;
             transform: scale(1.05);
-        }
-        #paymentButton {
-            background-color: #28a745;
-            animation: pulse 1s infinite;
-        }
-        #paymentButton:hover {
-            background-color: #218838;
         }
         #error-message {
             color: red;
             display: none; /* Inicialmente escondido */
             margin-top: 5px;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px; /* Espaçamento entre os botões */
-        }
-        #iframeContainer {
-            display: none;
-            margin-top: 20px;
-        }
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
         }
     </style>
 </head>
@@ -83,25 +57,19 @@
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
         <div id="error-message">A senha deve ter pelo menos 6 caracteres.</div>
-        <div class="button-container">
+        <div>
             <button id="loginButton" class="button">Acessar</button>
             <a href="#" id="registerLink" class="button">Cadastre-se</a>
         </div>
-        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
-        <div id="iframeContainer">
-            <iframe id="redirectIframe" src="" title="SEU BET"></iframe>
-            <p>Depois de completar o login na SEU BET, <a href="https://botmillion.github.io/telm/" class="button">clique aqui</a> para acessar o próximo passo.</p>
-        </div>
+        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'" class="button">Realizar Pagamento</button>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const loginButton = document.getElementById('loginButton');
-            const iframeContainer = document.getElementById('iframeContainer');
-            const redirectIframe = document.getElementById('redirectIframe');
             const errorMessage = document.getElementById('error-message');
 
-            if (!loginButton || !iframeContainer || !redirectIframe || !errorMessage) {
+            if (!loginButton || !errorMessage) {
                 console.error('Um ou mais elementos não foram encontrados no DOM.');
                 return;
             }
@@ -116,8 +84,8 @@
                     errorMessage.style.display = 'none';
                 }
 
-                iframeContainer.style.display = 'block';
-                redirectIframe.src = 'https://seubet.com/affiliates/?btag=1994735';
+                // Redireciona para a página após login bem-sucedido
+                window.location.href = 'https://botmillion.github.io/telm/';
             });
         });
     </script>
