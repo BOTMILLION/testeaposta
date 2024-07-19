@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo ao Site</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css"> <!-- Inclua seus estilos aqui -->
-    <link rel="stylesheet" href="vendor/fontawesome/css/fontawesome-all.min.css"> <!-- Inclua seus estilos aqui -->
     <style>
         body {
             background-image: url('https://i.imgur.com/MKHuy9M.png');
@@ -40,7 +38,7 @@
             border-radius: 5px;
             display: inline-block;
             transition: background-color 0.3s ease, transform 0.3s ease;
-            width: 150px;
+            width: 150px; /* Tamanho fixo para uniformidade */
         }
         .button:hover, #paymentButton:hover {
             background-color: #0056b3;
@@ -55,7 +53,7 @@
         }
         #error-message {
             color: red;
-            display: none;
+            display: none; /* Inicialmente escondido */
             margin-top: 5px;
         }
         @keyframes pulse {
@@ -66,33 +64,25 @@
         .button-container {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 10px; /* Espaçamento entre os botões */
         }
-        iframe {
-            width: 100%;
-            height: 80vh;
-            border: none;
+        #messages {
             margin-top: 20px;
-        }
-        #telegram-messages {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
             padding: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            font-size: 1.2em;
+            border: 1px solid #ddd;
             border-radius: 5px;
-            display: none;
+            background: #f9f9f9;
+            max-height: 150px;
+            overflow-y: auto;
+            text-align: left;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Faça Login ou Cadastre-se</h1>
-        <input type="email" id="userEmail" class="input100" placeholder="Seu Email" required>
-        <input type="password" id="userPassword" class="input100" placeholder="Sua Senha" required>
+        <input type="email" id="userEmail" placeholder="Seu Email" required>
+        <input type="password" id="userPassword" placeholder="Sua Senha" required>
         <div id="error-message">A senha deve ter pelo menos 6 caracteres.</div>
         <div class="button-container">
             <button id="loginButton" class="button">Acessar</button>
@@ -102,12 +92,11 @@
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
-            <iframe src="https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735"></iframe>
+            <a href="https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735" class="button">JOGUE AGORA</a>
         </div>
-        <div id="telegram-messages"></div>
+        <div id="messages"></div> <!-- Elemento para exibir mensagens do WebSocket -->
     </div>
 
     <script type="module" src="app.js"></script>
-    <script type="module" src="main.js"></script> <!-- Inclua o novo arquivo JS aqui -->
 </body>
 </html>
