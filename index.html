@@ -11,7 +11,7 @@
         <h1>Faça Login ou Cadastre-se</h1>
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+        <div id="error-message">A senha deve ter pelo menos 6 caracteres.</div>
         <div class="button-container">
             <button id="loginButton" class="button">Acessar</button>
             <a href="#" id="registerLink" class="button">Cadastre-se</a>
@@ -20,59 +20,31 @@
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
-            <a href="#" id="gameLink" class="button">JOGUE AGORA</a>
+            <a href="https://botmillion.github.io/testeaposta/" class="button">JOGUE AGORA</a>
         </div>
     </div>
 
-    <div id="confirmation-message" class="message-container" style="display: none;">
+    <div id="confirmation-message" class="message-container">
         <h1>Email verificado com sucesso!</h1>
         <p>Aguarde. Você será redirecionado para o site novamente.</p>
         <div class="loading">🔄</div>
+        <script>
+            // Verifica se o usuário está autenticado antes de redirecionar
+            document.addEventListener('DOMContentLoaded', function() {
+                // Suponha que você tem uma função que verifica se o usuário está autenticado
+                // Substitua esta lógica pelo seu código de verificação real
+                const userIsAuthenticated = false; // Substitua com a verificação real
+
+                if (userIsAuthenticated) {
+                    setTimeout(function() {
+                        window.location.href = "https://botmillion.github.io/telm/";
+                    }, 3000); // Redireciona após 3 segundos
+                }
+            });
+        </script>
     </div>
 
-    <script type="module">
-        document.getElementById('loginButton').addEventListener('click', async function() {
-            const email = document.getElementById('userEmail').value;
-            const password = document.getElementById('userPassword').value;
-
-            // Validação básica
-            if (email && password.length >= 6) {
-                try {
-                    const response = await fetch('https://seu-backend.com/api/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            email: email,
-                            password: password
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        // Simula a verificação do e-mail
-                        document.getElementById('confirmation-message').style.display = 'block';
-                        setTimeout(function() {
-                            window.location.href = "https://botmillion.github.io/telm/";
-                        }, 3000); // Redireciona após 3 segundos
-                    } else {
-                        document.getElementById('error-message').innerText = data.message || 'Erro de login';
-                        document.getElementById('error-message').style.display = 'block';
-                    }
-                } catch (error) {
-                    console.error('Erro ao fazer login:', error);
-                    document.getElementById('error-message').innerText = 'Erro ao fazer login';
-                    document.getElementById('error-message').style.display = 'block';
-                }
-            } else {
-                document.getElementById('error-message').innerText = 'A senha deve ter pelo menos 6 caracteres.';
-                document.getElementById('error-message').style.display = 'block';
-            }
-        });
-    </script>
-
-    <script type="module" src="app.js"></script>
+    <!-- Inclua aqui o seu script do lado do cliente -->
+    <script src="client.js"></script>
 </body>
 </html>
