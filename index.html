@@ -24,12 +24,11 @@
         </div>
     </div>
 
-    <div id="confirmation-message" class="message-container">
+    <div id="confirmation-message" class="message-container" style="display: none;">
         <h1>Email verificado com sucesso!</h1>
         <p>Aguarde. Você será redirecionado para o site novamente.</p>
         <div class="loading">🔄</div>
         <script>
-            // Lógica para redirecionar após a verificação do e-mail
             document.addEventListener('DOMContentLoaded', function() {
                 const userIsAuthenticated = false; // Substitua com a verificação real
                 if (userIsAuthenticated) {
