@@ -3,16 +3,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerLink = document.getElementById('registerLink');
     const errorMessage = document.getElementById('error-message');
 
-    // Lógica para o botão de login
-    loginButton.addEventListener('click', async () => {
+    loginButton.addEventListener('click', () => {
         const email = document.getElementById('userEmail').value;
         const password = document.getElementById('userPassword').value;
 
         if (password.length < 6) {
-            errorMessage.textContent = 'A senha deve ter pelo menos 6 caracteres.';
             errorMessage.style.display = 'block';
-            return;
+        } else {
+            errorMessage.style.display = 'none';
+            // Adicione a lógica de login aqui
         }
+    });
+
+    registerLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        const email = document.getElementById('userEmail').value;
+        const password = document.getElementById('userPassword').value;
+
+        if (password.length < 6) {
+            errorMessage.style.display = 'block';
+        } else {
+            errorMessage.style.display = 'none';
+            // Adicione a lógica de registro aqui
+        }
+    });
+});
+
 
         try {
             const response = await fetch('/login', {
