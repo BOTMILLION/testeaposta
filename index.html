@@ -21,6 +21,8 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            width: 100%;
+            max-width: 400px;
         }
         .container input {
             display: block;
@@ -29,7 +31,7 @@
             width: 80%;
             max-width: 300px;
         }
-        .button {
+        .button, #paymentButton {
             padding: 10px 20px;
             margin: 10px;
             background-color: #007bff;
@@ -40,14 +42,54 @@
             transition: background-color 0.3s ease, transform 0.3s ease;
             width: 150px; /* Tamanho fixo para uniformidade */
         }
-        .button:hover {
+        .button:hover, #paymentButton:hover {
             background-color: #0056b3;
             transform: scale(1.05);
+        }
+        #paymentButton {
+            background-color: #28a745;
+            animation: pulse 1s infinite;
+        }
+        #paymentButton:hover {
+            background-color: #218838;
         }
         #error-message {
             color: red;
             display: none; /* Inicialmente escondido */
             margin-top: 5px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Espaçamento entre os botões */
+        }
+        .message-container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none; /* Inicialmente escondido */
+        }
+        .message-container h1 {
+            color: #4CAF50;
+        }
+        .message-container p {
+            margin: 10px 0;
+            color: #555;
+        }
+        .loading {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
@@ -57,37 +99,29 @@
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
         <div id="error-message">A senha deve ter pelo menos 6 caracteres.</div>
-        <div>
+        <div class="button-container">
             <button id="loginButton" class="button">Acessar</button>
             <a href="#" id="registerLink" class="button">Cadastre-se</a>
         </div>
-        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'" class="button">Realizar Pagamento</button>
+        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+        <div id="welcome-message"></div>
+        <div id="timer" style="display: none;"></div>
+        <div id="buttons" style="display: none;">
+            <a href="https://botmillion.github.io/testeaposta/" class="button">JOGUE AGORA</a>
+        </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginButton = document.getElementById('loginButton');
-            const errorMessage = document.getElementById('error-message');
+    <div id="confirmation-message" class="message-container">
+        <h1>Email verificado com sucesso!</h1>
+        <p>Aguarde. Você será redirecionado para o site novamente.</p>
+        <div class="loading">🔄</div>
+        <script>
+            setTimeout(function() {
+                window.location.href = "https://afternoon-shelf-67854-a24479d38529.herokuapp.com";
+            }, 3000); // Redireciona após 3 segundos
+        </script>
+    </div>
 
-            if (!loginButton || !errorMessage) {
-                console.error('Um ou mais elementos não foram encontrados no DOM.');
-                return;
-            }
-
-            loginButton.addEventListener('click', () => {
-                const password = document.getElementById('userPassword').value.trim();
-                
-                if (password.length < 6) {
-                    errorMessage.style.display = 'block';
-                    return;
-                } else {
-                    errorMessage.style.display = 'none';
-                }
-
-                // Redireciona para a página após login bem-sucedido
-                window.location.href = 'https://botmillion.github.io/telm/';
-            });
-        });
-    </script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
