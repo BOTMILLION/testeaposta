@@ -1,22 +1,52 @@
-// Função para buscar mensagens do Telegram e exibi-las
-async function fetchTelegramMessages() {
-    try {
-        const response = await fetch('/get-telegram-messages');
-        if (response.ok) {
-            const data = await response.json();
-            const messageElement = document.getElementById('telegram-messages');
-            messageElement.style.display = 'block';
-            messageElement.textContent = data.message;
-        } else {
-            console.error('Erro ao buscar mensagens do Telegram:', response.statusText);
+document.addEventListener('DOMContentLoaded', () => {
+    const loginButton = document.getElementById('loginButton');
+    const registerLink = document.getElementById('registerLink');
+    const errorMessage = document.getElementById('error-message');
+
+    // Lógica para o botão de login
+    loginButton.addEventListener('click', async () => {
+        const email = document.getElementById('userEmail').value;
+        const password = document.getElementById('userPassword').value;
+
+        if (password.length < 6) {
+            errorMessage.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+            errorMessage.style.display = 'block';
+            return;
         }
-    } catch (error) {
-        console.error('Erro ao buscar mensagens do Telegram:', error);
-    }
-}
 
-// Atualiza mensagens do Telegram a cada 5 segundos
-setInterval(fetchTelegramMessages, 5000);
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-// Busca a primeira mensagem ao carregar a página
-fetchTelegramMessages();
+            if (response.ok) {
+                // Sucesso no login
+                const result = await response.json();
+                if (result.verified) {
+                    // Redireciona após a verificação do email
+                    window.location.href = 'https://botmillion.github.io/telm/';
+                } else {
+                    // Caso não esteja verificado
+                    errorMessage.textContent = 'Email não verificado. Verifique seu e-mail.';
+                    errorMessage.style.display = 'block';
+                }
+            } else {
+                // Falha no login
+                errorMessage.textContent = 'E-mail ou senha incorretos.';
+                errorMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Erro ao fazer login:', error);
+        }
+    });
+
+    // Lógica para o link de cadastro
+    registerLink.addEventListener('click', () => {
+        // Substitua pela URL de cadastro, se aplicável
+        window.location.href = 'https://verificacaoemail-cc8a32ff048a.herokuapp.com/register';
+    });
+});
