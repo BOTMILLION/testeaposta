@@ -1,84 +1,87 @@
-// Configuração do Firebase
-import firebase from 'https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js';
-import 'https://www.gstatic.com/firebasejs/9.6.7/firebase-auth.js';
-import 'https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js';
+const express = require('express');
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+const { v4: uuidv4 } = require('uuid');
+const admin = require('firebase-admin');
+const serviceAccount = require('./config/serviceAccountKey.json'); // Substitua pelo caminho correto para o arquivo JSON
 
-// Sua configuração do Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyCKw5ZcJBcTvf1onPtkzgvJqlRAsbUqauk",
-    authDomain: "robo-7937c.firebaseapp.com",
-    projectId: "robo-7937c",
-    storageBucket: "robo-7937c.appspot.com",
-    messagingSenderId: "444396924434",
-    appId: "1:444396924434:web:46b93323f9c22d90ac32cb",
-    measurementId: "G-G4NYL1GXGW"
-};
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://robo-7937c.firebaseio.com' // Substitua pela URL do seu banco de dados Firebase
+});
 
-// Inicialize o Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const firestore = firebase.firestore();
+const db = admin.firestore();
+const auth = admin.auth();
 
-document.getElementById('loginButton').addEventListener('click', async () => {
-    const email = document.getElementById('userEmail').value;
-    const password = document.getElementById('userPassword').value;
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-    try {
-        await auth.signInWithEmailAndPassword(email, password);
-        alert('Login bem-sucedido!');
-        window.location.href = "https://afternoon-shelf-67854-a24479d38529.herokuapp.com"; // Redirecionar após login
-    } catch (error) {
-        alert("Erro ao fazer login: " + error.message);
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
     }
 });
 
-document.getElementById('registerLink').addEventListener('click', async () => {
-    const email = document.getElementById('userEmail').value;
-    const password = document.getElementById('userPassword').value;
-
-    if (password.length < 6) {
-        document.getElementById('error-message').style.display = 'block';
-        return;
-    }
+app.post('/register', async (req, res) => {
+    const { email, password } = req.body;
 
     try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+        const userRecord = await auth.getUserByEmail(email).catch(() => null);
 
-        // Enviar e-mail de verificação
-        await user.sendEmailVerification();
-        console.log("Usuário registrado com sucesso. E-mail de verificação enviado.");
-
-        // Atualiza a mensagem de boas-vindas
-        document.getElementById('welcome-message').textContent = `Bem-vindo, ${email}! Verifique seu e-mail para ativar sua conta.`;
-
-        // Exibir mensagem de confirmação
-        document.getElementById('confirmation-message').style.display = 'block';
-    } catch (error) {
-        console.error("Erro ao registrar:", error);
-        alert("Erro ao registrar: " + error.message);
-    }
-});
-
-function startTrialTimer(userEmail, trialEndTime) {
-    const timerElement = document.getElementById('timer');
-    const updateTimer = () => {
-        const now = new Date();
-        const timeLeft = trialEndTime - now;
-        
-        if (timeLeft <= 0) {
-            timerElement.textContent = "Seu período de teste expirou.";
-            clearInterval(intervalId);
-        } else {
-            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-            
-            timerElement.textContent = `Tempo restante: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        if (userRecord) {
+            return res.status(400).send('E-mail já está em uso.');
         }
-    };
-    
-    updateTimer(); // Atualiza imediatamente
-    const intervalId = setInterval(updateTimer, 1000); // Atualiza a cada segundo
-}
+
+        const newUserRecord = await auth.createUser({
+            email: email,
+            password: password,
+        });
+        const userId = newUserRecord.uid;
+        
+        const verificationToken = uuidv4();
+        await db.collection('users').doc(userId).set({
+            email: email,
+            verificationToken: verificationToken,
+            verified: false
+        });
+
+        const mailOptions = {
+            from: process.env.GMAIL_USER,
+            to: email,
+            subject: 'Verifique seu endereço de email',
+            text: `Olá!\n\nPara completar seu cadastro, por favor, clique no link abaixo para verificar seu e-mail:\n\nhttp://afternoon-shelf-67854-a24479d38529.herokuapp.com/verify?token=${verificationToken}\n\nObrigado por se registrar\n\nAtenciosamente,\n\nEquipe Apostador Prime`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Erro ao enviar e-mail:', error);
+                return res.status(500).send('Erro ao enviar email.');
+            }
+            res.status(200).send('Email de verificação enviado.');
+        });
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+app.get('/verify', async (req, res) => {
+    const { token } = req.query;
+    try {
+        const snapshot = await db.collection('users').where('verificationToken', '==', token).get();
+        if (snapshot.empty) {
+            return res.status(400).send('Token inválido.');
+        }
+        const userId = snapshot.docs[0].id;
+        await db.collection('users').doc(userId).update({ verified: true });
+        res.status(200).sendFile(__dirname + '/confirmation.html');
+    } catch (error) {
+        res.status(400).send('Erro ao verificar email.');
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Servidor rodando na porta 3000');
+});
