@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
 const admin = require('firebase-admin');
-const serviceAccount = require('./config/serviceAccountKey.json'); // Substitua pelo caminho correto para o arquivo JSON
+const path = require('path');
+const serviceAccount = require('./config/serviceAccountKey.json'); // Caminho atualizado para o arquivo JSON
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -52,7 +53,7 @@ app.post('/register', async (req, res) => {
             from: process.env.GMAIL_USER,
             to: email,
             subject: 'Verifique seu endereço de email',
-            text: `Olá!\n\nPara completar seu cadastro, por favor, clique no link abaixo para verificar seu e-mail:\n\nhttps://verificacaoemail-cc8a32ff048a.herokuapp.com//verify?token=${verificationToken}\n\nObrigado por se registrar\n\nAtenciosamente,\n\nEquipe Apostador Prime`
+            text: `Olá!\n\nPara completar seu cadastro, por favor, clique no link abaixo para verificar seu e-mail:\n\nhttps://verificacaoemail-cc8a32ff048a.herokuapp.com/verify?token=${verificationToken}\n\nObrigado por se registrar\n\nAtenciosamente,\n\nEquipe Apostador Prime`
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -76,7 +77,7 @@ app.get('/verify', async (req, res) => {
         }
         const userId = snapshot.docs[0].id;
         await db.collection('users').doc(userId).update({ verified: true });
-        res.status(200).sendFile(__dirname + '/confirmation.html');
+        res.status(200).sendFile(path.join(__dirname, 'confirmation.html')); // Usa path.join para construir o caminho corretamente
     } catch (error) {
         res.status(400).send('Erro ao verificar email.');
     }
