@@ -1,23 +1,22 @@
-// Importando Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.6.11/firebase-auth.js';
+import { getFirestore, setDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js';
 
-// Configuração do Firebase
+// Configurações do Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyCKw5ZcJBcTvf1onPtkzgvJqlRAsbUqauk",
-    authDomain: "robo-7937c.firebaseapp.com",
-    projectId: "robo-7937c",
-    storageBucket: "robo-7937c.appspot.com",
-    messagingSenderId: "444396924434",
-    appId: "1:444396924434:web:46b93323f9c22d90ac32cb"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID",
+    measurementId: "YOUR_MEASUREMENT_ID"
 };
 
-// Inicializa o Firebase
-console.log("Inicializando Firebase...");
+// Inicialize o Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 document.getElementById('loginButton').addEventListener('click', async function() {
     const userEmail = document.getElementById('userEmail').value;
@@ -33,6 +32,12 @@ document.getElementById('loginButton').addEventListener('click', async function(
             const user = userCredential.user;
 
             console.log("Usuário logado:", user.uid);
+
+            // Verifica se o e-mail foi verificado
+            if (!user.emailVerified) {
+                alert("Por favor, verifique seu e-mail antes de acessar o site.");
+                return;
+            }
 
             // Obtém o horário do final do período de teste
             const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -77,17 +82,6 @@ document.getElementById('loginButton').addEventListener('click', async function(
     }
 });
 
-document.getElementById('registerLink').addEventListener('click', function() {
-    const userEmail = document.getElementById('userEmail').value;
-    const userPassword = document.getElementById('userPassword').value;
-
-    if (userEmail && userPassword) {
-        registerUser(userEmail, userPassword);
-    } else {
-        alert("Por favor, preencha todos os campos.");
-    }
-});
-
 async function registerUser(email, password) {
     console.log("Tentando registrar o usuário com email:", email);
 
@@ -101,6 +95,10 @@ async function registerUser(email, password) {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+
+        // Enviar e-mail de verificação
+        await user.sendEmailVerification();
+
         const userName = email.split('@')[0];
         const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
@@ -111,48 +109,39 @@ async function registerUser(email, password) {
             trialEnd: trialEnd
         });
 
-        console.log("Usuário registrado com sucesso.");
-        startTrialTimer(email, trialEnd);
-        document.getElementById('timer').style.display = 'block';
-        
+        console.log("Usuário registrado com sucesso. E-mail de verificação enviado.");
+
         // Atualiza a mensagem de boas-vindas
-        document.getElementById('welcome-message').textContent = `Bem-vindo, ${email}! Seu período de teste começa agora.`;
+        document.getElementById('welcome-message').textContent = `Bem-vindo, ${email}! Verifique seu e-mail para ativar sua conta.`;
 
-        // Gerar um token de autenticação
-        const token = btoa(email + ':' + password);
-        localStorage.setItem('authToken', token);
-
-        setTimeout(() => {
-            console.log("Redirecionando agora após registro...");
-            window.location.href = `https://botmillion.github.io/telm/?token=${token}`;
-        }, 5000); // Redireciona após 5 segundos
+        // Exibir mensagem de confirmação
+        document.getElementById('confirmation-message').style.display = 'block';
+        
     } catch (error) {
         console.error("Erro ao registrar:", error);
         alert("Erro ao registrar: " + error.message);
     }
 }
 
-function startTrialTimer(email, trialEndTime) {
-    console.log("Iniciando cronômetro de teste para:", email);
-    localStorage.setItem('trialEndTime_' + email, trialEndTime.getTime()); // Armazena o tempo de término do teste no localStorage
-
+function startTrialTimer(userEmail, trialEndTime) {
     const timerElement = document.getElementById('timer');
-
-    const interval = setInterval(() => {
-        const now = new Date().getTime();
-        const remainingTime = trialEndTime.getTime() - now;
-
-        if (remainingTime <= 0) {
-            clearInterval(interval);
-            timerElement.textContent = "Seu período de teste terminou!";
-            localStorage.removeItem('trialEndTime_' + email);
-            alert("Seu período de teste terminou! Você não pode mais acessar o site.");
+    const updateTimer = () => {
+        const now = new Date();
+        const timeLeft = trialEndTime - now;
+        
+        if (timeLeft <= 0) {
+            timerElement.textContent = "Seu período de teste expirou.";
+            clearInterval(intervalId);
         } else {
-            const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
             timerElement.textContent = `Tempo restante: ${days}d ${hours}h ${minutes}m ${seconds}s`;
         }
-    }, 1000);
+    };
+    
+    updateTimer(); // Atualiza imediatamente
+    const intervalId = setInterval(updateTimer, 1000); // Atualiza a cada segundo
 }
