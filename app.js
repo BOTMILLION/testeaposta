@@ -52,7 +52,7 @@ app.post('/register', async (req, res) => {
             from: process.env.GMAIL_USER,
             to: email,
             subject: 'Verifique seu endereço de email',
-            text: `Olá!\n\nPara completar seu cadastro, por favor, clique no link abaixo para verificar seu e-mail:\n\nhttp://afternoon-shelf-67854-a24479d38529.herokuapp.com/verify?token=${verificationToken}\n\nObrigado por se registrar\n\nAtenciosamente,\n\nEquipe Apostador Prime`
+            text: `Olá!\n\nPara completar seu cadastro, por favor, clique no link abaixo para verificar seu e-mail:\n\nhttps://verificacaoemail-fe01279c603a.herokuapp.com//verify?token=${verificationToken}\n\nObrigado por se registrar\n\nAtenciosamente,\n\nEquipe Apostador Prime`
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
