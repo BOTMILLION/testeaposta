@@ -50,7 +50,10 @@ document.getElementById('loginButton').addEventListener('click', async function(
             } else {
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
-                
+
+                // Atualiza a mensagem de boas-vindas
+                document.getElementById('welcome-message').textContent = `Bem-vindo de volta, ${userEmail}!`;
+
                 // Gerar um token de autenticação
                 const token = btoa(userEmail + ':' + userPassword);
                 localStorage.setItem('authToken', token);
@@ -112,6 +115,9 @@ async function registerUser(email, password) {
         startTrialTimer(email, trialEnd);
         document.getElementById('timer').style.display = 'block';
         
+        // Atualiza a mensagem de boas-vindas
+        document.getElementById('welcome-message').textContent = `Bem-vindo, ${email}! Seu período de teste começa agora.`;
+
         // Gerar um token de autenticação
         const token = btoa(email + ':' + password);
         localStorage.setItem('authToken', token);
