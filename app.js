@@ -4,11 +4,11 @@ const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
 const admin = require('firebase-admin');
 const path = require('path');
-const serviceAccount = require('./config/serviceAccountKey.json'); // Caminho atualizado para o arquivo JSON
+const serviceAccount = require('./config/serviceAccountKey.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: 'https://robo-7937c.firebaseio.com' // Substitua pela URL do seu banco de dados Firebase
+    databaseURL: 'https://robo-7937c.firebaseio.com'
 });
 
 const db = admin.firestore();
@@ -77,12 +77,12 @@ app.get('/verify', async (req, res) => {
         }
         const userId = snapshot.docs[0].id;
         await db.collection('users').doc(userId).update({ verified: true });
-        res.status(200).sendFile(path.join(__dirname, 'confirmation.html')); // Usa path.join para construir o caminho corretamente
+        res.status(200).sendFile(path.join(__dirname, 'confirmation.html'));
     } catch (error) {
         res.status(400).send('Erro ao verificar email.');
     }
 });
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
