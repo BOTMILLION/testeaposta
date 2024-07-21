@@ -1,12 +1,12 @@
 body {
     background-image: url('https://i.imgur.com/MKHuy9M.png');
     background-size: cover;
-    background-position: center;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
+    font-family: Arial, sans-serif;
 }
 
 .container {
@@ -25,9 +25,6 @@ body {
     padding: 10px;
     width: 80%;
     max-width: 300px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
 }
 
 .button, #paymentButton {
@@ -40,8 +37,8 @@ body {
     display: inline-block;
     transition: background-color 0.3s ease, transform 0.3s ease;
     width: 150px;
-    text-align: center;
-    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
 .button:hover, #paymentButton:hover {
@@ -102,4 +99,16 @@ body {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
     100% { opacity: 1; }
+}
+
+#timer {
+    font-size: 24px;
+    font-weight: bold;
+    color: #d9534f;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: 20px auto;
+    max-width: 200px;
 }
