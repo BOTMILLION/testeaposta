@@ -1,8 +1,10 @@
 // Importando Firebase
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
 // Inicializa o Firebase
 const auth = getAuth();
+const db = getFirestore();
 
 document.getElementById('loginButton').addEventListener('click', async function() {
     const userEmail = document.getElementById('userEmail').value;
@@ -10,7 +12,9 @@ document.getElementById('loginButton').addEventListener('click', async function(
 
     if (userEmail && userPassword) {
         // Adiciona a classe de animação
-        document.getElementById('loginButton').classList.add('button-clicked');
+        const button = document.getElementById('loginButton');
+        button.classList.add('button-clicked');
+        setTimeout(() => button.classList.remove('button-clicked'), 300); // Remove a classe após a animação
 
         try {
             // Tenta fazer login
@@ -19,7 +23,9 @@ document.getElementById('loginButton').addEventListener('click', async function(
             const user = userCredential.user;
 
             // Obtém o período de teste do Firestore
-            const trialEnd = await getTrialEnd(user.uid);
+            const userDoc = doc(db, 'users', user.uid);
+            const userData = (await getDoc(userDoc)).data();
+            const trialEnd = userData.trialEnd.toDate();
 
             // Exibe o cronômetro
             startTimer(trialEnd);
@@ -44,18 +50,21 @@ document.getElementById('registerLink').addEventListener('click', async function
 
     if (userEmail && userPassword) {
         // Adiciona a classe de animação
-        document.getElementById('registerLink').classList.add('button-clicked');
+        const button = document.getElementById('registerLink');
+        button.classList.add('button-clicked');
+        setTimeout(() => button.classList.remove('button-clicked'), 300); // Remove a classe após a animação
 
         try {
             // Tenta registrar o usuário
             const userCredential = await createUserWithEmailAndPassword(auth, userEmail, userPassword);
             console.log("Usuário registrado:", userCredential.user.uid);
+            const user = userCredential.user;
 
-            // Obtém o período de teste do Firestore
-            const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            // Define o período de teste
+            const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 dias a partir de agora
 
             // Armazena os dados do usuário no Firestore
-            await setDoc(doc(db, 'users', userCredential.user.uid), {
+            await setDoc(doc(db, 'users', user.uid), {
                 email: userEmail,
                 name: userEmail.split('@')[0],
                 trialEnd: trialEnd
@@ -98,9 +107,3 @@ function startTimer(trialEnd) {
         }
     }
 }
-
-document.querySelectorAll('.button').forEach(button => {
-    button.addEventListener('transitionend', () => {
-        button.classList.remove('button-clicked');
-    });
-});
