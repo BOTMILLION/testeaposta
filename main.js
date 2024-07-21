@@ -3,66 +3,75 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerLink = document.getElementById('registerLink');
     const errorMessage = document.getElementById('error-message');
 
-    loginButton.addEventListener('click', () => {
+    loginButton.addEventListener('click', async () => {
         const email = document.getElementById('userEmail').value;
         const password = document.getElementById('userPassword').value;
 
         if (password.length < 6) {
+            errorMessage.textContent = 'A senha deve ter pelo menos 6 caracteres.';
             errorMessage.style.display = 'block';
         } else {
             errorMessage.style.display = 'none';
-            // Adicione a lógica de login aqui
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.verified) {
+                        window.location.href = 'https://botmillion.github.io/telm/';
+                    } else {
+                        errorMessage.textContent = 'Email não verificado. Verifique seu e-mail.';
+                        errorMessage.style.display = 'block';
+                    }
+                } else {
+                    errorMessage.textContent = 'E-mail ou senha incorretos.';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
+                errorMessage.textContent = 'Erro ao fazer login. Tente novamente mais tarde.';
+                errorMessage.style.display = 'block';
+            }
         }
     });
 
-    registerLink.addEventListener('click', (event) => {
+    registerLink.addEventListener('click', async (event) => {
         event.preventDefault();
         const email = document.getElementById('userEmail').value;
         const password = document.getElementById('userPassword').value;
 
         if (password.length < 6) {
+            errorMessage.textContent = 'A senha deve ter pelo menos 6 caracteres.';
             errorMessage.style.display = 'block';
         } else {
             errorMessage.style.display = 'none';
-            // Adicione a lógica de registro aqui
-        }
-    });
-});
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
 
-
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            if (response.ok) {
-                // Sucesso no login
-                const result = await response.json();
-                if (result.verified) {
-                    // Redireciona após a verificação do email
-                    window.location.href = 'https://botmillion.github.io/telm/';
+                if (response.ok) {
+                    alert('Cadastro realizado com sucesso! Verifique seu e-mail para confirmar.');
                 } else {
-                    // Caso não esteja verificado
-                    errorMessage.textContent = 'Email não verificado. Verifique seu e-mail.';
+                    const errorText = await response.text();
+                    errorMessage.textContent = errorText;
                     errorMessage.style.display = 'block';
                 }
-            } else {
-                // Falha no login
-                errorMessage.textContent = 'E-mail ou senha incorretos.';
+            } catch (error) {
+                console.error('Erro ao fazer registro:', error);
+                errorMessage.textContent = 'Erro ao fazer registro. Tente novamente mais tarde.';
                 errorMessage.style.display = 'block';
             }
-        } catch (error) {
-            console.error('Erro ao fazer login:', error);
         }
-    });
-
-    // Lógica para o link de cadastro
-    registerLink.addEventListener('click', () => {
-        // Substitua pela URL de cadastro, se aplicável
-        window.location.href = 'https://verificacaoemail-cc8a32ff048a.herokuapp.com/register';
     });
 });
