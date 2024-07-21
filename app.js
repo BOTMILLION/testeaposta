@@ -31,7 +31,7 @@ document.getElementById('loginButton').addEventListener('click', async function(
             // Obtém o horário do final do período de teste
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (!userDoc.exists()) {
-                alert("Usuário não encontrado no Firestore.");
+                console.log("Usuário não encontrado no Firestore.");
                 return;
             }
 
@@ -39,7 +39,7 @@ document.getElementById('loginButton').addEventListener('click', async function(
 
             // Verifica se o período de teste ainda está ativo
             if (new Date() > trialEndTime) {
-                alert("Seu período de teste terminou! Você não pode mais acessar o site.");
+                alert("Seu período de teste terminou!");
             } else {
                 startTrialTimer(userEmail, trialEndTime);
                 document.getElementById('timer').style.display = 'block';
@@ -104,7 +104,7 @@ async function registerUser(email, password) {
 }
 
 function startTrialTimer(email, trialEndTime) {
-    localStorage.setItem('trialEndTime_' + email, trialEndTime.getTime()); // Armazena o tempo de término do teste no localStorage
+    localStorage.setItem('trialEndTime_' + email, trialEndTime.getTime());
 
     const timerElement = document.getElementById('timer');
 
@@ -116,7 +116,7 @@ function startTrialTimer(email, trialEndTime) {
             clearInterval(interval);
             timerElement.textContent = "Seu período de teste terminou!";
             localStorage.removeItem('trialEndTime_' + email);
-            alert("Seu período de teste terminou! Você não pode mais acessar o site.");
+            alert("Seu período de teste terminou!");
         } else {
             const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
             const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
