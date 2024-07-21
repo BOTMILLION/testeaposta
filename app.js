@@ -1,113 +1,128 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
-const { v4: uuidv4 } = require('uuid');
-const admin = require('firebase-admin');
-const path = require('path');
-const serviceAccount = require('./config/serviceAccountKey.json');
+// Importando Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: 'https://robo-7937c.firebaseio.com'
-});
+// Configuração do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCKw5ZcJBcTvf1onPtkzgvJqlRAsbUqauk",
+    authDomain: "robo-7937c.firebaseapp.com",
+    projectId: "robo-7937c",
+    storageBucket: "robo-7937c.appspot.com",
+    messagingSenderId: "444396924434",
+    appId: "1:444396924434:web:46b93323f9c22d90ac32cb"
+};
 
-const db = admin.firestore();
-const auth = admin.auth();
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+document.getElementById('loginButton').addEventListener('click', async function() {
+    const userEmail = document.getElementById('userEmail').value;
+    const userPassword = document.getElementById('userPassword').value;
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS
+    if (userEmail && userPassword) {
+        try {
+            // Tenta fazer login
+            const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
+            const user = userCredential.user;
+
+            // Obtém o horário do final do período de teste
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!userDoc.exists()) {
+                alert("Usuário não encontrado no Firestore.");
+                return;
+            }
+
+            const trialEndTime = userDoc.data().trialEnd.toDate();
+
+            // Verifica se o período de teste ainda está ativo
+            if (new Date() > trialEndTime) {
+                alert("Seu período de teste terminou! Você não pode mais acessar o site.");
+            } else {
+                startTrialTimer(userEmail, trialEndTime);
+                document.getElementById('timer').style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = "https://botmillion.github.io/telm/";
+                }, 5000); // Redireciona após 5 segundos
+            }
+        } catch (error) {
+            console.error("Erro ao acessar:", error);
+            if (error.code === 'auth/user-not-found') {
+                await registerUser(userEmail, userPassword);
+            } else {
+                alert("Erro ao acessar: " + error.message);
+            }
+        }
+    } else {
+        alert("Por favor, preencha todos os campos.");
     }
 });
 
-// Registro de usuário
-app.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+document.getElementById('registerLink').addEventListener('click', function() {
+    const userEmail = document.getElementById('userEmail').value;
+    const userPassword = document.getElementById('userPassword').value;
+
+    if (userEmail && userPassword) {
+        registerUser(userEmail, userPassword);
+    } else {
+        alert("Por favor, preencha todos os campos.");
+    }
+});
+
+async function registerUser(email, password) {
+    if (password.length < 6) {
+        document.getElementById('error-message').style.display = 'block';
+        return;
+    } else {
+        document.getElementById('error-message').style.display = 'none';
+    }
 
     try {
-        const userRecord = await auth.getUserByEmail(email).catch(() => null);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userName = email.split('@')[0];
+        const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-        if (userRecord) {
-            return res.status(400).send('E-mail já está em uso.');
-        }
-
-        const newUserRecord = await auth.createUser({
+        // Armazena os dados do usuário no Firestore
+        await setDoc(doc(db, 'users', user.uid), {
             email: email,
-            password: password,
-        });
-        const userId = newUserRecord.uid;
-
-        const verificationToken = uuidv4();
-        await db.collection('users').doc(userId).set({
-            email: email,
-            verificationToken: verificationToken,
-            verified: false
+            name: userName,
+            trialEnd: trialEnd
         });
 
-        const mailOptions = {
-            from: process.env.GMAIL_USER,
-            to: email,
-            subject: 'Verifique seu endereço de email',
-            text: `Olá!\n\nPara completar seu cadastro, por favor, clique no link abaixo para verificar seu e-mail:\n\nhttp://localhost:3000/verify/${verificationToken}\n\nObrigado!`
-        };
-
-        await transporter.sendMail(mailOptions);
-        res.status(200).send('Cadastro realizado com sucesso! Verifique seu e-mail para confirmar.');
+        startTrialTimer(email, trialEnd);
+        document.getElementById('timer').style.display = 'block';
+        setTimeout(() => {
+            window.location.href = "https://botmillion.github.io/telm/";
+        }, 5000); // Redireciona após 5 segundos
     } catch (error) {
-        console.error('Erro ao registrar usuário:', error);
-        res.status(500).send('Erro ao registrar usuário. Tente novamente mais tarde.');
+        console.error("Erro ao registrar:", error);
+        alert("Erro ao registrar: " + error.message);
     }
-});
+}
 
-// Login de usuário
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+function startTrialTimer(email, trialEndTime) {
+    localStorage.setItem('trialEndTime_' + email, trialEndTime.getTime()); // Armazena o tempo de término do teste no localStorage
 
-    try {
-        const userRecord = await auth.getUserByEmail(email);
-        const token = await auth.createCustomToken(userRecord.uid);
+    const timerElement = document.getElementById('timer');
 
-        // Simulação de autenticação
-        // Aqui você deve verificar a senha e o estado de verificação
-        const userDoc = await db.collection('users').doc(userRecord.uid).get();
-        const userData = userDoc.data();
+    const interval = setInterval(() => {
+        const now = new Date().getTime();
+        const remainingTime = trialEndTime.getTime() - now;
 
-        if (userData && userData.verified) {
-            res.status(200).json({ verified: true, token });
+        if (remainingTime <= 0) {
+            clearInterval(interval);
+            timerElement.textContent = "Seu período de teste terminou!";
+            localStorage.removeItem('trialEndTime_' + email);
+            alert("Seu período de teste terminou! Você não pode mais acessar o site.");
         } else {
-            res.status(400).json({ verified: false });
+            const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+            timerElement.textContent = `Tempo restante: ${days}d ${hours}h ${minutes}m ${seconds}s`;
         }
-    } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        res.status(500).send('Erro ao fazer login. Tente novamente mais tarde.');
-    }
-});
-
-// Verificação de e-mail
-app.get('/verify/:token', async (req, res) => {
-    const { token } = req.params;
-
-    try {
-        const userDoc = await db.collection('users').where('verificationToken', '==', token).get();
-        if (!userDoc.empty) {
-            const userId = userDoc.docs[0].id;
-            await db.collection('users').doc(userId).update({ verified: true });
-            res.redirect('/confirmation.html');
-        } else {
-            res.status(400).send('Token de verificação inválido.');
-        }
-    } catch (error) {
-        console.error('Erro ao verificar e-mail:', error);
-        res.status(500).send('Erro ao verificar e-mail. Tente novamente mais tarde.');
-    }
-});
-
-app.listen(3000, () => {
-    console.log('Servidor iniciado na porta 3000');
-});
+    }, 1000);
+}
