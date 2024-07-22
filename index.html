@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         body, html {
-            width: 1365px;
-            height: 945px;
+            width: 100vw;
+            height: 100vh;
             margin: 0;
             font-family: 'Arial', sans-serif;
             background-color: #fbeefb;
@@ -16,6 +16,10 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            background-image: url('https://i.imgur.com/3oDyemd.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .container {
@@ -111,6 +115,32 @@
 
         .register-link a:hover {
             text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+                height: auto;
+                padding: 10px;
+            }
+
+            input[type="email"],
+            input[type="password"],
+            .button,
+            #paymentButton {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            .register-link {
+                font-size: 12px;
+                bottom: 10px;
+            }
         }
     </style>
 </head>
