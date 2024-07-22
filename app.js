@@ -40,21 +40,20 @@ function switchToLogin() {
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('#loginLink')?.addEventListener('click', function(e) {
         e.preventDefault();
-        switchToRegister();
+        switchToLogin();
     });
 
     document.querySelector('#registerLink')?.addEventListener('click', function(e) {
         e.preventDefault();
-        switchToLogin();
+        switchToRegister();
     });
 
-    // Evento para login
     document.querySelector('#loginButton')?.addEventListener('click', async function() {
-        const userEmail = document.querySelector('#userEmail').value;
-        const userPassword = document.querySelector('#userPassword').value;
+        const userEmail = document.querySelector('#loginEmail').value;
+        const userPassword = document.querySelector('#loginPassword').value;
 
         if (userPassword.length < 6) {
-            document.querySelector('#error-message').style.display = 'block';
+            document.querySelector('#loginError').style.display = 'block';
             return;
         }
 
@@ -68,14 +67,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Evento para cadastro
     document.querySelector('#registerButton')?.addEventListener('click', async function() {
-        const userName = document.querySelector('#userName').value;
-        const userEmail = document.querySelector('#userEmail').value;
-        const userPassword = document.querySelector('#userPassword').value;
+        const userName = document.querySelector('#registerName').value;
+        const userEmail = document.querySelector('#registerEmail').value;
+        const userPassword = document.querySelector('#registerPassword').value;
 
         if (userPassword.length < 6) {
-            document.querySelector('#error-message').style.display = 'block';
+            document.querySelector('#registerError').style.display = 'block';
             return;
         }
 
