@@ -19,7 +19,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 80vh; /* Ajuste para ter espaço em cima e embaixo */
+            height: 80vh;
             width: 90%;
             max-width: 390px;
             padding: 20px;
@@ -27,7 +27,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             box-sizing: border-box;
-            position: relative; /* Para posicionar o botão em relação ao container */
+            position: relative;
         }
 
         h1 {
@@ -45,7 +45,6 @@
             font-size: 16px;
         }
         .custom-button {
-            position: relative;
             background: linear-gradient(45deg, #d81b60, #c2185b);
             border: none;
             color: white;
@@ -56,7 +55,7 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-top: 20px; /* Espaço para o texto embaixo do botão */
+            margin-top: 20px;
         }
 
         .custom-button::before {
@@ -136,7 +135,7 @@
             <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
             <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
-            <span class="info-text">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
+            <span class="info-text"><span id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span></span>
         </div>
 
         <!-- Formulário de Cadastro -->
@@ -147,7 +146,7 @@
             <input type="password" id="userPassword" placeholder="Sua Senha" required>
             <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
-            <span class="info-text">Já tem uma conta? <a href="#" id="loginLink">Login</a></span>
+            <span class="info-text"><span id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></span></span>
         </div>
 
         <div id="welcome-message"></div>
