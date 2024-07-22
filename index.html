@@ -1,36 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo ao Site</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #fbeefb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #d81b60;
+            margin-bottom: 20px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #d81b60;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #c2185b;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Faça Login ou Cadastre-se</h1>
-        <input type="email" id="userEmail" placeholder="Seu Email" required>
-        <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-        <div class="button-container">
-            <button id="loginButton" class="button">Acessar</button>
-            <a href="#" id="registerLink" class="button">Cadastre-se</a>
-        </div>
-        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
-        <div id="welcome-message"></div>
-        <div id="timer" style="display: none;"></div>
-        <div id="buttons" style="display: none;">
-            <a href="https://botmillion.github.io/testeaposta/" class="button">JOGUE AGORA</a>
-        </div>
+        <h1>Login</h1>
+        <form>
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+        </form>
     </div>
-
-    <div id="confirmation-message" class="message-container" style="display: none;">
-        <h1>Email verificado com sucesso!</h1>
-        <p>Aguarde. Você será redirecionado para o site novamente.</p>
-        <div class="loading">🔄</div>
-    </div>
-
-    <!-- Atualizar a inclusão do script para tipo módulo -->
-    <script type="module" src="app.js"></script>
 </body>
 </html>
