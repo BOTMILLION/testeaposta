@@ -28,6 +28,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             box-sizing: border-box;
+            position: relative; /* Para posicionar o botão em relação ao container */
         }
 
         h1 {
@@ -57,7 +58,7 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-top: 20px; /* Espaço para o texto embaixo do botão */
+            margin-top: 20px;
         }
 
         .custom-button::before {
@@ -90,6 +91,15 @@
             margin-top: 20px;
             font-size: 14px;
             color: #666;
+        }
+
+        .info-text a {
+            color: #d81b60;
+            text-decoration: none;
+        }
+
+        .info-text a:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 600px) {
@@ -131,8 +141,8 @@
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
         <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
         <button class="custom-button" id="loginButton">LOGIN</button>
-        <span class="info-text">Não tem uma conta? Cadastre-se</span>
         <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+        <span class="info-text">Não tem uma conta? <a href="pagina-de-cadastro.html">Cadastre-se</a></span>
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
