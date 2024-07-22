@@ -4,33 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo ao Site</title>
-    <link rel="stylesheet" href="styles.css">
-    <script type="module" src="app.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 80vh; /* Ajuste para ter espaço em cima e embaixo */
+            width: 90%;
+            max-width: 390px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-sizing: border-box;
+            position: relative; /* Para posicionar o botão em relação ao container */
+        }
+
+        h1 {
+            color: #d81b60;
+            margin-bottom: 20px;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .custom-button {
+            position: relative;
+            background: linear-gradient(45deg, #d81b60, #c2185b);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 20px; /* Espaço para o texto embaixo do botão */
+        }
+
+        .custom-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+        .custom-button:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .custom-button:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+        .custom-button:active {
+            transform: rotateX(10deg) rotateY(10deg);
+        }
+        .info-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-text a {
+            color: #d81b60;
+            text-decoration: none;
+        }
+
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .custom-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+        /* Animação pulsante */
+        @keyframes pulsar {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+        }
+        .pulse-button {
+            animation: pulsar 1.5s infinite;
+        }
+    </style>
 </head>
 <body>
-    <div id="loginContainer" class="container">
+    <div class="container">
         <h1>Faça Login</h1>
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
         <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-        <button id="loginButton" class="button">LOGIN</button>
-        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">REALIZAR PAGAMENTO</button>
-        <div id="cadastro-link">
-            <span>Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
+        <button class="custom-button" id="loginButton">LOGIN</button>
+        <span class="info-text">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
+        <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+        <div id="welcome-message"></div>
+        <div id="timer" style="display: none;"></div>
+        <div id="buttons" style="display: none;">
+            <a href="https://botmillion.github.io/testeaposta/" class="custom-button">JOGUE AGORA</a>
         </div>
     </div>
-
-    <div id="registerContainer" class="container" style="display: none;">
-        <h1>Cadastro</h1>
-        <input type="text" id="userName" placeholder="Seu Nome" required>
-        <input type="email" id="userEmail" placeholder="Seu Email" required>
-        <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-        <button id="registerButton" class="button">CADASTRAR</button>
-        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">REALIZAR PAGAMENTO</button>
-        <div id="cadastro-link">
-            <span>Já tem uma conta? <a href="#" id="loginLink">Login</a></span>
-        </div>
+    <div id="confirmation-message" class="message-container" style="display: none;">
+        <h1>Email verificado com sucesso!</h1>
+        <p>Aguarde. Você será redirecionado para o site novamente.</p>
+        <div class="loading">🔄</div>
     </div>
+    <script src="app.js" type="module"></script>
 </body>
 </html>
