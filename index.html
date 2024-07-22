@@ -3,176 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo ao Site</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Botão Personalizado</title>
     <style>
-        body, html {
-            width: 100vw;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #fbeefb;
+        body {
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            background-image: url('https://i.imgur.com/3oDyemd.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
         }
 
         .container {
-            width: 390px;
-            height: 650px;
-            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 80vh; /* Ajuste para ter espaço em cima e embaixo */
+            width: 90%;
+            max-width: 390px;
             padding: 20px;
+            background-color: #ffffff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             box-sizing: border-box;
+        }
+
+        .custom-button {
             position: relative;
-        }
-
-        h1 {
-            color: #d81b60;
-            margin-bottom: 20px;
-        }
-
-        input[type="email"],
-        input[type="password"],
-        .button {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .button {
-            background-color: #d81b60;
-            color: white;
+            background: linear-gradient(45deg, #d81b60, #c2185b);
             border: none;
-            cursor: pointer;
-        }
-
-        .button:hover {
-            background-color: #c2185b;
-        }
-
-        .button-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        #paymentButton {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            background-color: #d81b60;
             color: white;
-            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
             cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 20px; /* Espaço para o texto embaixo do botão */
         }
 
-        #paymentButton:hover {
-            background-color: #c2185b;
-        }
-
-        .message-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .loading {
-            font-size: 24px;
-            margin-top: 20px;
-        }
-
-        .register-link {
+        .custom-button::before {
+            content: '';
             position: absolute;
-            bottom: 20px;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+
+        .custom-button:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .custom-button:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .custom-button:active {
+            transform: rotateX(10deg) rotateY(10deg);
+        }
+
+        .info-text {
+            margin-top: 20px;
             font-size: 14px;
-            color: #d81b60;
-        }
-
-        .register-link a {
-            color: #d81b60;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
+            color: #666;
         }
 
         @media (max-width: 600px) {
             .container {
-                width: 90%;
-                height: 70%; /* Ajusta a altura para ter espaçamento em cima e embaixo */
-                max-width: 400px; /* Limita a largura máxima para não ficar muito largo */
-                margin: auto;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                background: white;
-            }
-
-            input[type="email"],
-            input[type="password"],
-            .button,
-            #paymentButton {
-                font-size: 14px;
+                width: 95%;
                 padding: 10px;
             }
-
-            h1 {
-                font-size: 24px;
-                margin-bottom: 15px;
-            }
-
-            .register-link {
-                font-size: 12px;
-                bottom: 10px;
+            .custom-button {
+                padding: 10px 20px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Faça Login</h1>
-        <input type="email" id="userEmail" placeholder="Seu Email" required>
-        <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-        <div class="button-container">
-            <button id="loginButton" class="button">LOGIN</button>
-        </div>
-        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
-        <div id="welcome-message"></div>
-        <div id="timer" style="display: none;"></div>
-        <div id="buttons" style="display: none;">
-            <a href="https://botmillion.github.io/testeaposta/" class="button">JOGUE AGORA</a>
-        </div>
-        <span class="register-link">Não tem uma conta? <a href="#">Cadastre-se</a></span>
+        <button class="custom-button">LOGIN</button>
+        <span class="info-text">Não tem uma conta? Cadastre-se</span>
     </div>
-    <div id="confirmation-message" class="message-container" style="display: none;">
-        <h1>Email verificado com sucesso!</h1>
-        <p>Aguarde. Você será redirecionado para o site novamente.</p>
-        <div class="loading">🔄</div>
-    </div>
-
-    <script src="main.js"></script>
-    <script type="module" src="app.js"></script>
 </body>
 </html>
