@@ -20,84 +20,73 @@ const auth = getAuth(app);
 
 // Alterna entre login e registro
 function switchToRegister() {
-    document.getElementById('loginContainer').style.display = 'none';
-    document.getElementById('registerContainer').style.display = 'block';
+    document.querySelector('.container').innerHTML = `
+        <h1>Cadastro</h1>
+        <input type="text" id="userName" placeholder="Seu Nome" required>
+        <input type="email" id="userEmail" placeholder="Seu Email" required>
+        <input type="password" id="userPassword" placeholder="Sua Senha" required>
+        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+        <button class="custom-button" id="registerButton">CADASTRAR</button>
+        <span class="info-text">Já tem uma conta? <a href="#" id="loginLink">Login</a></span>
+    `;
 }
 
 function switchToLogin() {
-    document.getElementById('loginContainer').style.display = 'block';
-    document.getElementById('registerContainer').style.display = 'none';
+    document.querySelector('.container').innerHTML = `
+        <h1>Faça Login</h1>
+        <input type="email" id="userEmail" placeholder="Seu Email" required>
+        <input type="password" id="userPassword" placeholder="Sua Senha" required>
+        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+        <button class="custom-button" id="loginButton">LOGIN</button>
+        <span class="info-text">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
+        <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+    `;
 }
 
-document.getElementById('loginButton').addEventListener('click', async function() {
-    const userEmail = document.getElementById('userEmail').value;
-    const userPassword = document.getElementById('userPassword').value;
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('#loginLink')?.addEventListener('click', function() {
+        switchToRegister();
+    });
 
-    if (userEmail && userPassword) {
-        try {
-            // Tenta fazer login
-            const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
-            const user = userCredential.user;
+    document.querySelector('#registerLink')?.addEventListener('click', function() {
+        switchToLogin();
+    });
 
-            // Redireciona após o login
-            setTimeout(() => {
-                window.location.href = "https://botmillion.github.io/telm/";
-            }, 5000); // Redireciona após 5 segundos
-        } catch (error) {
-            console.error("Erro ao acessar:", error);
-            alert("Erro ao acessar: " + error.message);
-            if (error.code === 'auth/user-not-found') {
-                switchToRegister();
-            }
-        }
-    } else {
-        alert("Por favor, preencha todos os campos.");
-    }
-});
+    document.querySelector('#loginButton')?.addEventListener('click', async function() {
+        const userEmail = document.querySelector('#userEmail').value;
+        const userPassword = document.querySelector('#userPassword').value;
 
-document.getElementById('registerLink').addEventListener('click', function() {
-    switchToRegister();
-});
-
-document.getElementById('registerButton').addEventListener('click', async function() {
-    const userName = document.getElementById('userName').value;
-    const userEmail = document.getElementById('userEmail').value;
-    const userPassword = document.getElementById('userPassword').value;
-
-    if (userEmail && userPassword) {
         if (userPassword.length < 6) {
-            document.getElementById('error-message').style.display = 'block';
+            document.querySelector('#error-message').style.display = 'block';
             return;
-        } else {
-            document.getElementById('error-message').style.display = 'none';
         }
 
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, userEmail, userPassword);
-            const user = userCredential.user;
-            const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-            // Armazena os dados do usuário no Firestore
-            await setDoc(doc(db, 'users', user.uid), {
-                email: userEmail,
-                name: userName,
-                trialEnd: trialEnd
-            });
-
-            // Redireciona após o registro
-            setTimeout(() => {
-                window.location.href = "https://botmillion.github.io/telm/";
-            }, 5000); // Redireciona após 5 segundos
+            await signInWithEmailAndPassword(auth, userEmail, userPassword);
+            document.querySelector('#welcome-message').textContent = 'Bem-vindo(a)!';
+            document.querySelector('#timer').style.display = 'block';
+            document.querySelector('#buttons').style.display = 'block';
         } catch (error) {
-            console.error("Erro ao registrar:", error);
-            alert("Erro ao registrar: " + error.message);
+            console.error(error.message);
         }
-    } else {
-        alert("Por favor, preencha todos os campos.");
-    }
-});
+    });
 
-// Adiciona evento para voltar para o login a partir do registro
-document.getElementById('loginLink').addEventListener('click', function() {
-    switchToLogin();
+    document.querySelector('#registerButton')?.addEventListener('click', async function() {
+        const userName = document.querySelector('#userName').value;
+        const userEmail = document.querySelector('#userEmail').value;
+        const userPassword = document.querySelector('#userPassword').value;
+
+        if (userPassword.length < 6) {
+            document.querySelector('#error-message').style.display = 'block';
+            return;
+        }
+
+        try {
+            await createUserWithEmailAndPassword(auth, userEmail, userPassword);
+            await setDoc(doc(db, 'users', userEmail), { name: userName });
+            switchToLogin();
+        } catch (error) {
+            console.error(error.message);
+        }
+    });
 });
