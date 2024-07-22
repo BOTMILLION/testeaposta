@@ -18,37 +18,27 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Alterna entre login e registro
+// Alterna para o formulário de cadastro
 function switchToRegister() {
-    document.querySelector('.container').innerHTML = `
-        <h1>Cadastro</h1>
-        <input type="text" id="userName" placeholder="Seu Nome" required>
-        <input type="email" id="userEmail" placeholder="Seu Email" required>
-        <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-        <button class="custom-button" id="registerButton">CADASTRAR</button>
-        <span class="info-text">Já tem uma conta? <a href="#" id="loginLink">Login</a></span>
-    `;
+    document.querySelector('#loginForm').style.display = 'none';
+    document.querySelector('#registerForm').style.display = 'block';
 }
 
+// Alterna para o formulário de login
 function switchToLogin() {
-    document.querySelector('.container').innerHTML = `
-        <h1>Faça Login</h1>
-        <input type="email" id="userEmail" placeholder="Seu Email" required>
-        <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-        <button class="custom-button" id="loginButton">LOGIN</button>
-        <span class="info-text">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
-        <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
-    `;
+    document.querySelector('#registerForm').style.display = 'none';
+    document.querySelector('#loginForm').style.display = 'block';
 }
 
+// Event listeners para alternar entre login e cadastro
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelector('#loginLink')?.addEventListener('click', function() {
+    document.querySelector('#loginLink')?.addEventListener('click', function(e) {
+        e.preventDefault();
         switchToRegister();
     });
 
-    document.querySelector('#registerLink')?.addEventListener('click', function() {
+    document.querySelector('#registerLink')?.addEventListener('click', function(e) {
+        e.preventDefault();
         switchToLogin();
     });
 
