@@ -22,12 +22,18 @@ const auth = getAuth(app);
 function switchToRegister() {
     document.querySelector('#loginForm').style.display = 'none';
     document.querySelector('#registerForm').style.display = 'block';
+    document.querySelector('#paymentButton').style.display = 'none';
+    document.querySelector('#loginToggleText').style.display = 'none';
+    document.querySelector('#registerToggleText').style.display = 'block';
 }
 
 // Alterna para o formulário de login
 function switchToLogin() {
     document.querySelector('#registerForm').style.display = 'none';
     document.querySelector('#loginForm').style.display = 'block';
+    document.querySelector('#paymentButton').style.display = 'block';
+    document.querySelector('#registerToggleText').style.display = 'none';
+    document.querySelector('#loginToggleText').style.display = 'block';
 }
 
 // Event listeners para alternar entre login e cadastro
@@ -42,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         switchToLogin();
     });
 
+    // Evento para login
     document.querySelector('#loginButton')?.addEventListener('click', async function() {
         const userEmail = document.querySelector('#userEmail').value;
         const userPassword = document.querySelector('#userPassword').value;
@@ -61,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Evento para cadastro
     document.querySelector('#registerButton')?.addEventListener('click', async function() {
         const userName = document.querySelector('#userName').value;
         const userEmail = document.querySelector('#userEmail').value;
