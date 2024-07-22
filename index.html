@@ -28,6 +28,7 @@
             justify-content: center;
             align-items: center;
             box-sizing: border-box;
+            position: relative;
         }
 
         h1 {
@@ -60,7 +61,7 @@
         .button-container {
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
         }
 
         #paymentButton {
@@ -92,17 +93,33 @@
             font-size: 24px;
             margin-top: 20px;
         }
+
+        .register-link {
+            position: absolute;
+            bottom: 20px;
+            font-size: 14px;
+            color: #d81b60;
+        }
+
+        .register-link a {
+            color: #d81b60;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Faça Login ou Cadastre-se</h1>
+        <h1>Faça Login</h1>
         <input type="email" id="userEmail" placeholder="Seu Email" required>
         <input type="password" id="userPassword" placeholder="Sua Senha" required>
         <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
         <div class="button-container">
-            <button id="loginButton" class="button">Acessar</button>
-            <a href="#" id="registerLink" class="button">Cadastre-se</a>
+            <button id="loginButton" class="button">LOGIN</button>
         </div>
         <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
         <div id="welcome-message"></div>
@@ -110,6 +127,7 @@
         <div id="buttons" style="display: none;">
             <a href="https://botmillion.github.io/testeaposta/" class="button">JOGUE AGORA</a>
         </div>
+        <span class="register-link">Não tem uma conta? <a href="#">Cadastre-se</a></span>
     </div>
     <div id="confirmation-message" class="message-container" style="display: none;">
         <h1>Email verificado com sucesso!</h1>
