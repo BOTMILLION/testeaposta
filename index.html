@@ -3,48 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <title>Chat Telegram</title>
+    <title>Bem-vindo ao Site</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         body, html {
             height: 100%;
             margin: 0;
             font-family: 'Arial', sans-serif;
             background-color: #fbeefb;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            background-image: url('https://i.ibb.co/Mk5kV1N/Texto-do-seu-par-grafo-2.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-        }
-        #message {
-            border: 1px solid #ccc;
-            padding: 5px;
-            background-color: rgba(255, 255, 255, 0.8);
-            box-sizing: border-box;
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            margin: 0;
-            z-index: 1;
-            position: relative;
-            height: 10vh;
-            font-size: 16px;
-            overflow-y: auto;
         }
-        .form-container {
+
+        .container {
             width: 390px;
             height: 650px;
             background: white;
@@ -55,15 +27,17 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin: auto;
+            box-sizing: border-box;
         }
+
         h1 {
             color: #d81b60;
             margin-bottom: 20px;
         }
+
         input[type="email"],
         input[type="password"],
-        button {
+        .button {
             width: 100%;
             padding: 15px;
             margin: 10px 0;
@@ -71,109 +45,79 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        button {
+
+        .button {
             background-color: #d81b60;
             color: white;
             border: none;
             cursor: pointer;
         }
-        button:hover {
+
+        .button:hover {
             background-color: #c2185b;
         }
-        iframe {
+
+        .button-container {
             width: 100%;
-            max-width: 400px;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            border: none;
-            box-sizing: border-box;
-            overflow: auto;
-            display: block;
-            height: calc(100vh - 10vh);
+            display: flex;
+            justify-content: space-between;
         }
-        @media (max-width: 600px) {
-            #message {
-                height: 15vh;
-                font-size: 14px;
-            }
-            iframe {
-                height: calc(100vh - 15vh);
-            }
+
+        #paymentButton {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #d81b60;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #paymentButton:hover {
+            background-color: #c2185b;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .loading {
+            font-size: 24px;
+            margin-top: 20px;
         }
     </style>
-    <script>
-        function ajustarAlturaIframe() {
-            const iframe = document.querySelector('iframe');
-            const messageHeight = document.getElementById('message').offsetHeight;
-            iframe.style.height = `calc(100vh - ${messageHeight}px)`;
-        }
-
-        function adicionarParametroUnico() {
-            const urlAtual = window.location.href.split('?')[0];
-            const timestamp = new Date().getTime();
-            const novoUrl = `${urlAtual}?v=${timestamp}`;
-            window.history.replaceState(null, '', novoUrl);
-        }
-
-        function conectarWebSocket() {
-            const ws = new WebSocket('wss://telegramheroku-87abbc9dd2f9.herokuapp.com/');
-
-            ws.onopen = function() {
-                console.log('Conectado ao servidor WebSocket');
-            };
-
-            ws.onmessage = function(event) {
-                const messageP = document.getElementById('message');
-                if (event.data instanceof Blob) {
-                    const reader = new FileReader();
-                    reader.onload = function() {
-                        const message = reader.result;
-                        if (message !== 'ping') {
-                            messageP.textContent = message;
-                            messageP.scrollTop = messageP.scrollHeight;
-                        }
-                    };
-                    reader.readAsText(event.data);
-                } else {
-                    if (event.data !== 'ping') {
-                        messageP.textContent = event.data;
-                        messageP.scrollTop = messageP.scrollHeight;
-                    }
-                }
-            };
-
-            ws.onclose = function() {
-                console.log('Conexão WebSocket encerrada. Tentando reconectar...');
-                setTimeout(conectarWebSocket, 2000);
-            };
-
-            ws.onerror = function(error) {
-                console.error('Erro no WebSocket:', error);
-            };
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            adicionarParametroUnico();
-            conectarWebSocket();
-            ajustarAlturaIframe();
-            window.addEventListener('resize', ajustarAlturaIframe);
-        });
-    </script>
 </head>
 <body>
     <div class="container">
-        <div class="form-container">
-            <h1>Login</h1>
-            <form>
-                <input type="email" placeholder="Email" required>
-                <input type="password" placeholder="Senha" required>
-                <button type="submit">Entrar</button>
-            </form>
+        <h1>Faça Login ou Cadastre-se</h1>
+        <input type="email" id="userEmail" placeholder="Seu Email" required>
+        <input type="password" id="userPassword" placeholder="Sua Senha" required>
+        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+        <div class="button-container">
+            <button id="loginButton" class="button">Acessar</button>
+            <a href="#" id="registerLink" class="button">Cadastre-se</a>
         </div>
-        <p id="message">Aguardando mensagens...</p>
-        <iframe src="https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735" title="Cassino ao Vivo"></iframe>
+        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+        <div id="welcome-message"></div>
+        <div id="timer" style="display: none;"></div>
+        <div id="buttons" style="display: none;">
+            <a href="https://botmillion.github.io/testeaposta/" class="button">JOGUE AGORA</a>
+        </div>
     </div>
+    <div id="confirmation-message" class="message-container" style="display: none;">
+        <h1>Email verificado com sucesso!</h1>
+        <p>Aguarde. Você será redirecionado para o site novamente.</p>
+        <div class="loading">🔄</div>
+    </div>
+
+    <script src="main.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
