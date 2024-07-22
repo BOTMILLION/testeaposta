@@ -102,6 +102,26 @@
                 font-size: 14px;
             }
         }
+
+        /* Animação pulsante */
+        @keyframes pulsar {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .pulse-button {
+            animation: pulsar 1.5s infinite;
+        }
     </style>
 </head>
 <body>
@@ -112,7 +132,7 @@
         <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
         <button class="custom-button" id="loginButton">LOGIN</button>
         <span class="info-text">Não tem uma conta? Cadastre-se</span>
-        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+        <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
