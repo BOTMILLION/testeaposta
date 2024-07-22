@@ -35,7 +35,8 @@
             margin-bottom: 20px;
         }
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="text"] {
             width: 100%;
             padding: 15px;
             margin: 10px 0;
@@ -127,13 +128,28 @@
 </head>
 <body>
     <div class="container">
-        <h1>Faça Login</h1>
-        <input type="email" id="userEmail" placeholder="Seu Email" required>
-        <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-        <button class="custom-button" id="loginButton">LOGIN</button>
-        <span class="info-text">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
-        <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+        <!-- Formulário de Login -->
+        <div id="loginForm">
+            <h1>Faça Login</h1>
+            <input type="email" id="userEmail" placeholder="Seu Email" required>
+            <input type="password" id="userPassword" placeholder="Sua Senha" required>
+            <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+            <button class="custom-button" id="loginButton">LOGIN</button>
+            <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+            <span class="info-text">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
+        </div>
+
+        <!-- Formulário de Cadastro -->
+        <div id="registerForm" style="display: none;">
+            <h1>Cadastro</h1>
+            <input type="text" id="userName" placeholder="Seu Nome" required>
+            <input type="email" id="userEmail" placeholder="Seu Email" required>
+            <input type="password" id="userPassword" placeholder="Sua Senha" required>
+            <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+            <button class="custom-button" id="registerButton">CADASTRAR</button>
+            <span class="info-text">Já tem uma conta? <a href="#" id="loginLink">Login</a></span>
+        </div>
+
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
