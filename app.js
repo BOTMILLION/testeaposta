@@ -1,87 +1,41 @@
-// Importando Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao Site</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js" defer></script>
+</head>
+<body>
+    <div id="loginContainer" class="container">
+        <h1>Faça Login</h1>
+        <input type="email" id="userEmail" placeholder="Seu Email" required>
+        <input type="password" id="userPassword" placeholder="Sua Senha" required>
+        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+        <button id="loginButton" class="button">LOGIN</button>
+        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">REALIZAR PAGAMENTO</button>
+        <div id="welcome-message"></div>
+        <div id="timer" style="display: none;"></div>
+        <div id="buttons" style="display: none;">
+            <a href="https://botmillion.github.io/testeaposta/" class="button">JOGUE AGORA</a>
+        </div>
+        <div id="cadastro-link">
+            <span>Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
+        </div>
+    </div>
 
-// Configuração do Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyCKw5ZcJBcTvf1onPtkzgvJqlRAsbUqauk",
-    authDomain: "robo-7937c.firebaseapp.com",
-    projectId: "robo-7937c",
-    storageBucket: "robo-7937c.appspot.com",
-    messagingSenderId: "444396924434",
-    appId: "1:444396924434:web:46b93323f9c22d90ac32cb"
-};
-
-// Inicializa o Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-document.getElementById('loginButton').addEventListener('click', async function() {
-    const userEmail = document.getElementById('userEmail').value;
-    const userPassword = document.getElementById('userPassword').value;
-
-    if (userEmail && userPassword) {
-        try {
-            // Tenta fazer login
-            const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
-            const user = userCredential.user;
-
-            // Redireciona após o login
-            setTimeout(() => {
-                window.location.href = "https://botmillion.github.io/telm/";
-            }, 5000); // Redireciona após 5 segundos
-        } catch (error) {
-            console.error("Erro ao acessar:", error);
-            alert("Erro ao acessar: " + error.message);
-            if (error.code === 'auth/user-not-found') {
-                await registerUser(userEmail, userPassword);
-            }
-        }
-    } else {
-        alert("Por favor, preencha todos os campos.");
-    }
-});
-
-document.getElementById('registerLink').addEventListener('click', function() {
-    const userEmail = document.getElementById('userEmail').value;
-    const userPassword = document.getElementById('userPassword').value;
-
-    if (userEmail && userPassword) {
-        registerUser(userEmail, userPassword);
-    } else {
-        alert("Por favor, preencha todos os campos.");
-    }
-});
-
-async function registerUser(email, password) {
-    if (password.length < 6) {
-        document.getElementById('error-message').style.display = 'block';
-        return;
-    } else {
-        document.getElementById('error-message').style.display = 'none';
-    }
-
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        const userName = email.split('@')[0];
-        const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-        // Armazena os dados do usuário no Firestore
-        await setDoc(doc(db, 'users', user.uid), {
-            email: email,
-            name: userName,
-            trialEnd: trialEnd
-        });
-
-        // Redireciona após o registro
-        setTimeout(() => {
-            window.location.href = "https://botmillion.github.io/telm/";
-        }, 5000); // Redireciona após 5 segundos
-    } catch (error) {
-        console.error("Erro ao registrar:", error);
-        alert("Erro ao registrar: " + error.message);
-    }
-}
+    <div id="registerContainer" class="container" style="display: none;">
+        <h1>Cadastro</h1>
+        <input type="text" id="userName" placeholder="Seu Nome" required>
+        <input type="email" id="userEmail" placeholder="Seu Email" required>
+        <input type="password" id="userPassword" placeholder="Sua Senha" required>
+        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+        <button id="registerButton" class="button">CADASTRAR</button>
+        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">REALIZAR PAGAMENTO</button>
+        <div id="cadastro-link">
+            <span>Já tem uma conta? <a href="#" id="loginLink">Login</a></span>
+        </div>
+    </div>
+</body>
+</html>
