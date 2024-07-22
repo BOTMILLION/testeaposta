@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Botão Personalizado</title>
+    <title>Bem-vindo ao Site</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,6 +28,21 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             box-sizing: border-box;
+        }
+
+        h1 {
+            color: #d81b60;
+            margin-bottom: 20px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
         }
 
         .custom-button {
@@ -91,8 +106,25 @@
 </head>
 <body>
     <div class="container">
-        <button class="custom-button">LOGIN</button>
+        <h1>Faça Login</h1>
+        <input type="email" id="userEmail" placeholder="Seu Email" required>
+        <input type="password" id="userPassword" placeholder="Sua Senha" required>
+        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+        <button class="custom-button" id="loginButton">LOGIN</button>
         <span class="info-text">Não tem uma conta? Cadastre-se</span>
+        <button id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+        <div id="welcome-message"></div>
+        <div id="timer" style="display: none;"></div>
+        <div id="buttons" style="display: none;">
+            <a href="https://botmillion.github.io/testeaposta/" class="custom-button">JOGUE AGORA</a>
+        </div>
     </div>
+    <div id="confirmation-message" class="message-container" style="display: none;">
+        <h1>Email verificado com sucesso!</h1>
+        <p>Aguarde. Você será redirecionado para o site novamente.</p>
+        <div class="loading">🔄</div>
+    </div>
+    <script src="main.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
