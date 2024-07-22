@@ -1,67 +1,126 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <title>Chat Telegram</title>
     <style>
-        body, html {
-            height: 100%;
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #fbeefb;
+            padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background-image: url('https://i.ibb.co/Mk5kV1N/Texto-do-seu-par-grafo-2.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
-
         .container {
-            width: 100%;
-            max-width: 400px;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
         }
-
-        h1 {
-            color: #d81b60;
-            margin-bottom: 20px;
-        }
-
-        input[type="email"],
-        input[type="password"],
-        button {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        #message {
+            border: 1px solid #ccc;
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin: 0;
+            z-index: 1;
+            position: relative;
+            height: 10vh;
             font-size: 16px;
+            overflow-y: auto;
         }
-
-        button {
-            background-color: #d81b60;
-            color: white;
+        iframe {
+            width: 100%;
             border: none;
-            cursor: pointer;
+            box-sizing: border-box;
+            overflow: auto; /* Permite rolagem dentro do iframe */
+            display: block;
+            height: calc(100vh - 10vh); /* Ajuste da altura do iframe */
         }
-
-        button:hover {
-            background-color: #c2185b;
+        @media (max-width: 600px) {
+            #message {
+                height: 15vh;
+                font-size: 14px;
+            }
+            iframe {
+                height: calc(100vh - 15vh); /* Ajuste da altura do iframe para dispositivos móveis */
+            }
         }
     </style>
+    <script>
+        function ajustarAlturaIframe() {
+            const iframe = document.querySelector('iframe');
+            const messageHeight = document.getElementById('message').offsetHeight;
+            iframe.style.height = `calc(100vh - ${messageHeight}px)`;
+        }
+
+        function adicionarParametroUnico() {
+            const urlAtual = window.location.href.split('?')[0];
+            const timestamp = new Date().getTime();
+            const novoUrl = `${urlAtual}?v=${timestamp}`;
+            window.history.replaceState(null, '', novoUrl);
+        }
+
+        function conectarWebSocket() {
+            const ws = new WebSocket('wss://telegramheroku-87abbc9dd2f9.herokuapp.com/');
+            
+            ws.onopen = function() {
+                console.log('Conectado ao servidor WebSocket');
+            };
+
+            ws.onmessage = function(event) {
+                const messageP = document.getElementById('message');
+                if (event.data instanceof Blob) {
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                        const message = reader.result;
+                        if (message !== 'ping') {
+                            messageP.textContent = message;
+                            messageP.scrollTop = messageP.scrollHeight;
+                        }
+                    };
+                    reader.readAsText(event.data);
+                } else {
+                    if (event.data !== 'ping') {
+                        messageP.textContent = event.data;
+                        messageP.scrollTop = messageP.scrollHeight;
+                    }
+                }
+            };
+
+            ws.onclose = function() {
+                console.log('Conexão WebSocket encerrada. Tentando reconectar...');
+                setTimeout(conectarWebSocket, 2000);
+            };
+
+            ws.onerror = function(error) {
+                console.error('Erro no WebSocket:', error);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            adicionarParametroUnico();
+            conectarWebSocket();
+            ajustarAlturaIframe(); // Ajusta a altura do iframe após o carregamento
+            window.addEventListener('resize', ajustarAlturaIframe); // Ajusta a altura do iframe ao redimensionar a janela
+        });
+    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Login</h1>
-        <form>
-            <input type="email" placeholder="Email" required>
-            <input type="password" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-        </form>
+        <p id="message">Aguardando mensagens...</p>
+        <iframe src="https://www.seubet.com/cassino-ao-vivo/slots/all/28/evolution/8267-217032-football-studio?mode=real&btag=1994735" title="Cassino ao Vivo"></iframe>
     </div>
 </body>
 </html>
