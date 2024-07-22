@@ -36,6 +36,7 @@
             margin-bottom: 20px;
         }
 
+        input[type="text"],
         input[type="email"],
         input[type="password"] {
             width: 100%;
@@ -136,13 +137,16 @@
 </head>
 <body>
     <div class="container">
-        <h1>Faça Login</h1>
-        <input type="email" id="userEmail" placeholder="Seu Email" required>
-        <input type="password" id="userPassword" placeholder="Sua Senha" required>
-        <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-        <button class="custom-button" id="loginButton">LOGIN</button>
-        <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
-        <span class="info-text">Não tem uma conta? <a href="pagina-de-cadastro.html">Cadastre-se</a></span>
+        <h1 id="formTitle">Faça Login</h1>
+        <form id="authForm">
+            <input type="text" id="userName" placeholder="Seu Nome" style="display: none;" required>
+            <input type="email" id="userEmail" placeholder="Seu Email" required>
+            <input type="password" id="userPassword" placeholder="Sua Senha" required>
+            <div id="error-message" style="display: none;">A senha deve ter pelo menos 6 caracteres.</div>
+            <button class="custom-button" id="submitButton">LOGIN</button>
+            <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
+            <span class="info-text" id="registerLink">Não tem uma conta? <a href="#" onclick="toggleForm()">Cadastre-se</a></span>
+        </form>
         <div id="welcome-message"></div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
@@ -154,6 +158,26 @@
         <p>Aguarde. Você será redirecionado para o site novamente.</p>
         <div class="loading">🔄</div>
     </div>
+    <script>
+        function toggleForm() {
+            const formTitle = document.getElementById('formTitle');
+            const userName = document.getElementById('userName');
+            const submitButton = document.getElementById('submitButton');
+            const registerLink = document.getElementById('registerLink');
+
+            if (formTitle.textContent === 'Faça Login') {
+                formTitle.textContent = 'Cadastro';
+                userName.style.display = 'block';
+                submitButton.textContent = 'CADASTRAR';
+                registerLink.innerHTML = 'Já tem uma conta? <a href="#" onclick="toggleForm()">Login</a>';
+            } else {
+                formTitle.textContent = 'Faça Login';
+                userName.style.display = 'none';
+                submitButton.textContent = 'LOGIN';
+                registerLink.innerHTML = 'Não tem uma conta? <a href="#" onclick="toggleForm()">Cadastre-se</a>';
+            }
+        }
+    </script>
     <script src="main.js"></script>
     <script type="module" src="app.js"></script>
 </body>
