@@ -7,59 +7,66 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap">
     <style>
         body {
-            font-family: 'Poppins', sans-serif; /* Aplicando a fonte Poppins Light */
+            font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            padding: 20px;
         }
-        .container {
+        .form-container {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            height: 80vh;
-            width: 90%;
-            max-width: 390px;
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            box-sizing: border-box;
-            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
         }
-        h1 {
-            color: #d81b60;
+        .form-group {
+            position: relative;
+            width: 100%;
             margin-bottom: 20px;
         }
-        input[type="email"],
-        input[type="password"],
-        input[type="text"] {
+        .form-group label {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            font-size: 16px;
+            color: #666;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .form-group input {
             width: 100%;
             padding: 15px;
-            margin: 10px 0;
+            margin: 0;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
+            background-color: #ffffff;
         }
-
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #d81b60;
+        }
         .button-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            margin-top: 20px;
         }
-
         .custom-button {
-            background: linear-gradient(45deg, #000000, #b71c1c); /* Gradiente de preto para vermelho sangue */
+            background: linear-gradient(45deg, #000000, #b71c1c);
             border: none;
             color: white;
             padding: 15px 30px;
             font-size: 16px;
-            border-radius: 50px; /* Faz o botão ficar oval */
+            border-radius: 50px;
             cursor: pointer;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -68,38 +75,15 @@
             position: relative;
             width: 100%;
         }
-
         .custom-button:hover {
-            background: linear-gradient(45deg, #b71c1c, #000000); /* Inverte o gradiente ao passar o mouse */
-        }
-
-        .custom-button:active {
-            transform: scale(0.95); /* Efeito de clique */
-        }
-
-        .custom-button:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 200%;
-            height: 200%;
             background: linear-gradient(45deg, #b71c1c, #000000);
-            transition: background 0.5s ease;
-            transform: rotate(45deg);
-            z-index: 0;
-            opacity: 0.5;
         }
-
-        .custom-button span {
-            position: relative;
-            z-index: 1;
+        .custom-button:active {
+            transform: scale(0.95);
         }
-
         .pulse-button {
             animation: pulse 1.5s infinite;
         }
-
         @keyframes pulse {
             0% {
                 transform: scale(1);
@@ -114,7 +98,6 @@
                 box-shadow: 0 0 0 rgba(255, 255, 255, 0);
             }
         }
-
         .info-text {
             margin-top: 20px;
             font-size: 14px;
@@ -166,50 +149,54 @@
         .popup .button:hover {
             background: linear-gradient(45deg, #c2185b, #d81b60);
         }
-        .footer-text {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-        }
         @media (max-width: 600px) {
-            .container {
-                width: 95%;
-                padding: 10px;
-            }
             .custom-button {
-                padding: 20px 40px; /* Aumenta o padding dos botões */
-                font-size: 18px; /* Aumenta o tamanho da fonte */
+                padding: 20px 40px;
+                font-size: 18px;
+            }
+            .form-group input {
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="form-container">
         <!-- Formulário de Login -->
         <div id="loginForm">
-            <h1>Faça Login</h1>
-            <input type="email" id="loginEmail" placeholder="Seu Email" required>
-            <input type="password" id="loginPassword" placeholder="Sua Senha" required>
+            <div class="form-group">
+                <input type="email" id="loginEmail" placeholder=" " required>
+                <label for="loginEmail">Seu Email</label>
+            </div>
+            <div class="form-group">
+                <input type="password" id="loginPassword" placeholder=" " required>
+                <label for="loginPassword">Sua Senha</label>
+            </div>
             <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <div class="button-container">
                 <button class="custom-button" id="loginButton">LOGIN</button>
                 <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
             </div>
-            <div class="footer-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></div>
+            <div class="info-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></div>
         </div>
 
         <!-- Formulário de Cadastro -->
         <div id="registerForm" style="display: none;">
-            <h1>Cadastro</h1>
-            <input type="text" id="registerName" placeholder="Seu Nome" required>
-            <input type="email" id="registerEmail" placeholder="Seu Email" required>
-            <input type="password" id="registerPassword" placeholder="Sua Senha" required>
+            <div class="form-group">
+                <input type="text" id="registerName" placeholder=" " required>
+                <label for="registerName">Seu Nome</label>
+            </div>
+            <div class="form-group">
+                <input type="email" id="registerEmail" placeholder=" " required>
+                <label for="registerEmail">Seu Email</label>
+            </div>
+            <div class="form-group">
+                <input type="password" id="registerPassword" placeholder=" " required>
+                <label for="registerPassword">Sua Senha</label>
+            </div>
             <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
-            <div class="footer-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></div>
+            <div class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></div>
         </div>
     </div>
     <!-- Popup de Redirecionamento -->
