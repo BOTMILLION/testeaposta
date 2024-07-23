@@ -26,22 +26,25 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             position: relative;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .logo {
             width: 150px;
-            margin: 0 auto;
-            display: block;
+            margin-bottom: 20px;
         }
         .welcome-text {
-            font-size: 28px;
-            font-weight: bold;
-            color: #d81b60; /* Cor da logo */
-            margin: 20px 0;
-            font-family: 'Material-Design-Iconic-Font';
             font-size: 62px;
+            font-family: 'Material-Design-Iconic-Font';
+            font-weight: bold;
+            color: #d81b60;
+            margin-bottom: 20px;
         }
         .line {
             position: relative;
+            width: 100%;
             margin: 10px 0;
         }
         .line input {
@@ -135,10 +138,6 @@
         }
         .popup .button:hover {
             background: linear-gradient(45deg, #c2185b, #d81b60);
-        }
-        .footer-text {
-            font-size: 14px;
-            color: #666;
         }
         @media (max-width: 600px) {
             .wrap-login {
