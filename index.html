@@ -34,13 +34,6 @@
             flex-direction: column;
             width: 100%;
         }
-        .form-container label {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 5px;
-            display: block;
-            position: relative;
-        }
         .form-container .line {
             border-bottom: 1px solid #ddd;
             margin-bottom: 20px;
@@ -80,6 +73,21 @@
         }
         .form-container input:focus {
             padding-top: 20px;
+        }
+        .password-container {
+            position: relative;
+        }
+        .password-container input {
+            padding-right: 30px; /* Space for the eye icon */
+        }
+        .password-container .eye-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
         }
         .button-container {
             display: flex;
@@ -192,14 +200,15 @@
         <div class="form-container">
             <!-- Formulário de Login -->
             <div id="loginForm">
-                <label for="loginEmail">Seu Email</label>
                 <div class="line">
                     <input type="email" id="loginEmail" placeholder="Seu Email" required>
                 </div>
                 
-                <label for="loginPassword">Sua Senha</label>
-                <div class="line">
-                    <input type="password" id="loginPassword" placeholder="Sua Senha" required>
+                <div class="password-container">
+                    <div class="line">
+                        <input type="password" id="loginPassword" placeholder="Sua Senha" required>
+                        <span class="eye-icon" id="togglePassword">👁️</span>
+                    </div>
                 </div>
                 
                 <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
@@ -212,19 +221,19 @@
 
             <!-- Formulário de Cadastro -->
             <div id="registerForm" style="display: none;">
-                <label for="registerName">Seu Nome</label>
                 <div class="line">
                     <input type="text" id="registerName" placeholder="Seu Nome" required>
                 </div>
                 
-                <label for="registerEmail">Seu Email</label>
                 <div class="line">
                     <input type="email" id="registerEmail" placeholder="Seu Email" required>
                 </div>
                 
-                <label for="registerPassword">Sua Senha</label>
-                <div class="line">
-                    <input type="password" id="registerPassword" placeholder="Sua Senha" required>
+                <div class="password-container">
+                    <div class="line">
+                        <input type="password" id="registerPassword" placeholder="Sua Senha" required>
+                        <span class="eye-icon" id="toggleRegisterPassword">👁️</span>
+                    </div>
                 </div>
                 
                 <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
@@ -239,6 +248,25 @@
         <p class="timer" id="countdown">5</p>
         <button class="button" id="redirectButton">Ir Agora</button>
     </div>
-    <script src="app.js" type="module"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordField = document.getElementById('loginPassword');
+            const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+            const registerPasswordField = document.getElementById('registerPassword');
+
+            togglePassword.addEventListener('click', () => {
+                const type = passwordField.type === 'password' ? 'text' : 'password';
+                passwordField.type = type;
+                togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+
+            toggleRegisterPassword.addEventListener('click', () => {
+                const type = registerPasswordField.type === 'password' ? 'text' : 'password';
+                registerPasswordField.type = type;
+                toggleRegisterPassword.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+        });
+    </script>
 </body>
 </html>
