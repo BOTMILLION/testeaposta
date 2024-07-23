@@ -1,291 +1,215 @@
 <!DOCTYPE html>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo ao Site</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/5.0.0/css/material-design-iconic-font.min.css">
-    <title>Login e Cadastro</title>
     <style>
-body {
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background: url('https://i.imgur.com/Rv500de.jpg') no-repeat center center fixed;
-    background-size: cover;
-}
-
-.container {
-    width: 1365px;
-    height: 945px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.wrap-login {
-    width: 390px;
-    height: 650px; /* Ajustado para preencher 650px verticalmente */
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: relative;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo {
-    width: 150px;
-    margin-bottom: 20px;
-}
-
-.welcome-text {
-    font-size: 30px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-    color: #c8102e; /* Vermelho mais forte */
-    width: 280px;
-    height: 62px;
-    line-height: 62px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.form-login {
-    width: 280px;
-    height: 540px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-.line {
-    position: relative;
-    width: 100%;
-    margin: 20px 0;
-}
-
-.line input {
-    border: none;
-    border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
-    width: 100%;
-    padding: 10px 0;
-    font-size: 16px;
-    outline: none;
-    background: transparent;
-    color: #333;
-}
-
-.line label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    font-size: 14px;
-    color: #c8102e; /* Vermelho mais forte */
-    transition: 0.3s;
-}
-
-.line input:focus + label,
-.line input:not(:placeholder-shown) + label {
-    top: -20px;
-    left: 0;
-    font-size: 12px;
-}
-
-.custom-button {
-    background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
-    border: none;
-    color: white;
-    padding: 15px 30px;
-    font-size: 16px;
-    border-radius: 50px;
-    cursor: pointer;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-    margin: 10px 0;
-    width: 100%;
-    position: relative;
-}
-
-.custom-button:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 1;
-}
-
-.custom-button:hover:before {
-    opacity: 0.3;
-}
-
-.custom-button:active {
-    transform: scale(0.95);
-}
-
-.pulse-button {
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.7;
-    }
-    50% {
-        transform: scale(1.05);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.7;
-    }
-}
-
-.info-text {
-    font-size: 14px;
-    color: #666;
-    text-align: center;
-    margin-top: 20px;
-}
-
-.info-text a {
-    color: #c8102e; /* Vermelho mais forte */
-    text-decoration: none;
-}
-
-.info-text a:hover {
-    text-decoration: underline;
-}
-
-.popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    text-align: center;
-    z-index: 1000;
-}
-
-.popup h2 {
-    margin: 0;
-    color: #c8102e; /* Vermelho mais forte */
-}
-
-.popup p {
-    font-size: 18px;
-}
-
-.popup .timer {
-    font-size: 24px;
-    font-weight: bold;
-    color: #c8102e; /* Vermelho mais forte */
-}
-
-.popup .button {
-    background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-}
-        /* Estilos gerais */
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
-            background-size: cover;
-        }
-
-.popup .button:hover {
-    background: linear-gradient(45deg, #a3141e, #c8102e); /* Vermelho mais forte */
-}
-        .container {
-            width: 1365px;
-            height: 945px;
-            margin: 0 auto;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: url('https://i.imgur.com/Rv500de.jpg') no-repeat center center fixed;
+            background-size: cover;
         }
-
-.line .zmdi-eye, .line .zmdi-eye-off {
-    font-size: 18px;
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    cursor: pointer;
-}
-        .wrap {
+        .wrap-login {
             width: 390px;
-            height: 650px;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            height: 70vh; /* Ajustado para preencher 70% da tela verticalmente */
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
-
-@media (max-width: 600px) {
-    .container {
-        width: 95%;
-        height: auto;
-        padding: 10px;
-    }
-    .wrap-login {
-        width: 95%;
-        height: auto;
-        padding: 10px;
-    }
-    .form-login {
-        width: 90%;
-        height: auto;
-    }
-    .custom-button {
-        padding: 15px 25px;
-        font-size: 18px;
-    }
-    .welcome-text {
-        font-size: 24px;
-    }
-}
-        .form {
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        .welcome-text {
+            font-size: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            color: #c8102e; /* Vermelho mais forte */
+            width: 280px;
+            height: 62px;
+            line-height: 62px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-login {
             width: 280px;
             height: 540px;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
+            position: relative;
         }
-
         .line {
             position: relative;
             width: 100%;
             margin: 20px 0;
         }
-
+        .line input {
+            border: none;
+            border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+            outline: none;
+            background: transparent;
+            color: #333;
+        }
+        .line label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 14px;
+            color: #c8102e; /* Vermelho mais forte */
+            transition: 0.3s;
+        }
+        .line input:focus + label,
+        .line input:not(:placeholder-shown) + label {
+            top: -20px;
+            left: 0;
+            font-size: 12px;
+        }
+        .custom-button {
+            background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            margin: 10px 0;
+            width: 100%;
+            position: relative;
+        }
+        .custom-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+        .custom-button:hover:before {
+            opacity: 0.3;
+        }
+        .custom-button:active {
+            transform: scale(0.95);
+        }
+        .pulse-button {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+        }
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .info-text a {
+            color: #c8102e; /* Vermelho mais forte */
+            text-decoration: none;
+        }
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            text-align: center;
+            z-index: 1000;
+        }
+        .popup h2 {
+            margin: 0;
+            color: #c8102e; /* Vermelho mais forte */
+        }
+        .popup p {
+            font-size: 18px;
+        }
+        .popup .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #c8102e; /* Vermelho mais forte */
+        }
+        .popup .button {
+            background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .popup .button:hover {
+            background: linear-gradient(45deg, #a3141e, #c8102e); /* Vermelho mais forte */
+        }
+        .line .zmdi-eye, .line .zmdi-eye-off {
+            font-size: 18px;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            .wrap-login {
+                width: 95%;
+                height: 70vh;
+                padding: 10px;
+            }
+            .form-login {
+                width: 100%;
+                height: auto;
+            }
+            .custom-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            .welcome-text {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -310,16 +234,6 @@ body {
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
             </div>
         </div>
-        .line input {
-            border: none;
-            border-bottom: 1px solid #c8102e;
-            width: 100%;
-            padding: 10px 0;
-            font-size: 16px;
-            outline: none;
-            background: transparent;
-            color: #333;
-        }
 
         <!-- Formulário de Cadastro -->
         <div class="form-login" id="registerForm" style="display: none;">
@@ -343,14 +257,6 @@ body {
             </div>
         </div>
     </div>
-        .line label {
-            position: absolute;
-            top: 0;
-            left: 0;
-            font-size: 14px;
-            color: #c8102e;
-            transition: 0.3s;
-        }
 
     <!-- Popup de Redirecionamento -->
     <div id="redirectPopup" class="popup">
@@ -358,12 +264,6 @@ body {
         <p>Em <span id="countdown" class="timer">5</span> segundos.</p>
         <button class="button" onclick="document.getElementById('redirectPopup').style.display = 'none';">Fechar</button>
     </div>
-        .line input:focus + label,
-        .line input:not(:placeholder-shown) + label {
-            top: -20px;
-            left: 0;
-            font-size: 12px;
-        }
 
     <script>
         function showRedirectPopup() {
@@ -375,16 +275,9 @@ body {
                 countdownElement.textContent = countdown;
                 if (countdown <= 0) {
                     clearInterval(interval);
-                    window.location.href = 'https://botmillion.github.io/telm/'; // Redireciona para o jogo
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
                 }
             }, 1000);
-        .zmdi-eye {
-            font-size: 18px;
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            cursor: pointer;
-            color: #c8102e;
         }
 
         function togglePasswordVisibility() {
@@ -397,15 +290,6 @@ body {
                 passwordField.type = 'password';
                 passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
             }
-        #redirectPopup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
         }
 
         function toggleRegisterPasswordVisibility() {
@@ -418,16 +302,6 @@ body {
                 passwordField.type = 'password';
                 passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
             }
-        #paymentButton {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: #c8102e;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
         }
 
         function validateLoginForm() {
@@ -442,8 +316,6 @@ body {
             errorElement.style.display = 'none';
             showRedirectPopup();
             return true;
-        .pulse-button {
-            animation: pulse 1s infinite;
         }
 
         function validateRegisterForm() {
@@ -455,15 +327,6 @@ body {
                 errorElement.textContent = 'Por favor, preencha todos os campos corretamente.';
                 errorElement.style.display = 'block';
                 return false;
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
             }
             errorElement.style.display = 'none';
             alert('Cadastro realizado com sucesso!');
@@ -483,52 +346,5 @@ body {
         document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
         document.getElementById('toggleRegisterPassword').addEventListener('click', toggleRegisterPasswordVisibility);
     </script>
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="wrap login">
-            <form id="loginForm" class="form">
-                <h2>Login</h2>
-                <div class="line">
-                    <input type="email" id="loginEmail" placeholder="Email" required />
-                    <label for="loginEmail">Email</label>
-                </div>
-                <div class="line">
-                    <input type="password" id="loginPassword" placeholder="Senha" required />
-                    <label for="loginPassword">Senha</label>
-                    <i class="zmdi zmdi-eye" id="togglePassword"></i>
-                    <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-                </div>
-                <button type="button" id="loginButton">Entrar</button>
-                <a href="#" id="registerLink">Criar uma conta</a>
-            </form>
-            <form id="registerForm" class="form" style="display: none;">
-                <h2>Cadastro</h2>
-                <div class="line">
-                    <input type="text" id="registerName" placeholder="Nome" required />
-                    <label for="registerName">Nome</label>
-                </div>
-                <div class="line">
-                    <input type="email" id="registerEmail" placeholder="Email" required />
-                    <label for="registerEmail">Email</label>
-                </div>
-                <div class="line">
-                    <input type="password" id="registerPassword" placeholder="Senha" required />
-                    <label for="registerPassword">Senha</label>
-                    <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
-                    <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-                </div>
-                <button type="button" id="registerButton">Cadastrar</button>
-                <a href="#" id="loginLink">Já tem uma conta? Faça login</a>
-            </form>
-        </div>
-        <div id="redirectPopup" style="display: none;">
-            <p>Você será redirecionado em <span id="countdown">5</span> segundos.</p>
-            <button id="redirectButton">Redirecionar agora</button>
-        </div>
-        <button id="paymentButton">Pagar</button>
-    </div>
-    <script src="app.js"></script>
 </body>
 </html>
