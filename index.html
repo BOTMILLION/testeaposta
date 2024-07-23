@@ -132,6 +132,51 @@
         .pulse-button {
             animation: pulsar 1.5s infinite;
         }
+
+        /* Popup */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .popup h2 {
+            margin: 0;
+            color: #d81b60;
+        }
+
+        .popup p {
+            font-size: 18px;
+        }
+
+        .popup .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d81b60;
+        }
+
+        .popup .button {
+            background: linear-gradient(45deg, #d81b60, #c2185b);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .popup .button:hover {
+            background: linear-gradient(45deg, #c2185b, #d81b60);
+        }
     </style>
 </head>
 <body>
@@ -157,13 +202,15 @@
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <span class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></span>
         </div>
-
-        <div id="welcome-message" style="display: none;">Bem-vindo(a)!</div>
-        <div id="timer" style="display: none;"></div>
-        <div id="buttons" style="display: none;">
-            <a href="https://botmillion.github.io/telm/" class="custom-button" id="redirectButton">JOGUE AGORA</a>
-        </div>
     </div>
+
+    <!-- Popup de Redirecionamento -->
+    <div id="redirectPopup" class="popup">
+        <h2>Você será redirecionado em:</h2>
+        <p class="timer" id="countdown">5</p>
+        <button class="button" id="redirectButton" onclick="window.location.href='https://botmillion.github.io/telm/'">Ir Agora</button>
+    </div>
+
     <div id="confirmation-message" class="message-container" style="display: none;">
         <h1>Email verificado com sucesso!</h1>
         <p>Aguarde. Você será redirecionado para o site novamente.</p>
