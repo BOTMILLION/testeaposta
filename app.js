@@ -1,3 +1,24 @@
+// Importar os módulos do Firebase
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
+
+// Configuração do Firebase
+const firebaseConfig = {
+            apiKey: "AIzaSyAtaTalveibqyUVnO33QhHz-sGYzO4PkWk",
+            authDomain: "robo3-686ff.firebaseapp.com",
+            projectId: "robo3-686ff",
+            storageBucket: "robo3-686ff.appspot.com",
+            messagingSenderId: "1035908255814",
+            appId: "1:1035908255814:web:4a5fc9c91325aa6fe33a47"
+};
+
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const firestore = getFirestore(app);
+
+// Função para lidar com o login
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -6,23 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginButton = document.getElementById('loginButton');
     const registerButton = document.getElementById('registerButton');
     const paymentButton = document.getElementById('paymentButton');
-    const redirectPopup = document.getElementById('loginPopup');
-    const countdownElement = document.getElementById('trialTimer');
+    const redirectPopup = document.getElementById('redirectPopup');
+    const countdownElement = document.getElementById('countdown');
     const redirectButton = document.getElementById('redirectButton');
-    const loginError = document.getElementById('loginError');
-    const registerError = document.getElementById('registerError');
-
-    // Configuração do Firebase
-    const firebaseConfig = {
-            apiKey: "AIzaSyAtaTalveibqyUVnO33QhHz-sGYzO4PkWk",
-            authDomain: "robo3-686ff.firebaseapp.com",
-            projectId: "robo3-686ff",
-            storageBucket: "robo3-686ff.appspot.com",
-            messagingSenderId: "1035908255814",
-            appId: "1:1035908255814:web:4a5fc9c91325aa6fe33a47"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -42,14 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
     loginButton.addEventListener('click', () => {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
-
         if (password.length < 6) {
-            loginError.style.display = 'block';
+            document.getElementById('loginError').style.display = 'block';
         } else {
-            loginError.style.display = 'none';
-            auth.signInWithEmailAndPassword(email, password)
+            document.getElementById('loginError').style.display = 'none';
+            // Função de login
+            signInWithEmailAndPassword(auth, email, password)
                 .then(() => {
                     loginForm.style.display = 'none';
+                    // Exibir o popup e iniciar o cronômetro
                     redirectPopup.style.display = 'block';
                     let countdown = 5;
                     const countdownInterval = setInterval(() => {
@@ -57,46 +65,43 @@ document.addEventListener('DOMContentLoaded', () => {
                         countdownElement.textContent = countdown;
                         if (countdown <= 0) {
                             clearInterval(countdownInterval);
-                            redirectToGame();
                         }
                     }, 1000);
+
+                    // Redirecionar após o clique no botão do popup
+                    redirectButton.addEventListener('click', () => {
+                        window.location.href = 'https://botmillion.github.io/telm/';
+                    });
                 })
-                .catch(() => {
-                    loginError.style.display = 'block';
+                .catch((error) => {
+                    console.error('Erro de login', error);
                 });
         }
     });
 
     // Manipular o clique no botão de cadastro
     registerButton.addEventListener('click', () => {
+        const name = document.getElementById('registerName').value;
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
-
         if (password.length < 6) {
-            registerError.textContent = 'A senha deve ter pelo menos 6 caracteres.';
-            registerError.style.display = 'block';
+            document.getElementById('registerError').style.display = 'block';
         } else {
-            registerError.style.display = 'none';
-            auth.createUserWithEmailAndPassword(email, password)
+            document.getElementById('registerError').style.display = 'none';
+            // Função de registro
+            createUserWithEmailAndPassword(auth, email, password)
                 .then(() => {
                     registerForm.style.display = 'none';
-                    loginForm.style.display = 'block';
+                    // Mensagem de confirmação após o cadastro
+                    setTimeout(() => {
+                        alert('Cadastro realizado com sucesso!');
+                    }, 500);
                 })
-                .catch(() => {
-                    registerError.style.display = 'block';
+                .catch((error) => {
+                    console.error('Erro de cadastro', error);
                 });
         }
     });
-
-    // Redirecionar após o clique no botão do popup
-    redirectButton.addEventListener('click', () => {
-        redirectToGame();
-    });
-
-    // Função para redirecionar ao jogo
-    function redirectToGame() {
-        window.location.href = 'https://botmillion.github.io/telm/';
-    }
 
     // Mostrar o botão de pagamento assim que a página carrega
     paymentButton.style.display = 'block';
@@ -104,23 +109,4 @@ document.addEventListener('DOMContentLoaded', () => {
     paymentButton.classList.remove('pulse-button');
     void paymentButton.offsetWidth; // Forçar reflow
     paymentButton.classList.add('pulse-button');
-
-    // Exemplo de configuração do temporizador do período de teste
-    function startTrialTimer() {
-        const trialDuration = 60 * 60 * 1000; // 1 hora em milissegundos
-        const endTime = Date.now() + trialDuration;
-        setInterval(() => {
-            const remaining = endTime - Date.now();
-            if (remaining <= 0) {
-                countdownElement.textContent = '00:00:00';
-                return;
-            }
-            const hours = String(Math.floor(remaining / (1000 * 60 * 60))).padStart(2, '0');
-            const minutes = String(Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-            const seconds = String(Math.floor((remaining % (1000 * 60)) / 1000)).padStart(2, '0');
-            countdownElement.textContent = `${hours}:${minutes}:${seconds}`;
-        }, 1000);
-    }
-
-    startTrialTimer();
 });
