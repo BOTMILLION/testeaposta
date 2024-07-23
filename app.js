@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectPopup = document.getElementById('redirectPopup');
     const countdownElement = document.getElementById('countdown');
     const redirectButton = document.getElementById('redirectButton');
+    const timerElement = document.getElementById('timer');
+    const userNameElement = document.getElementById('userName');
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -37,18 +39,33 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.style.display = 'none';
             // Exibir o popup e iniciar o cronômetro
             redirectPopup.style.display = 'block';
-            let countdown = 5;
+            const userName = email.split('@')[0]; // Obtém o nome do usuário a partir do email
+            userNameElement.textContent = userName;
+
+            // Inicializa o temporizador do período grátis
+            let timer = 30; // Tempo inicial do período grátis em segundos
+            const timerInterval = setInterval(() => {
+                timer--;
+                timerElement.textContent = timer;
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+
+            // Contagem regressiva para redirecionamento
+            let countdown = 3;
             const countdownInterval = setInterval(() => {
-                countdown -= 1;
+                countdown--;
                 countdownElement.textContent = countdown;
                 if (countdown <= 0) {
                     clearInterval(countdownInterval);
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
                 }
             }, 1000);
 
             // Redirecionar após o clique no botão do popup
             redirectButton.addEventListener('click', () => {
-                window.location.href = 'https://botmillion.github.io/telm/';
+                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
             });
         }
     });
