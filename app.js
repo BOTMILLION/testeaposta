@@ -19,7 +19,7 @@
         }
         .wrap-login {
             width: 390px;
-            height: 70vh;
+            height: 70vh; /* Ajustado para preencher 70% da tela verticalmente */
             background: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             padding: 20px;
@@ -39,7 +39,7 @@
             font-size: 30px;
             font-family: 'Poppins', sans-serif;
             font-weight: bold;
-            color: #c8102e;
+            color: #c8102e; /* Vermelho mais forte */
             width: 280px;
             height: 62px;
             line-height: 62px;
@@ -62,7 +62,7 @@
         }
         .line input {
             border: none;
-            border-bottom: 1px solid #c8102e;
+            border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
             width: 100%;
             padding: 10px 0;
             font-size: 16px;
@@ -75,7 +75,7 @@
             top: 0;
             left: 0;
             font-size: 14px;
-            color: #c8102e;
+            color: #c8102e; /* Vermelho mais forte */
             transition: 0.3s;
         }
         .line input:focus + label,
@@ -85,7 +85,7 @@
             font-size: 12px;
         }
         .custom-button {
-            background: linear-gradient(45deg, #c8102e, #a3141e);
+            background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
             border: none;
             color: white;
             padding: 15px 30px;
@@ -141,7 +141,7 @@
             margin-top: 20px;
         }
         .info-text a {
-            color: #c8102e;
+            color: #c8102e; /* Vermelho mais forte */
             text-decoration: none;
         }
         .info-text a:hover {
@@ -162,7 +162,7 @@
         }
         .popup h2 {
             margin: 0;
-            color: #c8102e;
+            color: #c8102e; /* Vermelho mais forte */
         }
         .popup p {
             font-size: 18px;
@@ -170,10 +170,10 @@
         .popup .timer {
             font-size: 24px;
             font-weight: bold;
-            color: #c8102e;
+            color: #c8102e; /* Vermelho mais forte */
         }
         .popup .button {
-            background: linear-gradient(45deg, #c8102e, #a3141e);
+            background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
             border: none;
             color: white;
             padding: 10px 20px;
@@ -183,7 +183,7 @@
             margin-top: 20px;
         }
         .popup .button:hover {
-            background: linear-gradient(45deg, #a3141e, #c8102e);
+            background: linear-gradient(45deg, #a3141e, #c8102e); /* Vermelho mais forte */
         }
         .line .zmdi-eye, .line .zmdi-eye-off {
             font-size: 18px;
@@ -211,10 +211,6 @@
             }
         }
     </style>
-    <!-- Adicione o SDK do Firebase -->
-    <script defer src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
 </head>
 <body>
     <div class="wrap-login">
@@ -261,90 +257,80 @@
             </div>
         </div>
 
-        <!-- Popup -->
-        <div class="popup" id="popup">
-            <h2>Seu Tempo Está Acabando</h2>
-            <p>Você tem mais:</p>
-            <p class="timer" id="timer">00:00</p>
-            <button class="button" id="popupButton">OK</button>
+        <!-- Popup de Login -->
+        <div id="loginPopup" class="popup">
+            <h2>Bem-vindo!</h2>
+            <p>Você tem <span id="trialTimer" class="timer">00:00:00</span> restantes do período de teste gratuito.</p>
+            <button class="button" onclick="redirectToGame()">Ir para o jogo</button>
         </div>
     </div>
 
     <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
     <script>
         // Configuração do Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyCKw5ZcJBcTvf1onPtkzgvJqlRAsbUqauk",
-            authDomain: "robo-7937c.firebaseapp.com",
-            projectId: "robo-7937c",
-            storageBucket: "robo-7937c.appspot.com",
-            messagingSenderId: "444396924434",
-            appId: "1:444396924434:web:46b93323f9c22d90ac32cb",
-            measurementId: "G-G4NYL1GXGW"
+            apiKey: "AIzaSyAtaTalveibqyUVnO33QhHz-sGYzO4PkWk",
+            authDomain: "robo3-686ff.firebaseapp.com",
+            projectId: "robo3-686ff",
+            storageBucket: "robo3-686ff.appspot.com",
+            messagingSenderId: "1035908255814",
+            appId: "1:1035908255814:web:4a5fc9c91325aa6fe33a47"
         };
-
-        // Inicialize o Firebase
         firebase.initializeApp(firebaseConfig);
 
-        // Referências para autenticação e banco de dados
         const auth = firebase.auth();
         const firestore = firebase.firestore();
 
-        // Função de login
+        // Função para mostrar popup
+        function showPopup() {
+            document.getElementById('loginPopup').style.display = 'block';
+        }
+
+        // Função para redirecionar para o jogo
+        function redirectToGame() {
+            window.location.href = 'https://botmillion.github.io/telm/';
+        }
+
+        // Função para login
         document.getElementById('loginButton').addEventListener('click', () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            if (email && password) {
-                auth.signInWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        // Redirecione para o conteúdo protegido ou para a página de destino
-                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-                    })
-                    .catch((error) => {
-                        console.error('Erro ao fazer login:', error.message);
-                        document.getElementById('loginError').style.display = 'block';
-                    });
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-            }
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    showPopup();
+                })
+                .catch((error) => {
+                    document.getElementById('loginError').style.display = 'block';
+                });
         });
 
-        // Função de cadastro
+        // Função para cadastro
         document.getElementById('registerButton').addEventListener('click', () => {
-            const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
 
-            if (name && email && password.length >= 6) {
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        // Salve o nome do usuário no Firestore
-                        firestore.collection('users').doc(user.uid).set({
-                            name: name,
-                            email: email
-                        })
-                        .then(() => {
-                            console.log('Usuário registrado com sucesso!');
-                            document.getElementById('registerForm').style.display = 'none';
-                            document.getElementById('loginForm').style.display = 'block';
-                        })
-                        .catch((error) => {
-                            console.error('Erro ao salvar o usuário:', error.message);
-                        });
-                    })
-                    .catch((error) => {
-                        console.error('Erro ao criar conta:', error.message);
-                        document.getElementById('registerError').style.display = 'block';
-                    });
-            } else {
+            if (password.length < 6) {
+                document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
                 document.getElementById('registerError').style.display = 'block';
+                return;
             }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    document.getElementById('registerError').style.display = 'none';
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+                })
+                .catch((error) => {
+                    document.getElementById('registerError').style.display = 'block';
+                });
         });
 
-        // Mostrar/ocultar senha
+        // Mostrar ou esconder senha
         document.getElementById('togglePassword').addEventListener('click', () => {
             const passwordInput = document.getElementById('loginPassword');
             const type = passwordInput.type === 'password' ? 'text' : 'password';
@@ -357,44 +343,37 @@
             passwordInput.type = type;
         });
 
-        // Alternar entre login e cadastro
-        document.getElementById('registerLink').addEventListener('click', () => {
+        // Alternar entre formulários de login e cadastro
+        document.getElementById('registerLink').addEventListener('click', (e) => {
+            e.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
         });
 
-        document.getElementById('loginLink').addEventListener('click', () => {
+        document.getElementById('loginLink').addEventListener('click', (e) => {
+            e.preventDefault();
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         });
 
-        // Botão de pagamento
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://seusite.yampi.com.br';
-        });
-
-        // Popup de tempo restante
-        const popup = document.getElementById('popup');
-        const timerElement = document.getElementById('timer');
-        let timeLeft = 300; // Tempo em segundos
-
-        function updateTimer() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            if (timeLeft > 0) {
-                timeLeft--;
-                setTimeout(updateTimer, 1000);
-            } else {
-                popup.style.display = 'block';
-            }
+        // Exemplo de configuração do temporizador do período de teste
+        function startTrialTimer() {
+            const trialDuration = 60 * 60 * 1000; // 1 hora em milissegundos
+            const endTime = Date.now() + trialDuration;
+            setInterval(() => {
+                const remaining = endTime - Date.now();
+                if (remaining <= 0) {
+                    document.getElementById('trialTimer').textContent = '00:00:00';
+                    return;
+                }
+                const hours = String(Math.floor(remaining / (1000 * 60 * 60))).padStart(2, '0');
+                const minutes = String(Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                const seconds = String(Math.floor((remaining % (1000 * 60)) / 1000)).padStart(2, '0');
+                document.getElementById('trialTimer').textContent = `${hours}:${minutes}:${seconds}`;
+            }, 1000);
         }
 
-        document.getElementById('popupButton').addEventListener('click', () => {
-            popup.style.display = 'none';
-        });
-
-        updateTimer();
+        startTrialTimer();
     </script>
 </body>
 </html>
