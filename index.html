@@ -48,7 +48,7 @@
         }
         .form-login {
             width: 280px;
-            height: auto; /* Ajustado para auto para dispositivos móveis */
+            height: 540px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -63,7 +63,7 @@
         .line input {
             border: none;
             border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
-            width: calc(100% - 30px); /* Ajustado para acomodar o ícone */
+            width: 100%;
             padding: 10px 0;
             font-size: 16px;
             outline: none;
@@ -83,13 +83,6 @@
             top: -20px;
             left: 0;
             font-size: 12px;
-        }
-        .line .zmdi-eye, .line .zmdi-eye-off {
-            font-size: 18px;
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            cursor: pointer;
         }
         .custom-button {
             background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
@@ -192,32 +185,29 @@
         .popup .button:hover {
             background: linear-gradient(45deg, #a3141e, #c8102e); /* Vermelho mais forte */
         }
+        .line .zmdi-eye, .line .zmdi-eye-off {
+            font-size: 18px;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
+        }
         @media (max-width: 600px) {
             .wrap-login {
                 width: 95%;
-                height: auto; /* Ajustado para auto para dispositivos móveis */
+                height: 70vh;
                 padding: 10px;
             }
             .form-login {
                 width: 100%;
-                height: auto; /* Ajustado para auto para dispositivos móveis */
+                height: auto;
             }
             .custom-button {
-                padding: 15px;
-                font-size: 18px;
+                padding: 10px 20px;
+                font-size: 14px;
             }
             .welcome-text {
                 font-size: 24px;
-            }
-            .line input {
-                font-size: 18px;
-                padding: 15px 0;
-            }
-            .line .zmdi-eye, .line .zmdi-eye-off {
-                font-size: 22px;
-                right: 5px;
-                top: 50%;
-                transform: translateY(-50%);
             }
         }
     </style>
@@ -239,86 +229,122 @@
             </div>
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button pulse-button" id="registerButton">REGISTRAR</button>
+            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
+            <div class="info-text">
+                Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
+            </div>
         </div>
-        <div class="info-text">Não tem uma conta? <a href="#" id="registerLink">Registre-se</a></div>
+
+        <!-- Formulário de Cadastro -->
+        <div class="form-login" id="registerForm" style="display: none;">
+            <div class="line">
+                <input type="text" id="registerName" placeholder=" " required>
+                <label for="registerName">Seu Nome</label>
+            </div>
+            <div class="line">
+                <input type="email" id="registerEmail" placeholder=" " required>
+                <label for="registerEmail">Seu Email</label>
+            </div>
+            <div class="line">
+                <input type="password" id="registerPassword" placeholder=" " required>
+                <label for="registerPassword">Sua Senha</label>
+                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
+            </div>
+            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <button class="custom-button" id="registerSubmitButton">REGISTRAR</button>
+            <div class="info-text">
+                <a href="#" id="loginLink">Já tem uma conta? Faça login</a>
+            </div>
+        </div>
     </div>
-    <div id="welcomePopup" class="popup">
-        <h2>Bem-vindo!</h2>
-        <p>Você terá acesso gratuito por</p>
-        <div class="timer" id="countdown">00:00:00</div>
-        <button class="button" id="startGameButton">JOGAR AGORA</button>
+
+    <!-- Popup de Redirecionamento -->
+    <div id="redirectPopup" class="popup">
+        <h2>Você será redirecionado</h2>
+        <p>Em <span id="countdown" class="timer">5</span> segundos.</p>
+        <button class="button" onclick="document.getElementById('redirectPopup').style.display = 'none';">Fechar</button>
     </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mostrar/Ocultar Senha
-            const togglePassword = document.getElementById('togglePassword');
+        function showRedirectPopup() {
+            document.getElementById('redirectPopup').style.display = 'block';
+            let countdown = 5;
+            const countdownElement = document.getElementById('countdown');
+            const interval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
+                }
+            }, 1000);
+        }
+
+        function togglePasswordVisibility() {
             const passwordField = document.getElementById('loginPassword');
-            togglePassword.addEventListener('click', function () {
-                if (passwordField.type === 'password') {
-                    passwordField.type = 'text';
-                    togglePassword.classList.remove('zmdi-eye');
-                    togglePassword.classList.add('zmdi-eye-off');
-                } else {
-                    passwordField.type = 'password';
-                    togglePassword.classList.remove('zmdi-eye-off');
-                    togglePassword.classList.add('zmdi-eye');
-                }
-            });
-
-            // Contador de Tempo para Popup
-            function startCountdown(duration, display) {
-                let timer = duration, hours, minutes, seconds;
-                setInterval(function () {
-                    hours = parseInt(timer / 3600, 10);
-                    minutes = parseInt(timer % 3600 / 60, 10);
-                    seconds = parseInt(timer % 60, 10);
-
-                    hours = hours < 10 ? '0' + hours : hours;
-                    minutes = minutes < 10 ? '0' + minutes : minutes;
-                    seconds = seconds < 10 ? '0' + seconds : seconds;
-
-                    display.textContent = hours + ':' + minutes + ':' + seconds;
-
-                    if (--timer < 0) {
-                        timer = duration;
-                    }
-                }, 1000);
+            const passwordIcon = document.getElementById('togglePassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.replace('zmdi-eye', 'zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
             }
+        }
 
-            window.onload = function () {
-                let fiveMinutes = 60 * 5,
-                    display = document.querySelector('#countdown');
-                startCountdown(fiveMinutes, display);
-            };
+        function toggleRegisterPasswordVisibility() {
+            const passwordField = document.getElementById('registerPassword');
+            const passwordIcon = document.getElementById('toggleRegisterPassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.replace('zmdi-eye', 'zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
+            }
+        }
 
-            // Evento do Botão de Login
-            document.getElementById('loginButton').addEventListener('click', function () {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                if (email && password) {
-                    document.getElementById('welcomePopup').style.display = 'block';
-                } else {
-                    document.getElementById('loginError').style.display = 'block';
-                }
-            });
+        function validateLoginForm() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorElement = document.getElementById('loginError');
+            if (!email || !password) {
+                errorElement.textContent = 'Por favor, preencha todos os campos corretamente.';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            errorElement.style.display = 'none';
+            showRedirectPopup();
+            return true;
+        }
 
-            // Evento do Botão de Registro
-            document.getElementById('registerButton').addEventListener('click', function () {
-                alert('Registro realizado com sucesso!');
-            });
+        function validateRegisterForm() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const errorElement = document.getElementById('registerError');
+            if (!name || !email || !password) {
+                errorElement.textContent = 'Por favor, preencha todos os campos corretamente.';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            errorElement.style.display = 'none';
+            alert('Cadastro realizado com sucesso!');
+            return true;
+        }
 
-            // Evento do Link de Registro
-            document.getElementById('registerLink').addEventListener('click', function () {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('welcomePopup').style.display = 'block';
-            });
-
-            // Evento do Botão de Jogar Agora
-            document.getElementById('startGameButton').addEventListener('click', function () {
-                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-            });
+        document.getElementById('loginButton').addEventListener('click', validateLoginForm);
+        document.getElementById('registerSubmitButton').addEventListener('click', validateRegisterForm);
+        document.getElementById('registerLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
         });
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+        document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
+        document.getElementById('toggleRegisterPassword').addEventListener('click', toggleRegisterPasswordVisibility);
     </script>
 </body>
 </html>
