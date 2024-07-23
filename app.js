@@ -1,81 +1,120 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Elementos do formulário de login e registro
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    const loginLink = document.getElementById('loginLink');
+    const registerContainer = document.getElementById('registerContainer');
+    const loginContainer = document.querySelector('.wrap-login');
+    const registerPopup = document.getElementById('registerPopup');
+    const loginPopup = document.getElementById('loginPopup');
     const registerLink = document.getElementById('registerLink');
+    const loginLink = document.getElementById('loginLink');
     const loginButton = document.getElementById('loginButton');
-    const registerButton = document.getElementById('registerButton');
     const paymentButton = document.getElementById('paymentButton');
-    const redirectPopup = document.getElementById('redirectPopup');
-    const countdownElement = document.getElementById('countdown');
-    const redirectButton = document.getElementById('redirectButton');
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+    const registerSubmit = document.getElementById('registerSubmit');
+    const registerRedirectButton = document.getElementById('registerRedirectButton');
+    const loginRedirectButton = document.getElementById('loginRedirectButton');
+    const loginTimer = document.getElementById('loginTimer');
+    const loginRedirectCountdown = document.getElementById('loginRedirectCountdown');
+    const registerTimer = document.getElementById('registerTimer');
+    const registerRedirectCountdown = document.getElementById('registerRedirectCountdown');
+    const loginUserName = document.getElementById('loginUserName');
+    const registerUserName = document.getElementById('registerUserName');
+    let userName = 'Usuário'; // Substitua isso pelo nome real do usuário
 
-    // Mostrar o formulário de cadastro
-    registerLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-    });
-
-    // Mostrar o formulário de login
-    loginLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
-    });
-
-    // Manipular o clique no botão de login
-    loginButton.addEventListener('click', () => {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        if (password.length < 6) {
-            document.getElementById('loginError').style.display = 'block';
+    // Alternar visibilidade da senha
+    togglePassword.addEventListener('click', () => {
+        const passwordInput = document.getElementById('loginPassword');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePassword.innerHTML = '<i class="material-icons">visibility_off</i>';
         } else {
-            document.getElementById('loginError').style.display = 'none';
-            // Simulação de login
-            // Normalmente você enviaria uma solicitação de login aqui
-            loginForm.style.display = 'none';
-            // Exibir o popup e iniciar o cronômetro
-            redirectPopup.style.display = 'block';
-            let countdown = 5;
-            const countdownInterval = setInterval(() => {
-                countdown -= 1;
-                countdownElement.textContent = countdown;
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                }
-            }, 1000);
-
-            // Redirecionar após o clique no botão do popup
-            redirectButton.addEventListener('click', () => {
-                window.location.href = 'https://botmillion.github.io/telm/';
-            });
+            passwordInput.type = 'password';
+            togglePassword.innerHTML = '<i class="material-icons">visibility</i>';
         }
     });
 
-    // Manipular o clique no botão de cadastro
-    registerButton.addEventListener('click', () => {
+    toggleRegisterPassword.addEventListener('click', () => {
+        const passwordInput = document.getElementById('registerPassword');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleRegisterPassword.innerHTML = '<i class="material-icons">visibility_off</i>';
+        } else {
+            passwordInput.type = 'password';
+            toggleRegisterPassword.innerHTML = '<i class="material-icons">visibility</i>';
+        }
+    });
+
+    // Alternar entre login e registro
+    registerLink.addEventListener('click', () => {
+        loginContainer.style.display = 'none';
+        registerContainer.style.display = 'block';
+    });
+
+    loginLink.addEventListener('click', () => {
+        registerContainer.style.display = 'none';
+        loginContainer.style.display = 'block';
+    });
+
+    // Formulário de login
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        showLoginPopup(userName);
+    });
+
+    // Formulário de registro
+    registerForm.addEventListener('submit', (event) => {
+        event.preventDefault();
         const name = document.getElementById('registerName').value;
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        if (password.length < 6) {
-            document.getElementById('registerError').style.display = 'block';
-        } else {
-            document.getElementById('registerError').style.display = 'none';
-            // Simulação de cadastro
-            // Normalmente você enviaria uma solicitação de cadastro aqui
-            registerForm.style.display = 'none';
-            // Mensagem de confirmação após o cadastro
-            setTimeout(() => {
-                alert('Cadastro realizado com sucesso!');
-            }, 500);
-        }
+        showRegisterPopup(name);
     });
 
-    // Mostrar o botão de pagamento assim que a página carrega
-    paymentButton.style.display = 'block';
-    // Reiniciar a animação do botão de pagamento
-    paymentButton.classList.remove('pulse-button');
-    void paymentButton.offsetWidth; // Forçar reflow
-    paymentButton.classList.add('pulse-button');
+    // Exibir popup de registro
+    function showRegisterPopup(userName) {
+        document.getElementById('registerUserName').textContent = userName;
+        registerPopup.style.display = 'block';
+
+        let timer = 5;
+        let countdown = 3;
+
+        const timerInterval = setInterval(() => {
+            document.getElementById('registerTimer').textContent = timer;
+            timer--;
+            if (timer < 0) clearInterval(timerInterval);
+        }, 1000);
+
+        const countdownInterval = setInterval(() => {
+            document.getElementById('registerRedirectCountdown').textContent = countdown;
+            countdown--;
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+                window.location.href = 'https://botmillion.github.io/telm/';
+            }
+        }, 1000);
+    }
+
+    // Exibir popup de login
+    function showLoginPopup(userName) {
+        document.getElementById('loginUserName').textContent = userName;
+        loginPopup.style.display = 'block';
+
+        let timer = 5;
+        let countdown = 3;
+
+        const timerInterval = setInterval(() => {
+            document.getElementById('loginTimer').textContent = timer;
+            timer--;
+            if (timer < 0) clearInterval(timerInterval);
+        }, 1000);
+
+        const countdownInterval = setInterval(() => {
+            document.getElementById('loginRedirectCountdown').textContent = countdown;
+            countdown--;
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+                window.location.href = 'https://botmillion.github.io/telm/';
+            }
+        }, 1000);
+    }
 });
