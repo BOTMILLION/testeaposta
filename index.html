@@ -19,7 +19,7 @@
         }
         .wrap-login {
             width: 390px;
-            height: 650px;
+            height: 70vh; /* Ajustado para preencher 70% da tela verticalmente */
             background: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             padding: 20px;
@@ -39,7 +39,7 @@
             font-size: 30px;
             font-family: 'Poppins', sans-serif;
             font-weight: bold;
-            color: #d81b60;
+            color: #c8102e; /* Vermelho mais forte */
             width: 280px;
             height: 62px;
             line-height: 62px;
@@ -62,7 +62,7 @@
         }
         .line input {
             border: none;
-            border-bottom: 1px solid #d81b60;
+            border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
             width: 100%;
             padding: 10px 0;
             font-size: 16px;
@@ -75,7 +75,7 @@
             top: 0;
             left: 0;
             font-size: 14px;
-            color: #d81b60;
+            color: #c8102e; /* Vermelho mais forte */
             transition: 0.3s;
         }
         .line input:focus + label,
@@ -85,7 +85,7 @@
             font-size: 12px;
         }
         .custom-button {
-            background: linear-gradient(45deg, #d81b60, #c2185b);
+            background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
             border: none;
             color: white;
             padding: 15px 30px;
@@ -101,7 +101,7 @@
         .custom-button:hover {
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
             transform: scale(1.05);
-            background: linear-gradient(45deg, #c2185b, #d81b60);
+            background: linear-gradient(45deg, #a3141e, #c8102e); /* Vermelho mais forte */
         }
         .pulse-button {
             animation: pulse 1.5s infinite;
@@ -126,7 +126,7 @@
             text-align: center;
         }
         .info-text a {
-            color: #d81b60;
+            color: #c8102e; /* Vermelho mais forte */
             text-decoration: none;
         }
         .info-text a:hover {
@@ -147,7 +147,7 @@
         }
         .popup h2 {
             margin: 0;
-            color: #d81b60;
+            color: #c8102e; /* Vermelho mais forte */
         }
         .popup p {
             font-size: 18px;
@@ -155,10 +155,10 @@
         .popup .timer {
             font-size: 24px;
             font-weight: bold;
-            color: #d81b60;
+            color: #c8102e; /* Vermelho mais forte */
         }
         .popup .button {
-            background: linear-gradient(45deg, #d81b60, #c2185b);
+            background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
             border: none;
             color: white;
             padding: 10px 20px;
@@ -168,12 +168,12 @@
             margin-top: 20px;
         }
         .popup .button:hover {
-            background: linear-gradient(45deg, #c2185b, #d81b60);
+            background: linear-gradient(45deg, #a3141e, #c8102e); /* Vermelho mais forte */
         }
         @media (max-width: 600px) {
             .wrap-login {
                 width: 95%;
-                height: auto;
+                height: 70vh;
                 padding: 10px;
             }
             .form-login {
@@ -206,7 +206,7 @@
                 <i class="zmdi zmdi-eye" id="togglePassword" style="position: absolute; right: 10px; top: 10px; cursor: pointer;"></i>
             </div>
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
-            <button class="custom-button pulse-button" id="loginButton">LOGIN</button>
+            <button class="custom-button" id="loginButton">LOGIN</button>
             <div class="info-text">
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
             </div>
@@ -234,8 +234,8 @@
             </div>
         </div>
 
-        <!-- Botão de Realizar Pagamento -->
-        <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
+        <!-- Botão Realizar Pagamento -->
+        <button class="custom-button" id="paymentButton">REALIZAR PAGAMENTO</button>
     </div>
 
     <!-- Popup de Redirecionamento -->
@@ -314,18 +314,14 @@
         }
 
         document.getElementById('loginButton').addEventListener('click', validateLoginForm);
-        document.getElementById('registerButton').addEventListener('click', () => {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-        });
         document.getElementById('registerSubmitButton').addEventListener('click', validateRegisterForm);
-        document.getElementById('loginLink').addEventListener('click', () => {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        });
         document.getElementById('registerLink').addEventListener('click', () => {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
+        });
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
         });
         document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
         document.getElementById('toggleRegisterPassword').addEventListener('click', toggleRegisterPasswordVisibility);
