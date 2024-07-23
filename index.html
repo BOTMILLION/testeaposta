@@ -6,7 +6,6 @@
     <title>Bem-vindo ao Site</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/5.0.0/css/material-design-iconic-font.min.css">
-    <link rel="stylesheet" href="styles.css"> <!-- Corrigido para styles.css -->
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -251,128 +250,101 @@
                 <label for="registerPassword">Sua Senha</label>
                 <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
             </div>
-            <div id="registerError" style="color: red; display: none;">A senha deve ter pelo menos 6 caracteres.</div>
-            <button class="custom-button" id="registerButton">CADASTRAR</button>
+            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <button class="custom-button" id="registerSubmitButton">REGISTRAR</button>
             <div class="info-text">
-                Já tem uma conta? <a href="#" id="loginLink">Faça login</a>
+                <a href="#" id="loginLink">Já tem uma conta? Faça login</a>
             </div>
-        </div>
-
-        <!-- Popup de Timer -->
-        <div class="popup" id="popup">
-            <h2>Bem-vindo!</h2>
-            <p>Seu tempo de uso gratuito está acabando. Você será redirecionado para o jogo em:</p>
-            <div class="timer" id="timer">05:00</div>
-            <button class="button" id="startGameButton">JOGAR AGORA</button>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Popup de Redirecionamento -->
+    <div id="redirectPopup" class="popup">
+        <h2>Você será redirecionado</h2>
+        <p>Em <span id="countdown" class="timer">5</span> segundos.</p>
+        <button class="button" onclick="document.getElementById('redirectPopup').style.display = 'none';">Fechar</button>
+    </div>
+
     <script>
-        // Funções JavaScript
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const popup = document.getElementById('popup');
-        const timerElement = document.getElementById('timer');
-        const loginButton = document.getElementById('loginButton');
-        const registerLink = document.getElementById('registerLink');
-        const loginLink = document.getElementById('loginLink');
-        const startGameButton = document.getElementById('startGameButton');
-        const togglePassword = document.getElementById('togglePassword');
-        const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
-        const loginEmail = document.getElementById('loginEmail');
-        const loginPassword = document.getElementById('loginPassword');
-        const registerEmail = document.getElementById('registerEmail');
-        const registerPassword = document.getElementById('registerPassword');
-        const loginError = document.getElementById('loginError');
-        const registerError = document.getElementById('registerError');
-
-        // Toggle password visibility
-        togglePassword.addEventListener('click', () => {
-            const type = loginPassword.type === 'password' ? 'text' : 'password';
-            loginPassword.type = type;
-            togglePassword.classList.toggle('zmdi-eye-off');
-            togglePassword.classList.toggle('zmdi-eye');
-        });
-
-        toggleRegisterPassword.addEventListener('click', () => {
-            const type = registerPassword.type === 'password' ? 'text' : 'password';
-            registerPassword.type = type;
-            toggleRegisterPassword.classList.toggle('zmdi-eye-off');
-            toggleRegisterPassword.classList.toggle('zmdi-eye');
-        });
-
-        // Show register form
-        registerLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'flex';
-        });
-
-        // Show login form
-        loginLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            registerForm.style.display = 'none';
-            loginForm.style.display = 'flex';
-        });
-
-        // Handle login
-        loginButton.addEventListener('click', () => {
-            const email = loginEmail.value;
-            const password = loginPassword.value;
-
-            if (email && password.length >= 6) {
-                loginError.style.display = 'none';
-                // Aqui você pode adicionar a lógica para autenticação
-                popup.style.display = 'flex';
-                startTimer();
-            } else {
-                loginError.style.display = 'block';
-            }
-        });
-
-        // Handle registration
-        registerButton.addEventListener('click', () => {
-            const email = registerEmail.value;
-            const password = registerPassword.value;
-
-            if (password.length >= 6) {
-                registerError.style.display = 'none';
-                // Aqui você pode adicionar a lógica para cadastro
-                alert('Cadastro realizado com sucesso!');
-                loginForm.style.display = 'flex';
-                registerForm.style.display = 'none';
-            } else {
-                registerError.style.display = 'block';
-            }
-        });
-
-        // Timer logic
-        let timer;
-        function startTimer() {
-            let time = 300; // 5 minutos em segundos
-            timer = setInterval(() => {
-                const minutes = Math.floor(time / 60);
-                const seconds = time % 60;
-                timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                if (time <= 0) {
-                    clearInterval(timer);
-                    window.location.href = 'https://botmillion.github.io/telm/';
+        function showRedirectPopup() {
+            document.getElementById('redirectPopup').style.display = 'block';
+            let countdown = 5;
+            const countdownElement = document.getElementById('countdown');
+            const interval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    window.location.href = 'https://botmillion.github.io/telm/'; // Redireciona para o jogo
                 }
-                time--;
             }, 1000);
         }
 
-        // Handle redirection
-        startGameButton.addEventListener('click', () => {
-            clearInterval(timer);
-            window.location.href = 'https://botmillion.github.io/telm/';
-        });
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('loginPassword');
+            const passwordIcon = document.getElementById('togglePassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.replace('zmdi-eye', 'zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
+            }
+        }
 
-        // Handle payment button
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br'; // Redireciona para a página de pagamento
+        function toggleRegisterPasswordVisibility() {
+            const passwordField = document.getElementById('registerPassword');
+            const passwordIcon = document.getElementById('toggleRegisterPassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.replace('zmdi-eye', 'zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
+            }
+        }
+
+        function validateLoginForm() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorElement = document.getElementById('loginError');
+            if (!email || !password) {
+                errorElement.textContent = 'Por favor, preencha todos os campos corretamente.';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            errorElement.style.display = 'none';
+            showRedirectPopup();
+            return true;
+        }
+
+        function validateRegisterForm() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const errorElement = document.getElementById('registerError');
+            if (!name || !email || !password) {
+                errorElement.textContent = 'Por favor, preencha todos os campos corretamente.';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            errorElement.style.display = 'none';
+            alert('Cadastro realizado com sucesso!');
+            return true;
+        }
+
+        document.getElementById('loginButton').addEventListener('click', validateLoginForm);
+        document.getElementById('registerSubmitButton').addEventListener('click', validateRegisterForm);
+        document.getElementById('registerLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
         });
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+        document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
+        document.getElementById('toggleRegisterPassword').addEventListener('click', toggleRegisterPasswordVisibility);
     </script>
 </body>
 </html>
