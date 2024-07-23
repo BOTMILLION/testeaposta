@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectPopup = document.getElementById('redirectPopup');
     const countdownElement = document.getElementById('countdown');
     const redirectButton = document.getElementById('redirectButton');
-
+    
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
         event.preventDefault();
@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginError').style.display = 'block';
         } else {
             document.getElementById('loginError').style.display = 'none';
-            // Aqui você pode adicionar a lógica de login e autenticação
+            // Simulação de autenticação de login
+            // Normalmente você enviaria uma solicitação de autenticação aqui
             loginForm.style.display = 'none';
             redirectPopup.style.display = 'block';
 
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeLeft--;
                 if (timeLeft < 0) {
                     clearInterval(countdown);
-                    redirectButton.click();
+                    redirectButton.click(); // Redireciona automaticamente após o temporizador
                 }
             }, 1000);
         }
@@ -56,14 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('registerError').style.display = 'block';
         } else {
             document.getElementById('registerError').style.display = 'none';
-            // Aqui você pode adicionar a lógica de cadastro
+            // Simulação de cadastro
+            // Normalmente você enviaria uma solicitação de cadastro aqui
             registerForm.style.display = 'none';
-            confirmationMessage.style.display = 'block';
-
-            // Redirecionar após alguns segundos
+            // Mensagem de confirmação após o cadastro
             setTimeout(() => {
-                window.location.href = 'https://botmillion.github.io/telm/';
-            }, 3000);
+                alert('Cadastro realizado com sucesso!');
+            }, 500);
         }
     });
 
@@ -71,4 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         paymentButton.style.display = 'block';
     }, 10000); // Exibe após 10 segundos
+
+    // Redirecionar após o clique no botão do popup
+    redirectButton.addEventListener('click', () => {
+        window.location.href = 'https://botmillion.github.io/telm/';
+    });
 });
