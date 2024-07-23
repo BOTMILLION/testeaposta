@@ -39,6 +39,7 @@
             color: #666;
             margin-bottom: 5px;
             display: block;
+            position: relative;
         }
         .form-container .line {
             border-bottom: 1px solid #ddd;
@@ -52,31 +53,30 @@
             width: 100%;
             height: 100%;
             font-size: 16px;
-            padding: 10px;
+            padding: 0;
+            margin: 0;
             background: transparent;
             position: absolute;
             top: 0;
             left: 0;
         }
-        .form-container .line input::placeholder {
+        .form-container input::placeholder {
             color: #666;
             position: absolute;
             top: 15px;
-            left: 10px;
+            left: 0;
             font-size: 16px;
             transition: 0.3s;
             pointer-events: none;
         }
         .form-container input:focus::placeholder,
         .form-container input:not(:placeholder-shown)::placeholder {
-            top: -10px;
-            left: 10px;
+            top: -15px;
             font-size: 12px;
             color: #d81b60;
         }
-        .form-container input:focus,
-        .form-container input:not(:placeholder-shown) {
-            padding-top: 25px;
+        .form-container input:focus {
+            padding-top: 20px;
         }
         .button-container {
             display: flex;
