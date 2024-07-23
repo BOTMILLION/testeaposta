@@ -47,6 +47,13 @@
             font-size: 16px;
         }
 
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
         .custom-button {
             background: linear-gradient(45deg, #d81b60, #c2185b);
             border: none;
@@ -58,7 +65,8 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-top: 20px;
+            margin: 10px 0;
+            width: 100%;
         }
 
         .custom-button:hover {
@@ -174,8 +182,10 @@
             <input type="email" id="loginEmail" placeholder="Seu Email" required>
             <input type="password" id="loginPassword" placeholder="Sua Senha" required>
             <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-            <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
+            <div class="button-container">
+                <button class="custom-button" id="loginButton">LOGIN</button>
+                <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
+            </div>
             <div class="footer-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></div>
         </div>
 
