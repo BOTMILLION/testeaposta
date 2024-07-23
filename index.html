@@ -36,7 +36,7 @@
             margin-bottom: 20px;
         }
         .logo-container img {
-            width: 100px;
+            width: 200px;
             height: auto;
         }
         .logo-container h2 {
@@ -230,7 +230,8 @@
                     </div>
                 </div>
                 
-                <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
+                <div id="loginError" style="display: none; color: red;">Por favor, preencha todos os campos.</div>
+                <div id="loginIncorrect" style="display: none; color: red;">Email ou senha incorretos.</div>
                 <div class="button-container">
                     <button class="custom-button" id="loginButton">LOGIN</button>
                     <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
@@ -264,7 +265,7 @@
 
     <!-- Pop-up Timer -->
     <div id="popup" class="popup">
-        <h2>Bem-vindo!</h2>
+        
         <p>Você será redirecionado para o jogo em <span class="timer">5</span> segundos.</p>
         <button class="button" id="closePopupButton">Fechar</button>
     </div>
@@ -292,6 +293,11 @@
             const registerForm = document.getElementById('registerForm');
             const registerLink = document.getElementById('registerLink');
             const loginLink = document.getElementById('loginLink');
+            const loginButton = document.getElementById('loginButton');
+            const loginError = document.getElementById('loginError');
+            const loginIncorrect = document.getElementById('loginIncorrect');
+            const registerButton = document.getElementById('registerButton');
+            const registerError = document.getElementById('registerError');
 
             registerLink.addEventListener('click', () => {
                 loginForm.style.display = 'none';
@@ -320,13 +326,45 @@
                     if (timer === 0) {
                         clearInterval(countdown);
                         // Redirecionar para o jogo
-                        window.location.href = "https://seulink.com"; // Substitua pelo link do seu jogo
+                        // window.location.href = "https://botmillion.github.io/telm/"; // Substitua pelo link do seu jogo
                     }
                 }, 1000);
             });
 
             closePopupButton.addEventListener('click', () => {
                 popup.style.display = 'none';
+            });
+
+            // Login Form Validation
+            loginButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginError.style.display = 'none';
+                loginIncorrect.style.display = 'none';
+
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                if (!email || !password) {
+                    loginError.style.display = 'block';
+                } else {
+                    // Aqui você pode adicionar a lógica para verificar o email e senha
+                    // Caso a verificação falhe, mostre a mensagem de erro abaixo
+                    // loginIncorrect.style.display = 'block';
+                }
+            });
+
+            // Register Form Validation
+            registerButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerError.style.display = 'none';
+
+                const password = registerPasswordField.value;
+
+                if (password.length < 6) {
+                    registerError.style.display = 'block';
+                } else {
+                    // Aqui você pode adicionar a lógica para o cadastro
+                }
             });
         });
     </script>
