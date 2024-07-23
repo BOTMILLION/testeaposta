@@ -29,6 +29,21 @@
             box-sizing: border-box;
             position: relative;
         }
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            width: 100px;
+            height: auto;
+        }
+        .logo-container h2 {
+            margin: 10px 0 0 0;
+            font-size: 24px;
+            color: #d81b60;
+        }
         .form-container {
             display: flex;
             flex-direction: column;
@@ -197,6 +212,10 @@
 </head>
 <body>
     <div class="wrap-login">
+        <div class="logo-container">
+            <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo">
+            <h2>BEM VINDO</h2>
+        </div>
         <div class="form-container">
             <!-- Formulário de Login -->
             <div id="loginForm">
@@ -238,16 +257,18 @@
                 
                 <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
                 <button class="custom-button" id="registerButton">CADASTRAR</button>
-                <div class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></div>
+                <div class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça login</a></div>
             </div>
         </div>
     </div>
-    <!-- Popup de Redirecionamento -->
-    <div id="redirectPopup" class="popup">
-        <h2>Você será redirecionado em:</h2>
-        <p class="timer" id="countdown">5</p>
-        <button class="button" id="redirectButton">Ir Agora</button>
+
+    <!-- Pop-up Timer -->
+    <div id="popup" class="popup">
+        <h2>Bem-vindo!</h2>
+        <p>Você será redirecionado para o jogo em <span class="timer">5</span> segundos.</p>
+        <button class="button" id="closePopupButton">Fechar</button>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const togglePassword = document.getElementById('togglePassword');
@@ -265,6 +286,47 @@
                 const type = registerPasswordField.type === 'password' ? 'text' : 'password';
                 registerPasswordField.type = type;
                 toggleRegisterPassword.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const registerLink = document.getElementById('registerLink');
+            const loginLink = document.getElementById('loginLink');
+
+            registerLink.addEventListener('click', () => {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            });
+
+            loginLink.addEventListener('click', () => {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            });
+
+            // Timer Popup
+            const popup = document.getElementById('popup');
+            const closePopupButton = document.getElementById('closePopupButton');
+            const paymentButton = document.getElementById('paymentButton');
+
+            paymentButton.addEventListener('click', () => {
+                popup.style.display = 'block';
+                let timer = 5;
+                const timerElement = document.querySelector('.timer');
+                timerElement.textContent = timer;
+
+                const countdown = setInterval(() => {
+                    timer--;
+                    timerElement.textContent = timer;
+                    if (timer === 0) {
+                        clearInterval(countdown);
+                        // Redirecionar para o jogo
+                        window.location.href = "https://seulink.com"; // Substitua pelo link do seu jogo
+                    }
+                }, 1000);
+            });
+
+            closePopupButton.addEventListener('click', () => {
+                popup.style.display = 'none';
             });
         });
     </script>
