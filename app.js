@@ -33,25 +33,30 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             document.getElementById('loginError').style.display = 'none';
             // Simulação de autenticação de login
-            // Normalmente você enviaria uma solicitação de autenticação aqui
+            // Normalmente você enviaria uma solicitação de login aqui
             loginForm.style.display = 'none';
+            // Exibir o popup e iniciar o cronômetro
             redirectPopup.style.display = 'block';
-
-            // Iniciar o temporizador do popup
-            let timeLeft = 5;
-            const countdown = setInterval(() => {
-                countdownElement.textContent = timeLeft;
-                timeLeft--;
-                if (timeLeft < 0) {
-                    clearInterval(countdown);
-                    redirectButton.click(); // Redireciona automaticamente após o temporizador
+            let countdown = 5;
+            const countdownInterval = setInterval(() => {
+                countdown -= 1;
+                countdownElement.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
                 }
             }, 1000);
+
+            // Redirecionar após o clique no botão do popup
+            redirectButton.addEventListener('click', () => {
+                window.location.href = 'https://botmillion.github.io/telm/';
+            });
         }
     });
 
     // Manipular o clique no botão de cadastro
     registerButton.addEventListener('click', () => {
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
         if (password.length < 6) {
             document.getElementById('registerError').style.display = 'block';
@@ -67,13 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Mostrar o botão de pagamento após alguns segundos
-    setTimeout(() => {
-        paymentButton.style.display = 'block';
-    }, 10000); // Exibe após 10 segundos
-
-    // Redirecionar após o clique no botão do popup
-    redirectButton.addEventListener('click', () => {
-        window.location.href = 'https://botmillion.github.io/telm/';
-    });
+    // Mostrar o botão de pagamento assim que a página carrega
+    paymentButton.style.display = 'block';
+    // Reiniciar a animação do botão de pagamento
+    paymentButton.classList.remove('pulse-button');
+    void paymentButton.offsetWidth; // Forçar reflow
+    paymentButton.classList.add('pulse-button');
 });
