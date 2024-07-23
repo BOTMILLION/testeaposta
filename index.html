@@ -13,7 +13,9 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-image: url('https://i.imgur.com/Rv500de.jpg');
+            background-size: cover;
+            background-position: center;
             padding: 20px;
         }
         .wrap-login {
@@ -22,7 +24,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.9); /* Fundo transparente com cor */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             padding: 20px;
@@ -36,13 +38,13 @@
             margin-bottom: 20px;
         }
         .logo-container img {
-            width: 200px;
+            width: 400px;
             height: auto;
         }
         .logo-container h2 {
             margin: 10px 0 0 0;
             font-size: 24px;
-            color: #d81b60;
+            color: #d81b60; /* Cor do texto */
         }
         .form-container {
             display: flex;
@@ -70,9 +72,10 @@
             left: 0;
             box-sizing: border-box;
             text-align: left;
+            color: #d81b60; /* Cor do texto */
         }
         .form-container input::placeholder {
-            color: #666;
+            color: #d81b60; /* Cor do placeholder */
             position: absolute;
             top: 12px;
             left: 0;
@@ -84,7 +87,7 @@
         .form-container input:not(:placeholder-shown)::placeholder {
             top: -10px;
             font-size: 12px;
-            color: #d81b60;
+            color: #d81b60; /* Cor do placeholder ao focar */
         }
         .form-container input:focus {
             padding-top: 20px;
@@ -93,7 +96,7 @@
             position: relative;
         }
         .password-container input {
-            padding-right: 30px; /* Space for the eye icon */
+            padding-right: 30px; /* Espaço para o ícone do olho */
         }
         .password-container .eye-icon {
             position: absolute;
@@ -102,7 +105,7 @@
             transform: translateY(-50%);
             cursor: pointer;
             font-size: 20px;
-            color: #666;
+            color: #d81b60; /* Cor do ícone */
         }
         .button-container {
             display: flex;
@@ -111,7 +114,7 @@
             width: 100%;
         }
         .custom-button {
-            background: linear-gradient(45deg, #000000, #b71c1c);
+            background: linear-gradient(45deg, #d81b60, #8e24aa); /* Cores do botão */
             border: none;
             color: white;
             padding: 15px 30px;
@@ -126,7 +129,7 @@
             width: 100%;
         }
         .custom-button:hover {
-            background: linear-gradient(45deg, #b71c1c, #000000);
+            background: linear-gradient(45deg, #8e24aa, #d81b60);
         }
         .custom-button:active {
             transform: scale(0.95);
@@ -151,11 +154,11 @@
         .info-text {
             margin-top: 20px;
             font-size: 14px;
-            color: #666;
+            color: #d81b60; /* Cor do texto */
             text-align: center;
         }
         .info-text a {
-            color: #d81b60;
+            color: #d81b60; /* Cor do link */
             text-decoration: none;
         }
         .info-text a:hover {
@@ -176,7 +179,7 @@
         }
         .popup h2 {
             margin: 0;
-            color: #d81b60;
+            color: #d81b60; /* Cor do texto */
         }
         .popup p {
             font-size: 18px;
@@ -184,10 +187,10 @@
         .popup .timer {
             font-size: 24px;
             font-weight: bold;
-            color: #d81b60;
+            color: #d81b60; /* Cor do texto */
         }
         .popup .button {
-            background: linear-gradient(45deg, #d81b60, #c2185b);
+            background: linear-gradient(45deg, #d81b60, #8e24aa); /* Cores do botão */
             border: none;
             color: white;
             padding: 10px 20px;
@@ -197,7 +200,7 @@
             margin-top: 20px;
         }
         .popup .button:hover {
-            background: linear-gradient(45deg, #c2185b, #d81b60);
+            background: linear-gradient(45deg, #8e24aa, #d81b60);
         }
         @media (max-width: 600px) {
             .custom-button {
@@ -214,7 +217,7 @@
     <div class="wrap-login">
         <div class="logo-container">
             <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo">
-            <h2>BEM VINDO</h2>
+            <h2><span style="font-size: 280x62; font-weight: bold; font-family: 'Material-Design-Iconic-Font';">BEM VINDO</span></h2>
         </div>
         <div class="form-container">
             <!-- Formulário de Login -->
@@ -244,28 +247,27 @@
                 <div class="line">
                     <input type="text" id="registerName" placeholder="Seu Nome" required>
                 </div>
-                
                 <div class="line">
                     <input type="email" id="registerEmail" placeholder="Seu Email" required>
                 </div>
-                
                 <div class="password-container">
                     <div class="line">
                         <input type="password" id="registerPassword" placeholder="Sua Senha" required>
                         <span class="eye-icon" id="toggleRegisterPassword">👁️</span>
                     </div>
                 </div>
-                
                 <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-                <button class="custom-button" id="registerButton">CADASTRAR</button>
-                <div class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça login</a></div>
+                <div class="button-container">
+                    <button class="custom-button" id="registerButton">REGISTRAR</button>
+                </div>
+                <div class="info-text">Já tem uma conta? <a href="#" id="loginLink">Faça login</a></div>
             </div>
         </div>
     </div>
 
     <!-- Pop-up Timer -->
     <div id="popup" class="popup">
-        
+        <h2>Bem-vindo!</h2>
         <p>Você será redirecionado para o jogo em <span class="timer">5</span> segundos.</p>
         <button class="button" id="closePopupButton">Fechar</button>
     </div>
@@ -326,7 +328,7 @@
                     if (timer === 0) {
                         clearInterval(countdown);
                         // Redirecionar para o jogo
-                        // window.location.href = "https://botmillion.github.io/telm/"; // Substitua pelo link do seu jogo
+                        // window.location.href = "https://seulink.com"; // Substitua pelo link do seu jogo
                     }
                 }, 1000);
             });
