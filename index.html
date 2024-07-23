@@ -257,12 +257,16 @@
             </div>
         </div>
 
-        <!-- Popup -->
-        <div class="popup" id="redirectPopup">
-            <h2>Login Bem-sucedido!</h2>
-            <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
-            <button class="button" id="redirectNowButton">Ir Agora</button>
-        </div>
+<!-- Popup de Redirecionamento -->
+<div id="redirectPopup" class="popup">
+    <h2>Login Bem-sucedido!</h2>
+    <p>Olá <span id="userName"></span></p>
+    <p>Esse é o seu temporizador de período grátis:</p>
+    <p><span id="timer" class="timer">30</span> segundos restantes</p>
+    <p>Você será redirecionado para o jogo em <span id="countdown" class="timer">3</span> segundos.</p>
+    <button class="button" onclick="document.getElementById('redirectPopup').style.display = 'none';">Fechar</button>
+</div>
+
     </div>
 
     <script>
