@@ -108,22 +108,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('registerError').style.display = 'none';
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                    // Usuário cadastrado com sucesso
+                    // Cadastro bem-sucedido
                     const user = userCredential.user;
+                    alert('Cadastro bem-sucedido. Agora você pode fazer login.');
                     registerForm.style.display = 'none';
-                    alert('Cadastro realizado com sucesso!');
+                    loginForm.style.display = 'block';
                 })
                 .catch((error) => {
-                    console.error('Erro ao cadastrar usuário:', error);
-                    alert('Erro ao cadastrar usuário: ' + error.message);
+                    console.error('Erro ao fazer cadastro:', error);
+                    alert('Erro ao fazer cadastro: ' + error.message);
                 });
         }
     });
 
-    // Mostrar o botão de pagamento assim que a página carrega
-    paymentButton.style.display = 'block';
-    // Reiniciar a animação do botão de pagamento
-    paymentButton.classList.remove('pulse-button');
-    void paymentButton.offsetWidth; // Forçar reflow
-    paymentButton.classList.add('pulse-button');
+    // Mostrar botão de pagamento quando o temporizador expira
+    setTimeout(() => {
+        paymentButton.style.display = 'block';
+    }, 30000); // 30 segundos
+
+    paymentButton.addEventListener('click', () => {
+        window.location.href = 'https://checkout.yampi.com.br'; // Link para o checkout do Yampi
+    });
 });
