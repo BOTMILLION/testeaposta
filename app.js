@@ -12,6 +12,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const timerElement = document.getElementById('timer');
     const userNameElement = document.getElementById('userName');
 
+    // Configurar Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCKw5ZcJBcTvf1onPtkzgvJqlRAsbUqauk",
+        authDomain: "robo-7937c.firebaseapp.com",
+        projectId: "robo-7937c",
+        storageBucket: "robo-7937c.appspot.com",
+        messagingSenderId: "444396924434",
+        appId: "1:444396924434:web:46b93323f9c22d90ac32cb",
+        measurementId: "G-G4NYL1GXGW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
         event.preventDefault();
@@ -34,42 +51,49 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginError').style.display = 'block';
         } else {
             document.getElementById('loginError').style.display = 'none';
-            // Simulação de login
-            // Normalmente você enviaria uma solicitação de login aqui
-            loginForm.style.display = 'none';
-            // Exibir o popup e iniciar o cronômetro
-            redirectPopup.style.display = 'block';
-            
-            const userName = email.split('@')[0]; // Obtém o nome do usuário a partir do email
-            userNameElement.textContent = userName;
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Login bem-sucedido
+                    const user = userCredential.user;
+                    loginForm.style.display = 'none';
+                    redirectPopup.style.display = 'block';
 
-            // Inicializa o temporizador do período grátis
-            let timer = 30; // Tempo inicial do período grátis em segundos
-            timerElement.textContent = timer; // Exibe o tempo inicial
-            const timerInterval = setInterval(() => {
-                timer--;
-                timerElement.textContent = timer;
-                if (timer <= 0) {
-                    clearInterval(timerInterval);
-                }
-            }, 1000);
+                    // Exibir nome do usuário no popup
+                    const userName = email.split('@')[0]; // Obtém o nome do usuário a partir do email
+                    userNameElement.textContent = userName;
 
-            // Contagem regressiva para redirecionamento
-            let countdown = 3;
-            countdownElement.textContent = countdown; // Exibe a contagem inicial
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                countdownElement.textContent = countdown;
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
-                }
-            }, 1000);
+                    // Inicializa o temporizador do período grátis
+                    let timer = 30; // Tempo inicial do período grátis em segundos
+                    timerElement.textContent = timer; // Exibe o tempo inicial
+                    const timerInterval = setInterval(() => {
+                        timer--;
+                        timerElement.textContent = timer;
+                        if (timer <= 0) {
+                            clearInterval(timerInterval);
+                        }
+                    }, 1000);
 
-            // Redirecionar após o clique no botão do popup
-            redirectButton.addEventListener('click', () => {
-                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
-            });
+                    // Contagem regressiva para redirecionamento
+                    let countdown = 3;
+                    countdownElement.textContent = countdown; // Exibe a contagem inicial
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        countdownElement.textContent = countdown;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
+                        }
+                    }, 1000);
+
+                    // Redirecionar após o clique no botão do popup
+                    redirectButton.addEventListener('click', () => {
+                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
+                    });
+                })
+                .catch((error) => {
+                    console.error('Erro ao fazer login:', error);
+                    alert('Erro ao fazer login: ' + error.message);
+                });
         }
     });
 
@@ -82,13 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('registerError').style.display = 'block';
         } else {
             document.getElementById('registerError').style.display = 'none';
-            // Simulação de cadastro
-            // Normalmente você enviaria uma solicitação de cadastro aqui
-            registerForm.style.display = 'none';
-            // Mensagem de confirmação após o cadastro
-            setTimeout(() => {
-                alert('Cadastro realizado com sucesso!');
-            }, 500);
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Usuário cadastrado com sucesso
+                    const user = userCredential.user;
+                    registerForm.style.display = 'none';
+                    alert('Cadastro realizado com sucesso!');
+                })
+                .catch((error) => {
+                    console.error('Erro ao cadastrar usuário:', error);
+                    alert('Erro ao cadastrar usuário: ' + error.message);
+                });
         }
     });
 
