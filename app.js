@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectPopup = document.getElementById('redirectPopup');
     const countdownElement = document.getElementById('countdown');
     const redirectButton = document.getElementById('redirectButton');
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+    const passwordField = document.getElementById('loginPassword');
+    const registerPasswordField = document.getElementById('registerPassword');
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -33,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             document.getElementById('loginError').style.display = 'none';
             // Simulação de login
-            // Normalmente você enviaria uma solicitação de login aqui
             loginForm.style.display = 'none';
             // Exibir o popup e iniciar o cronômetro
             redirectPopup.style.display = 'block';
@@ -63,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             document.getElementById('registerError').style.display = 'none';
             // Simulação de cadastro
-            // Normalmente você enviaria uma solicitação de cadastro aqui
             registerForm.style.display = 'none';
             // Mensagem de confirmação após o cadastro
             setTimeout(() => {
@@ -72,10 +74,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Mostrar e ocultar a senha
+    togglePassword.addEventListener('click', () => {
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+        } else {
+            passwordField.type = 'password';
+        }
+    });
+
+    toggleRegisterPassword.addEventListener('click', () => {
+        if (registerPasswordField.type === 'password') {
+            registerPasswordField.type = 'text';
+        } else {
+            registerPasswordField.type = 'password';
+        }
+    });
+
     // Mostrar o botão de pagamento assim que a página carrega
     paymentButton.style.display = 'block';
     // Reiniciar a animação do botão de pagamento
-    paymentButton.classList.remove('pulse-button');
-    void paymentButton.offsetWidth; // Forçar reflow
     paymentButton.classList.add('pulse-button');
 });
