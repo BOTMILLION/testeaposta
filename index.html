@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo ao Site</title>
+    <title>Botão Oval com Gradiente</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,202 +16,54 @@
         }
 
         .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 80vh;
-            width: 90%;
-            max-width: 390px;
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        h1 {
-            color: #d81b60;
-            margin-bottom: 20px;
-        }
-
-        input[type="email"],
-        input[type="password"],
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
+            text-align: center;
         }
 
         .custom-button {
-            background: linear-gradient(45deg, #d81b60, #c2185b);
+            background: linear-gradient(45deg, #000000, #b71c1c); /* Gradiente de preto para vermelho sangue */
             border: none;
             color: white;
             padding: 15px 30px;
             font-size: 16px;
-            border-radius: 5px;
+            border-radius: 50px; /* Faz o botão ficar oval */
             cursor: pointer;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            transition: background 0.5s ease; /* Transição suave */
             margin: 10px 0;
-            width: 100%;
         }
 
-        .custom-button:hover {
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            transform: scale(1.05);
+        .custom-button:hover, .custom-button:focus {
+            background: linear-gradient(45deg, #b71c1c, #000000); /* Inverte o gradiente ao passar o mouse */
         }
 
         .custom-button:active {
-            transform: scale(0.95);
+            transform: scale(0.95); /* Efeito de clique */
         }
 
-        .pulse-button {
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 rgba(255, 255, 255, 0.7);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
-            }
-        }
-
-        .info-text {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-            text-align: center;
-        }
-
-        .info-text a {
-            color: #d81b60;
-            text-decoration: none;
-        }
-
-        .info-text a:hover {
-            text-decoration: underline;
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            text-align: center;
-            z-index: 1000;
-        }
-
-        .popup h2 {
-            margin: 0;
-            color: #d81b60;
-        }
-
-        .popup p {
-            font-size: 18px;
-        }
-
-        .popup .timer {
-            font-size: 24px;
-            font-weight: bold;
-            color: #d81b60;
-        }
-
-        .popup .button {
-            background: linear-gradient(45deg, #d81b60, #c2185b);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .popup .button:hover {
-            background: linear-gradient(45deg, #c2185b, #d81b60);
-        }
-
-        .footer-text {
+        .custom-button:before {
+            content: '';
             position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            font-size: 14px;
-            color: #666;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, #b71c1c, #000000);
+            transition: background 0.5s ease;
+            transform: rotate(45deg);
+            z-index: 0;
+            opacity: 0.5;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                width: 95%;
-                padding: 10px;
-            }
-            .custom-button {
-                padding: 10px 20px;
-                font-size: 14px;
-            }
+        .custom-button span {
+            position: relative;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Formulário de Login -->
-        <div id="loginForm">
-            <h1>Faça Login</h1>
-            <input type="email" id="loginEmail" placeholder="Seu Email" required>
-            <input type="password" id="loginPassword" placeholder="Sua Senha" required>
-            <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-            <div class="button-container">
-                <button class="custom-button" id="loginButton">LOGIN</button>
-                <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
-            </div>
-            <div class="footer-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></div>
-        </div>
-
-        <!-- Formulário de Cadastro -->
-        <div id="registerForm" style="display: none;">
-            <h1>Cadastro</h1>
-            <input type="text" id="registerName" placeholder="Seu Nome" required>
-            <input type="email" id="registerEmail" placeholder="Seu Email" required>
-            <input type="password" id="registerPassword" placeholder="Sua Senha" required>
-            <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-            <button class="custom-button" id="registerButton">CADASTRAR</button>
-            <div class="footer-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></div>
-        </div>
+        <button class="custom-button" id="accessButton"><span>ACESSAR</span></button>
     </div>
-
-    <!-- Popup de Redirecionamento -->
-    <div id="redirectPopup" class="popup">
-        <h2>Você será redirecionado em:</h2>
-        <p class="timer" id="countdown">5</p>
-        <button class="button" id="redirectButton">Ir Agora</button>
-    </div>
-
-    <script src="app.js" type="module"></script>
 </body>
 </html>
