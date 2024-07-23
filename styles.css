@@ -1,93 +1,80 @@
-body {
-    font-family: Arial, sans-serif;
-    background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
-    background-size: cover;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login e Registro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="wrap-login">
+        <div class="login-container">
+            <!-- Logo e Bem-vindo -->
+            <div class="logo-container">
+                <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo" class="logo">
+                <span class="welcome-text">Bem Vindo</span>
+            </div>
 
-.container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    max-width: 400px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+            <!-- Formulário de Login -->
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <div class="line"></div>
+                    <input type="email" id="loginEmail" placeholder="Seu Email" required>
+                </div>
+                <div class="form-group">
+                    <div class="line"></div>
+                    <input type="password" id="loginPassword" placeholder="Sua Senha" required>
+                    <button type="button" id="togglePassword">
+                        <i class="material-icons">visibility</i>
+                    </button>
+                </div>
+                <button type="submit" id="loginButton" class="button">Login</button>
+                <button type="button" id="paymentButton" class="button">Realizar Pagamento</button>
+                <span id="registerLink">Não tem uma conta? Cadastre-se</span>
+            </form>
+        </div>
+    </div>
 
-h1 {
-    text-align: center;
-}
+    <!-- Formulário de Registro -->
+    <div class="wrap-register" id="registerContainer">
+        <form class="register-form" id="registerForm">
+            <div class="form-group">
+                <div class="line"></div>
+                <input type="text" id="registerName" placeholder="Seu Nome" required>
+            </div>
+            <div class="form-group">
+                <div class="line"></div>
+                <input type="email" id="registerEmail" placeholder="Seu Email" required>
+            </div>
+            <div class="form-group">
+                <div class="line"></div>
+                <input type="password" id="registerPassword" placeholder="Sua Senha" required>
+                <button type="button" id="toggleRegisterPassword">
+                    <i class="material-icons">visibility</i>
+                </button>
+            </div>
+            <button type="submit" id="registerSubmit" class="button">Registrar</button>
+            <span id="loginLink">Já tem uma conta? Faça login</span>
+        </form>
+    </div>
 
-input {
-    display: block;
-    width: calc(100% - 20px);
-    margin: 10px auto;
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-}
+    <!-- Popup de Registro -->
+    <div id="registerPopup" class="popup">
+        <h2>Olá <span id="registerUserName"></span>!</h2>
+        <p>O seu período de teste começa agora...</p>
+        <p>Esse é o seu temporizador: <span id="registerTimer">5</span> segundos</p>
+        <p>Você será redirecionado em: <span id="registerRedirectCountdown">3</span> segundos</p>
+        <button class="button" id="registerRedirectButton">Ir Agora</button>
+    </div>
 
-.custom-button {
-    display: block;
-    width: calc(100% - 20px);
-    margin: 10px auto;
-    padding: 10px;
-    border-radius: 4px;
-    border: none;
-    background-color: #28a745;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
+    <!-- Popup de Login -->
+    <div id="loginPopup" class="popup">
+        <h2>Olá <span id="loginUserName"></span>!</h2>
+        <p>Esse é o seu temporizador: <span id="loginTimer">5</span> segundos</p>
+        <p>Você será redirecionado em: <span id="loginRedirectCountdown">3</span> segundos</p>
+        <button class="button" id="loginRedirectButton">Ir Agora</button>
+    </div>
 
-.custom-button:hover {
-    background-color: #218838;
-}
-
-.pulse-button {
-    background-color: #007bff;
-}
-
-.pulse-button:hover {
-    background-color: #0056b3;
-}
-
-.error-message {
-    color: red;
-    font-size: 12px;
-    text-align: center;
-    display: none;
-}
-
-.info-text {
-    text-align: center;
-    display: block;
-    margin-top: 10px;
-}
-
-.info-text a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.info-text a:hover {
-    text-decoration: underline;
-}
-
-.message-container {
-    text-align: center;
-    font-size: 16px;
-}
-
-.loading {
-    font-size: 24px;
-    margin: 20px 0;
-}
+    <script src="script.js"></script>
+</body>
+</html>
