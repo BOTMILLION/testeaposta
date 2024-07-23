@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo ao Site</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif; /* Aplicando a fonte Poppins Light */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -95,6 +96,25 @@
             z-index: 1;
         }
 
+        .pulse-button {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
         .info-text {
             margin-top: 20px;
             font-size: 14px;
@@ -160,8 +180,8 @@
                 padding: 10px;
             }
             .custom-button {
-                padding: 10px 20px;
-                font-size: 14px;
+                padding: 20px 40px; /* Aumenta o padding dos botões */
+                font-size: 18px; /* Aumenta o tamanho da fonte */
             }
         }
     </style>
