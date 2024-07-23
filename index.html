@@ -29,15 +29,6 @@
             width: 100%;
             margin-bottom: 20px;
         }
-        .form-group label {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            font-size: 16px;
-            color: #666;
-            transition: 0.3s;
-            pointer-events: none;
-        }
         .form-group input {
             width: 100%;
             padding: 15px;
@@ -46,9 +37,27 @@
             border-radius: 5px;
             font-size: 16px;
             background-color: #ffffff;
+            transition: padding 0.2s ease, font-size 0.2s ease, top 0.2s ease;
         }
-        .form-group input:focus + label,
-        .form-group input:not(:placeholder-shown) + label {
+        .form-group input:focus,
+        .form-group input:not(:placeholder-shown) {
+            padding-top: 25px;
+        }
+        .form-group input:focus::placeholder,
+        .form-group input:not(:placeholder-shown)::placeholder {
+            color: transparent;
+        }
+        .form-group input::placeholder {
+            color: #666;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 16px;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .form-group input:focus::placeholder,
+        .form-group input:not(:placeholder-shown)::placeholder {
             top: -10px;
             left: 10px;
             font-size: 12px;
@@ -165,12 +174,10 @@
         <!-- Formulário de Login -->
         <div id="loginForm">
             <div class="form-group">
-                <input type="email" id="loginEmail" placeholder=" " required>
-                <label for="loginEmail">Seu Email</label>
+                <input type="email" id="loginEmail" placeholder="Seu Email" required>
             </div>
             <div class="form-group">
-                <input type="password" id="loginPassword" placeholder=" " required>
-                <label for="loginPassword">Sua Senha</label>
+                <input type="password" id="loginPassword" placeholder="Sua Senha" required>
             </div>
             <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <div class="button-container">
@@ -183,16 +190,13 @@
         <!-- Formulário de Cadastro -->
         <div id="registerForm" style="display: none;">
             <div class="form-group">
-                <input type="text" id="registerName" placeholder=" " required>
-                <label for="registerName">Seu Nome</label>
+                <input type="text" id="registerName" placeholder="Seu Nome" required>
             </div>
             <div class="form-group">
-                <input type="email" id="registerEmail" placeholder=" " required>
-                <label for="registerEmail">Seu Email</label>
+                <input type="email" id="registerEmail" placeholder="Seu Email" required>
             </div>
             <div class="form-group">
-                <input type="password" id="registerPassword" placeholder=" " required>
-                <label for="registerPassword">Sua Senha</label>
+                <input type="password" id="registerPassword" placeholder="Sua Senha" required>
             </div>
             <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
