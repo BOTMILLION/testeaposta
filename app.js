@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectPopup = document.getElementById('redirectPopup');
     const countdownElement = document.getElementById('countdown');
     const redirectButton = document.getElementById('redirectButton');
-    
+
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
         event.preventDefault();
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginError').style.display = 'block';
         } else {
             document.getElementById('loginError').style.display = 'none';
-            // Simulação de autenticação de login
+            // Simulação de login
             // Normalmente você enviaria uma solicitação de login aqui
             loginForm.style.display = 'none';
             // Exibir o popup e iniciar o cronômetro
