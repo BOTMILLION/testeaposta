@@ -42,6 +42,15 @@
             color: #d81b60;
             margin-bottom: 20px;
         }
+        .form-login {
+            width: 280px;
+            height: 540px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
         .line {
             position: relative;
             width: 100%;
@@ -83,11 +92,29 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
             margin: 10px 0;
+            width: 100%;
         }
         .custom-button:hover {
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
             transform: scale(1.05);
             background: linear-gradient(45deg, #c2185b, #d81b60);
+        }
+        .pulse-button {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
         }
         .info-text {
             font-size: 14px;
@@ -145,6 +172,10 @@
                 height: auto;
                 padding: 10px;
             }
+            .form-login {
+                width: 100%;
+                height: auto;
+            }
             .custom-button {
                 padding: 10px 20px;
                 font-size: 14px;
@@ -160,7 +191,7 @@
         <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo" class="logo">
         <div class="welcome-text">Bem Vindo</div>
         <!-- Formulário de Login -->
-        <div id="loginForm">
+        <div class="form-login" id="loginForm">
             <div class="line">
                 <input type="email" id="loginEmail" placeholder=" " required>
                 <label for="loginEmail">Seu Email</label>
@@ -171,15 +202,14 @@
                 <i class="zmdi zmdi-eye" id="togglePassword" style="position: absolute; right: 10px; top: 10px; cursor: pointer;"></i>
             </div>
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
-            <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button" id="registerButton">REGISTRAR</button>
+            <button class="custom-button pulse-button" id="loginButton">LOGIN</button>
             <div class="info-text">
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
             </div>
         </div>
 
         <!-- Formulário de Cadastro -->
-        <div id="registerForm" style="display: none;">
+        <div class="form-login" id="registerForm" style="display: none;">
             <div class="line">
                 <input type="text" id="registerName" placeholder=" " required>
                 <label for="registerName">Seu Nome</label>
@@ -194,7 +224,7 @@
                 <i class="zmdi zmdi-eye" id="toggleRegisterPassword" style="position: absolute; right: 10px; top: 10px; cursor: pointer;"></i>
             </div>
             <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
-            <button class="custom-button" id="registerSubmitButton">CADASTRAR</button>
+            <button class="custom-button pulse-button" id="registerSubmitButton">CADASTRAR</button>
             <div class="info-text">
                 Já tem uma conta? <a href="#" id="loginLink">Faça o login</a>
             </div>
@@ -209,7 +239,6 @@
     </div>
 
     <script>
-        // Função para exibir o popup de redirecionamento
         function showRedirectPopup() {
             document.getElementById('redirectPopup').style.display = 'block';
             let countdown = 5;
@@ -219,12 +248,11 @@
                 countdownElement.textContent = countdown;
                 if (countdown <= 0) {
                     clearInterval(interval);
-                    window.location.href = 'https://botmillion.github.io/telm/';
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
                 }
             }, 1000);
         }
 
-        // Função para alternar a visibilidade da senha
         function togglePasswordVisibility() {
             const passwordField = document.getElementById('loginPassword');
             const passwordIcon = document.getElementById('togglePassword');
@@ -249,7 +277,6 @@
             }
         }
 
-        // Função para validar o formulário de login
         function validateLoginForm() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -260,11 +287,10 @@
                 return false;
             }
             errorElement.style.display = 'none';
-            showRedirectPopup(); // Exibe o popup ao enviar o formulário
+            showRedirectPopup();
             return true;
         }
 
-        // Função para validar o formulário de registro
         function validateRegisterForm() {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
@@ -280,7 +306,6 @@
             return true;
         }
 
-        // Adiciona eventos aos botões
         document.getElementById('loginButton').addEventListener('click', validateLoginForm);
         document.getElementById('registerButton').addEventListener('click', () => {
             document.getElementById('loginForm').style.display = 'none';
