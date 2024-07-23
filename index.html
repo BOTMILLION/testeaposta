@@ -1,102 +1,215 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const loginLink = document.getElementById('loginLink');
-    const registerLink = document.getElementById('registerLink');
-    const loginButton = document.getElementById('loginButton');
-    const registerButton = document.getElementById('registerButton');
-    const redirectPopup = document.getElementById('redirectPopup');
-    const countdownElement = document.getElementById('countdown');
-    const redirectMessage = document.getElementById('redirectMessage');
-    const redirectButton = document.getElementById('redirectButton');
-
-    // Mostrar o formulário de cadastro
-    registerLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-    });
-
-    // Mostrar o formulário de login
-    loginLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
-    });
-
-    // Manipular o clique no botão de login
-    loginButton.addEventListener('click', () => {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        if (password.length < 6) {
-            document.getElementById('loginError').style.display = 'block';
-        } else {
-            document.getElementById('loginError').style.display = 'none';
-            // Simulação de login
-            // Normalmente você enviaria uma solicitação de login aqui
-            loginForm.style.display = 'none';
-            // Exibir o popup e iniciar o cronômetro
-            redirectMessage.textContent = `Olá ${email}! Esse é o seu temporizador. Você será redirecionado em `;
-            redirectPopup.style.display = 'block';
-            let countdown = 3;
-            countdownElement.textContent = countdown;
-            const countdownInterval = setInterval(() => {
-                countdown -= 1;
-                countdownElement.textContent = countdown;
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = 'https://botmillion.github.io/telm/';
-                }
-            }, 1000);
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao Site</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/5.0.0/css/material-design-iconic-font.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: url('https://i.imgur.com/Rv500de.jpg') no-repeat center center fixed;
+            background-size: cover;
         }
-    });
-
-    // Manipular o clique no botão de cadastro
-    registerButton.addEventListener('click', () => {
-        const name = document.getElementById('registerName').value;
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        if (password.length < 6) {
-            document.getElementById('registerError').style.display = 'block';
-        } else {
-            document.getElementById('registerError').style.display = 'none';
-            // Simulação de cadastro
-            // Normalmente você enviaria uma solicitação de cadastro aqui
-            registerForm.style.display = 'none';
-            // Exibir o popup e iniciar o cronômetro
-            redirectMessage.textContent = `Olá ${name}! O seu período de teste começa agora. Esse é o seu temporizador. Você será redirecionado em `;
-            redirectPopup.style.display = 'block';
-            let countdown = 3;
-            countdownElement.textContent = countdown;
-            const countdownInterval = setInterval(() => {
-                countdown -= 1;
-                countdownElement.textContent = countdown;
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = 'https://botmillion.github.io/telm/';
-                }
-            }, 1000);
+        .wrap-login {
+            width: 390px;
+            height: 70vh; /* Ajustado para preencher 70% da tela verticalmente */
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
-    });
-
-    // Função para alternar a visibilidade da senha
-    function togglePasswordVisibility(passwordFieldId, iconId) {
-        const passwordField = document.getElementById(passwordFieldId);
-        const passwordIcon = document.getElementById(iconId);
-        if (passwordField.type === 'password') {
-            passwordField.type = 'text';
-            passwordIcon.classList.replace('zmdi-eye', 'zmdi-eye-off');
-        } else {
-            passwordField.type = 'password';
-            passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
         }
-    }
+        .welcome-text {
+            font-size: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            color: #c8102e; /* Vermelho mais forte */
+            width: 280px;
+            height: 62px;
+            line-height: 62px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-login {
+            width: 280px;
+            height: 540px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .line {
+            position: relative;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .line input {
+            border: none;
+            border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+            outline: none;
+            background: transparent;
+            color: #333;
+        }
+        .line label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 14px;
+            color: #c8102e; /* Vermelho mais forte */
+            transition: 0.3s;
+        }
+        .line input:focus + label,
+        .line input:not(:placeholder-shown) + label {
+            top: -20px;
+            left: 0;
+            font-size: 12px;
+        }
+        .custom-button {
+            background: linear-gradient(45deg, #c8102e, #a3141e); /* Vermelho mais forte */
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            margin: 10px 0;
+            width: 100%;
+            position: relative;
+        }
+        .custom-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+        .custom-button:hover:before {
+            opacity: 0.3;
+        }
+        .custom-button:active {
+            transform: scale(0.95);
+        }
+        .pulse-button {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #c8102e; /* Vermelho mais forte */
+        }
+        .link {
+            color: #c8102e; /* Vermelho mais forte */
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .link:hover {
+            color: #a3141e; /* Vermelho ainda mais forte */
+        }
+        #loginError, #registerError {
+            color: red;
+            display: none;
+            font-size: 14px;
+        }
+        #redirectPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap-login">
+        <img src="https://i.imgur.com/tM2zzF4.png" alt="Logo" class="logo">
+        <div class="welcome-text">Bem-vindo ao Site</div>
+        <form id="loginForm" class="form-login">
+            <div class="line">
+                <input type="email" id="loginEmail" required placeholder=" ">
+                <label for="loginEmail">Email</label>
+            </div>
+            <div class="line">
+                <input type="password" id="loginPassword" required placeholder=" ">
+                <label for="loginPassword">Senha</label>
+                <span class="zmdi zmdi-eye toggle-password" id="togglePassword"></span>
+            </div>
+            <button type="button" id="loginButton" class="custom-button pulse-button">Login</button>
+            <div id="loginError">A senha deve ter pelo menos 6 caracteres.</div>
+            <a id="registerLink" class="link">Ainda não tem conta? Cadastre-se</a>
+        </form>
+        <form id="registerForm" class="form-login" style="display: none;">
+            <div class="line">
+                <input type="text" id="registerName" required placeholder=" ">
+                <label for="registerName">Nome</label>
+            </div>
+            <div class="line">
+                <input type="email" id="registerEmail" required placeholder=" ">
+                <label for="registerEmail">Email</label>
+            </div>
+            <div class="line">
+                <input type="password" id="registerPassword" required placeholder=" ">
+                <label for="registerPassword">Senha</label>
+                <span class="zmdi zmdi-eye toggle-password" id="toggleRegisterPassword"></span>
+            </div>
+            <button type="button" id="registerButton" class="custom-button pulse-button">Registrar</button>
+            <div id="registerError">A senha deve ter pelo menos 6 caracteres.</div>
+            <a id="loginLink" class="link">Já tem conta? Faça login</a>
+        </form>
+    </div>
 
-    // Adicionar evento de clique para alternar visibilidade da senha
-    document.getElementById('togglePassword').addEventListener('click', () => {
-        togglePasswordVisibility('loginPassword', 'togglePassword');
-    });
-    document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
-        togglePasswordVisibility('registerPassword', 'toggleRegisterPassword');
-    });
-});
+    <div id="redirectPopup">
+        <div id="redirectMessage"></div>
+        <div id="countdown"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
