@@ -24,30 +24,25 @@
             max-width: 600px;
             margin: 0 auto;
         }
-        .form-group {
-            position: relative;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        .form-group input {
+        .form-container input {
             width: 100%;
             padding: 15px;
-            margin: 0;
+            margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
             background-color: #ffffff;
             transition: padding 0.2s ease, font-size 0.2s ease, top 0.2s ease;
         }
-        .form-group input:focus,
-        .form-group input:not(:placeholder-shown) {
+        .form-container input:focus,
+        .form-container input:not(:placeholder-shown) {
             padding-top: 25px;
         }
-        .form-group input:focus::placeholder,
-        .form-group input:not(:placeholder-shown)::placeholder {
+        .form-container input:focus::placeholder,
+        .form-container input:not(:placeholder-shown)::placeholder {
             color: transparent;
         }
-        .form-group input::placeholder {
+        .form-container input::placeholder {
             color: #666;
             position: absolute;
             top: 15px;
@@ -56,8 +51,8 @@
             transition: 0.3s;
             pointer-events: none;
         }
-        .form-group input:focus::placeholder,
-        .form-group input:not(:placeholder-shown)::placeholder {
+        .form-container input:focus::placeholder,
+        .form-container input:not(:placeholder-shown)::placeholder {
             top: -10px;
             left: 10px;
             font-size: 12px;
@@ -163,7 +158,7 @@
                 padding: 20px 40px;
                 font-size: 18px;
             }
-            .form-group input {
+            .form-container input {
                 padding: 20px;
             }
         }
@@ -173,12 +168,8 @@
     <div class="form-container">
         <!-- Formulário de Login -->
         <div id="loginForm">
-            <div class="form-group">
-                <input type="email" id="loginEmail" placeholder="Seu Email" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="loginPassword" placeholder="Sua Senha" required>
-            </div>
+            <input type="email" id="loginEmail" placeholder="Seu Email" required>
+            <input type="password" id="loginPassword" placeholder="Sua Senha" required>
             <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <div class="button-container">
                 <button class="custom-button" id="loginButton">LOGIN</button>
@@ -189,15 +180,9 @@
 
         <!-- Formulário de Cadastro -->
         <div id="registerForm" style="display: none;">
-            <div class="form-group">
-                <input type="text" id="registerName" placeholder="Seu Nome" required>
-            </div>
-            <div class="form-group">
-                <input type="email" id="registerEmail" placeholder="Seu Email" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="registerPassword" placeholder="Sua Senha" required>
-            </div>
+            <input type="text" id="registerName" placeholder="Seu Nome" required>
+            <input type="email" id="registerEmail" placeholder="Seu Email" required>
+            <input type="password" id="registerPassword" placeholder="Sua Senha" required>
             <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></div>
