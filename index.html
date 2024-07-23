@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo ao Site</title>
-    <style>
-        /* O estilo permanece o mesmo */
-        /* ... */
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
@@ -16,7 +13,7 @@
             <h1>Faça Login</h1>
             <input type="email" id="loginEmail" placeholder="Seu Email" required>
             <input type="password" id="loginPassword" placeholder="Sua Senha" required>
-            <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
+            <div id="loginError" class="error-message">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
             <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
             <span class="info-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
@@ -28,12 +25,13 @@
             <input type="text" id="registerName" placeholder="Seu Nome" required>
             <input type="email" id="registerEmail" placeholder="Seu Email" required>
             <input type="password" id="registerPassword" placeholder="Sua Senha" required>
-            <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
+            <div id="registerError" class="error-message">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <span class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></span>
         </div>
 
-        <div id="welcome-message"></div>
+        <!-- Contador e Botão de Redirecionamento -->
+        <div id="welcome-message" style="display: none;">Bem-vindo(a)!</div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
             <a href="https://botmillion.github.io/telm/" class="custom-button" id="redirectButton">JOGUE AGORA</a>
