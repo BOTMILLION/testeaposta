@@ -4,7 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo ao Site</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            width: 90%;
+            max-width: 390px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        h1 {
+            color: #d81b60;
+            margin-bottom: 20px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .custom-button {
+            background: linear-gradient(45deg, #d81b60, #c2185b);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .custom-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+
+        .custom-button:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .custom-button:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .custom-button:active {
+            transform: rotateX(10deg) rotateY(10deg);
+        }
+
+        .info-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-text a {
+            color: #d81b60;
+            text-decoration: none;
+        }
+
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .custom-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+        /* Animação pulsante */
+        @keyframes pulsar {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .pulse-button {
+            animation: pulsar 1.5s infinite;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,7 +141,7 @@
             <h1>Faça Login</h1>
             <input type="email" id="loginEmail" placeholder="Seu Email" required>
             <input type="password" id="loginPassword" placeholder="Sua Senha" required>
-            <div id="loginError" class="error-message">A senha deve ter pelo menos 6 caracteres.</div>
+            <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
             <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
             <span class="info-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
@@ -25,12 +153,11 @@
             <input type="text" id="registerName" placeholder="Seu Nome" required>
             <input type="email" id="registerEmail" placeholder="Seu Email" required>
             <input type="password" id="registerPassword" placeholder="Sua Senha" required>
-            <div id="registerError" class="error-message">A senha deve ter pelo menos 6 caracteres.</div>
+            <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <span class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></span>
         </div>
 
-        <!-- Contador e Botão de Redirecionamento -->
         <div id="welcome-message" style="display: none;">Bem-vindo(a)!</div>
         <div id="timer" style="display: none;"></div>
         <div id="buttons" style="display: none;">
