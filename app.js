@@ -39,11 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.style.display = 'none';
             // Exibir o popup e iniciar o cronômetro
             redirectPopup.style.display = 'block';
+            
             const userName = email.split('@')[0]; // Obtém o nome do usuário a partir do email
             userNameElement.textContent = userName;
 
             // Inicializa o temporizador do período grátis
             let timer = 30; // Tempo inicial do período grátis em segundos
+            timerElement.textContent = timer; // Exibe o tempo inicial
             const timerInterval = setInterval(() => {
                 timer--;
                 timerElement.textContent = timer;
@@ -54,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Contagem regressiva para redirecionamento
             let countdown = 3;
+            countdownElement.textContent = countdown; // Exibe a contagem inicial
             const countdownInterval = setInterval(() => {
                 countdown--;
                 countdownElement.textContent = countdown;
