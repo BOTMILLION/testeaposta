@@ -16,13 +16,29 @@
             background-color: #f0f0f0;
             padding: 20px;
         }
-        .form-container {
+        .wrap-login {
+            width: 390px;
+            height: 650px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
             width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
+        }
+        .form-container label {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 5px;
+            display: block;
         }
         .form-container input {
             width: 100%;
@@ -165,27 +181,39 @@
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <!-- Formulário de Login -->
-        <div id="loginForm">
-            <input type="email" id="loginEmail" placeholder="Seu Email" required>
-            <input type="password" id="loginPassword" placeholder="Sua Senha" required>
-            <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-            <div class="button-container">
-                <button class="custom-button" id="loginButton">LOGIN</button>
-                <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
+    <div class="wrap-login">
+        <div class="form-container">
+            <!-- Formulário de Login -->
+            <div id="loginForm">
+                <label for="loginEmail">Seu Email</label>
+                <input type="email" id="loginEmail" placeholder="Seu Email" required>
+                
+                <label for="loginPassword">Sua Senha</label>
+                <input type="password" id="loginPassword" placeholder="Sua Senha" required>
+                
+                <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
+                <div class="button-container">
+                    <button class="custom-button" id="loginButton">LOGIN</button>
+                    <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
+                </div>
+                <div class="info-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></div>
             </div>
-            <div class="info-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></div>
-        </div>
 
-        <!-- Formulário de Cadastro -->
-        <div id="registerForm" style="display: none;">
-            <input type="text" id="registerName" placeholder="Seu Nome" required>
-            <input type="email" id="registerEmail" placeholder="Seu Email" required>
-            <input type="password" id="registerPassword" placeholder="Sua Senha" required>
-            <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-            <button class="custom-button" id="registerButton">CADASTRAR</button>
-            <div class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></div>
+            <!-- Formulário de Cadastro -->
+            <div id="registerForm" style="display: none;">
+                <label for="registerName">Seu Nome</label>
+                <input type="text" id="registerName" placeholder="Seu Nome" required>
+                
+                <label for="registerEmail">Seu Email</label>
+                <input type="email" id="registerEmail" placeholder="Seu Email" required>
+                
+                <label for="registerPassword">Sua Senha</label>
+                <input type="password" id="registerPassword" placeholder="Sua Senha" required>
+                
+                <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
+                <button class="custom-button" id="registerButton">CADASTRAR</button>
+                <div class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></div>
+            </div>
         </div>
     </div>
     <!-- Popup de Redirecionamento -->
