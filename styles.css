@@ -1,198 +1,93 @@
-/* Estilo geral */
 body {
-    font-family: Poppins, sans-serif;
+    font-family: Arial, sans-serif;
+    background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
+    background-size: cover;
     margin: 0;
     padding: 0;
-    background-image: url('https://i.imgur.com/Rv500de.jpg');
-    background-size: cover;
-    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.wrap-login {
-    width: 390px;
-    height: 650px;
-    margin: 0 auto;
-    position: relative;
-}
-
-.login-container {
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
+.container {
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    box-sizing: border-box;
+    max-width: 400px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
 }
 
-.logo-container {
+h1 {
     text-align: center;
-    margin-bottom: 20px;
 }
 
-.logo {
-    width: 150px; /* Tamanho ajustado da logo */
-}
-
-.welcome-text {
-    font-size: 30px;
-    font-weight: bold;
-    color: #d81b60;
-    margin-top: 10px;
+input {
     display: block;
-}
-
-.login-form {
-    width: 280px;
-    height: 540px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.form-group {
-    width: 100%;
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.line {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: #d81b60;
-}
-
-input[type="email"], input[type="password"] {
-    width: 100%;
-    border: none;
-    border-bottom: 1px solid #d81b60;
+    width: calc(100% - 20px);
+    margin: 10px auto;
     padding: 10px;
-    font-size: 16px;
-    outline: none;
+    border-radius: 4px;
+    border: 1px solid #ccc;
 }
 
-button {
-    background: linear-gradient(45deg, #d81b60, #c2185b);
+.custom-button {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 4px;
     border: none;
+    background-color: #28a745;
     color: white;
-    padding: 10px 20px;
     font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    position: relative;
-    overflow: hidden;
-}
-
-button:hover {
-    background: linear-gradient(45deg, #c2185b, #d81b60);
-}
-
-#loginButton {
-    margin-bottom: 10px;
-}
-
-#paymentButton {
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-#registerLink, #loginLink {
-    margin-top: 20px;
-    color: #d81b60;
     cursor: pointer;
 }
 
-.popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
+.custom-button:hover {
+    background-color: #218838;
+}
+
+.pulse-button {
+    background-color: #007bff;
+}
+
+.pulse-button:hover {
+    background-color: #0056b3;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
     text-align: center;
-    z-index: 1000;
+    display: none;
 }
 
-.popup h2 {
-    margin: 0;
-    color: #d81b60;
+.info-text {
+    text-align: center;
+    display: block;
+    margin-top: 10px;
 }
 
-.popup p {
-    font-size: 18px;
+.info-text a {
+    color: #007bff;
+    text-decoration: none;
 }
 
-.popup .button {
-    background: linear-gradient(45deg, #d81b60, #c2185b);
-    border: none;
-    color: white;
-    padding: 10px 20px;
+.info-text a:hover {
+    text-decoration: underline;
+}
+
+.message-container {
+    text-align: center;
     font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
 }
 
-.popup .button:hover {
-    background: linear-gradient(45deg, #c2185b, #d81b60);
-}
-
-.popup .button:active {
-    transform: scale(0.95);
-}
-
-/* Estilo para o formulário de registro */
-.wrap-register {
-    display: none; /* Inicialmente escondido */
-    width: 390px;
-    height: 650px;
-    margin: 0 auto;
-    position: relative;
-}
-
-.register-form {
-    width: 280px;
-    height: 540px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-#togglePassword, #toggleRegisterPassword {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #d81b60;
-}
-
-.material-icons {
+.loading {
     font-size: 24px;
+    margin: 20px 0;
 }
