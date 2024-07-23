@@ -97,11 +97,25 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
             margin: 10px 0;
             width: 100%;
+            position: relative;
         }
-        .custom-button:hover {
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            transform: scale(1.05);
-            background: linear-gradient(45deg, #a3141e, #c8102e); /* Vermelho mais forte */
+        .custom-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+        .custom-button:hover:before {
+            opacity: 0.3;
+        }
+        .custom-button:active {
+            transform: scale(0.95);
         }
         .pulse-button {
             animation: pulse 1.5s infinite;
@@ -124,6 +138,7 @@
             font-size: 14px;
             color: #666;
             text-align: center;
+            margin-top: 20px;
         }
         .info-text a {
             color: #c8102e; /* Vermelho mais forte */
@@ -170,6 +185,13 @@
         .popup .button:hover {
             background: linear-gradient(45deg, #a3141e, #c8102e); /* Vermelho mais forte */
         }
+        .line .zmdi-eye, .line .zmdi-eye-off {
+            font-size: 18px;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
+        }
         @media (max-width: 600px) {
             .wrap-login {
                 width: 95%;
@@ -203,10 +225,11 @@
             <div class="line">
                 <input type="password" id="loginPassword" placeholder=" " required>
                 <label for="loginPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="togglePassword" style="position: absolute; right: 10px; top: 10px; cursor: pointer;"></i>
+                <i class="zmdi zmdi-eye" id="togglePassword"></i>
             </div>
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
+            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
             <div class="info-text">
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
             </div>
@@ -225,17 +248,14 @@
             <div class="line">
                 <input type="password" id="registerPassword" placeholder=" " required>
                 <label for="registerPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="toggleRegisterPassword" style="position: absolute; right: 10px; top: 10px; cursor: pointer;"></i>
+                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
             </div>
             <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
-            <button class="custom-button pulse-button" id="registerSubmitButton">CADASTRAR</button>
+            <button class="custom-button" id="registerSubmitButton">REGISTRAR</button>
             <div class="info-text">
-                Já tem uma conta? <a href="#" id="loginLink">Faça o login</a>
+                <a href="#" id="loginLink">Já tem uma conta? Faça login</a>
             </div>
         </div>
-
-        <!-- Botão Realizar Pagamento -->
-        <button class="custom-button" id="paymentButton">REALIZAR PAGAMENTO</button>
     </div>
 
     <!-- Popup de Redirecionamento -->
