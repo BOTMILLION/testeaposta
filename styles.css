@@ -1,47 +1,93 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo ao Site</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <!-- Formulário de Login -->
-        <div id="loginForm">
-            <h1>Faça Login</h1>
-            <input type="email" id="loginEmail" placeholder="Seu Email" required>
-            <input type="password" id="loginPassword" placeholder="Sua Senha" required>
-            <div id="loginError" class="error-message">A senha deve ter pelo menos 6 caracteres.</div>
-            <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button pulse-button" id="paymentButton" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
-            <span class="info-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
-        </div>
+body {
+    font-family: Arial, sans-serif;
+    background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-        <!-- Formulário de Cadastro -->
-        <div id="registerForm" style="display: none;">
-            <h1>Cadastro</h1>
-            <input type="text" id="registerName" placeholder="Seu Nome" required>
-            <input type="email" id="registerEmail" placeholder="Seu Email" required>
-            <input type="password" id="registerPassword" placeholder="Sua Senha" required>
-            <div id="registerError" class="error-message">A senha deve ter pelo menos 6 caracteres.</div>
-            <button class="custom-button" id="registerButton">CADASTRAR</button>
-            <span class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></span>
-        </div>
+.container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        <!-- Contador e Botão de Redirecionamento -->
-        <div id="welcome-message" style="display: none;">Bem-vindo(a)!</div>
-        <div id="timer" style="display: none;"></div>
-        <div id="buttons" style="display: none;">
-            <a href="https://botmillion.github.io/telm/" class="custom-button" id="redirectButton">JOGUE AGORA</a>
-        </div>
-    </div>
-    <div id="confirmation-message" class="message-container" style="display: none;">
-        <h1>Email verificado com sucesso!</h1>
-        <p>Aguarde. Você será redirecionado para o site novamente.</p>
-        <div class="loading">🔄</div>
-    </div>
-    <script src="app.js" type="module"></script>
-</body>
-</html>
+h1 {
+    text-align: center;
+}
+
+input {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.custom-button {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 4px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.custom-button:hover {
+    background-color: #218838;
+}
+
+.pulse-button {
+    background-color: #007bff;
+}
+
+.pulse-button:hover {
+    background-color: #0056b3;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    text-align: center;
+    display: none;
+}
+
+.info-text {
+    text-align: center;
+    display: block;
+    margin-top: 10px;
+}
+
+.info-text a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.info-text a:hover {
+    text-decoration: underline;
+}
+
+.message-container {
+    text-align: center;
+    font-size: 16px;
+}
+
+.loading {
+    font-size: 24px;
+    margin: 20px 0;
+}
