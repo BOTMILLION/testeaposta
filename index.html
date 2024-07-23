@@ -66,10 +66,30 @@
             transform: scale(1.05);
         }
 
+        .pulse-button {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
         .info-text {
             margin-top: 20px;
             font-size: 14px;
             color: #666;
+            text-align: center;
         }
 
         .info-text a {
@@ -81,18 +101,6 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                width: 95%;
-                padding: 10px;
-            }
-            .custom-button {
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-        }
-
-        /* Popup */
         .popup {
             display: none;
             position: fixed;
@@ -136,6 +144,26 @@
         .popup .button:hover {
             background: linear-gradient(45deg, #c2185b, #d81b60);
         }
+
+        .footer-text {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .custom-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -147,8 +175,8 @@
             <input type="password" id="loginPassword" placeholder="Sua Senha" required>
             <div id="loginError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button pulse-button" id="paymentButton" style="display: none;" onclick="window.location.href='https://checkout.yampi.com/checkout-link-seu-produto'">Realizar Pagamento</button>
-            <span class="info-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></span>
+            <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
+            <div class="footer-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></div>
         </div>
 
         <!-- Formulário de Cadastro -->
@@ -159,7 +187,7 @@
             <input type="password" id="registerPassword" placeholder="Sua Senha" required>
             <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
-            <span class="info-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></span>
+            <div class="footer-text" id="registerToggleText">Já tem uma conta? <a href="#" id="loginLink">Faça o login</a></div>
         </div>
     </div>
 
