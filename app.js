@@ -1,24 +1,3 @@
-// Importar os módulos do Firebase
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
-
-// Configuração do Firebase
-const firebaseConfig = {
-            apiKey: "AIzaSyAtaTalveibqyUVnO33QhHz-sGYzO4PkWk",
-            authDomain: "robo3-686ff.firebaseapp.com",
-            projectId: "robo3-686ff",
-            storageBucket: "robo3-686ff.appspot.com",
-            messagingSenderId: "1035908255814",
-            appId: "1:1035908255814:web:4a5fc9c91325aa6fe33a47"
-};
-
-// Inicializa o Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const firestore = getFirestore(app);
-
-// Função para lidar com o login
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -53,29 +32,24 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginError').style.display = 'block';
         } else {
             document.getElementById('loginError').style.display = 'none';
-            // Função de login
-            signInWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    loginForm.style.display = 'none';
-                    // Exibir o popup e iniciar o cronômetro
-                    redirectPopup.style.display = 'block';
-                    let countdown = 5;
-                    const countdownInterval = setInterval(() => {
-                        countdown -= 1;
-                        countdownElement.textContent = countdown;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                        }
-                    }, 1000);
+            // Simulação de login
+            // Normalmente você enviaria uma solicitação de login aqui
+            loginForm.style.display = 'none';
+            // Exibir o popup e iniciar o cronômetro
+            redirectPopup.style.display = 'block';
+            let countdown = 5;
+            const countdownInterval = setInterval(() => {
+                countdown -= 1;
+                countdownElement.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
 
-                    // Redirecionar após o clique no botão do popup
-                    redirectButton.addEventListener('click', () => {
-                        window.location.href = 'https://botmillion.github.io/telm/';
-                    });
-                })
-                .catch((error) => {
-                    console.error('Erro de login', error);
-                });
+            // Redirecionar após o clique no botão do popup
+            redirectButton.addEventListener('click', () => {
+                window.location.href = 'https://botmillion.github.io/telm/';
+            });
         }
     });
 
@@ -88,18 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('registerError').style.display = 'block';
         } else {
             document.getElementById('registerError').style.display = 'none';
-            // Função de registro
-            createUserWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    registerForm.style.display = 'none';
-                    // Mensagem de confirmação após o cadastro
-                    setTimeout(() => {
-                        alert('Cadastro realizado com sucesso!');
-                    }, 500);
-                })
-                .catch((error) => {
-                    console.error('Erro de cadastro', error);
-                });
+            // Simulação de cadastro
+            // Normalmente você enviaria uma solicitação de cadastro aqui
+            registerForm.style.display = 'none';
+            // Mensagem de confirmação após o cadastro
+            setTimeout(() => {
+                alert('Cadastro realizado com sucesso!');
+            }, 500);
         }
     });
 
