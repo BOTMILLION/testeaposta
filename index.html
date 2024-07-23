@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo ao Site</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/5.0.0/css/material-design-iconic-font.min.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -13,108 +14,62 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-image: url('https://i.imgur.com/Rv500de.jpg');
+            background: url('https://i.imgur.com/Rv500de.jpg') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            padding: 20px;
         }
         .wrap-login {
             width: 390px;
             height: 650px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.9); /* Fundo transparente com cor */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             padding: 20px;
-            box-sizing: border-box;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             position: relative;
+            text-align: center;
         }
-        .logo-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
+        .logo {
+            width: 150px;
+            margin: 0 auto;
+            display: block;
         }
-        .logo-container img {
-            width: 200px; /* Tamanho original da logo */
-            height: auto;
+        .welcome-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d81b60; /* Cor da logo */
+            margin: 20px 0;
+            font-family: 'Material-Design-Iconic-Font';
+            font-size: 62px;
         }
-        .logo-container h2 {
-            margin: 10px 0 0 0;
-            font-size: 24px;
-            color: #d81b60; /* Cor do texto */
-        }
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-        .form-container .line {
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
+        .line {
             position: relative;
-            height: 40px;
-            line-height: 40px;
+            margin: 10px 0;
         }
-        .form-container input {
+        .line input {
             border: none;
+            border-bottom: 1px solid #d81b60;
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
             outline: none;
-            width: 100%;
-            height: 100%;
-            font-size: 16px;
-            padding: 0;
-            margin: 0;
             background: transparent;
-            position: absolute;
-            top: 0;
-            left: 0;
-            box-sizing: border-box;
-            text-align: left;
-            color: #d81b60; /* Cor do texto */
+            color: #333;
         }
-        .form-container input::placeholder {
-            color: #d81b60; /* Cor do placeholder */
+        .line label {
             position: absolute;
-            top: 12px;
+            top: -20px;
             left: 0;
-            font-size: 16px;
+            font-size: 14px;
+            color: #d81b60;
             transition: 0.3s;
-            pointer-events: none;
         }
-        .form-container input:focus::placeholder,
-        .form-container input:not(:placeholder-shown)::placeholder {
-            top: -10px;
+        .line input:focus + label,
+        .line input:not(:placeholder-shown) + label {
+            top: -30px;
+            left: 0;
             font-size: 12px;
-            color: #d81b60; /* Cor do placeholder ao focar */
-        }
-        .form-container input:focus {
-            padding-top: 20px;
-        }
-        .password-container {
-            position: relative;
-        }
-        .password-container input {
-            padding-right: 30px; /* Espaço para o ícone do olho */
-        }
-        .password-container .eye-icon {
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 20px;
-            color: #d81b60; /* Cor do ícone */
-        }
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
         }
         .custom-button {
-            background: linear-gradient(45deg, #d81b60, #8e24aa); /* Cores do botão */
+            background: linear-gradient(45deg, #d81b60, #c2185b);
             border: none;
             color: white;
             padding: 15px 30px;
@@ -123,42 +78,21 @@
             cursor: pointer;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: background 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
             margin: 10px 0;
-            position: relative;
-            width: 100%;
         }
         .custom-button:hover {
-            background: linear-gradient(45deg, #8e24aa, #d81b60);
-        }
-        .custom-button:active {
-            transform: scale(0.95);
-        }
-        .pulse-button {
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 rgba(255, 255, 255, 0.7);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
-            }
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #c2185b, #d81b60);
         }
         .info-text {
-            margin-top: 20px;
             font-size: 14px;
-            color: #d81b60; /* Cor do texto */
+            color: #666;
             text-align: center;
         }
         .info-text a {
-            color: #d81b60; /* Cor do link */
+            color: #d81b60;
             text-decoration: none;
         }
         .info-text a:hover {
@@ -179,7 +113,7 @@
         }
         .popup h2 {
             margin: 0;
-            color: #d81b60; /* Cor do texto */
+            color: #d81b60;
         }
         .popup p {
             font-size: 18px;
@@ -187,10 +121,10 @@
         .popup .timer {
             font-size: 24px;
             font-weight: bold;
-            color: #d81b60; /* Cor do texto */
+            color: #d81b60;
         }
         .popup .button {
-            background: linear-gradient(45deg, #d81b60, #8e24aa); /* Cores do botão */
+            background: linear-gradient(45deg, #d81b60, #c2185b);
             border: none;
             color: white;
             padding: 10px 20px;
@@ -200,175 +134,170 @@
             margin-top: 20px;
         }
         .popup .button:hover {
-            background: linear-gradient(45deg, #8e24aa, #d81b60);
+            background: linear-gradient(45deg, #c2185b, #d81b60);
+        }
+        .footer-text {
+            font-size: 14px;
+            color: #666;
         }
         @media (max-width: 600px) {
-            .custom-button {
-                padding: 20px 40px;
-                font-size: 18px;
+            .wrap-login {
+                width: 95%;
+                height: auto;
+                padding: 10px;
             }
-            .form-container input {
-                padding: 20px;
+            .custom-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            .welcome-text {
+                font-size: 24px;
             }
         }
     </style>
 </head>
 <body>
     <div class="wrap-login">
-        <div class="logo-container">
-            <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo">
-            <h2><span style="font-weight: bold; font-family: 'Material-Design-Iconic-Font';">BEM VINDO</span></h2>
-        </div>
-        <div class="form-container">
-            <!-- Formulário de Login -->
-            <div id="loginForm">
-                <div class="line">
-                    <input type="email" id="loginEmail" placeholder="Seu Email" required>
-                </div>
-                
-                <div class="password-container">
-                    <div class="line">
-                        <input type="password" id="loginPassword" placeholder="Sua Senha" required>
-                        <span class="eye-icon" id="togglePassword">👁️</span>
-                    </div>
-                </div>
-                
-                <div id="loginError" style="display: none; color: red;">Por favor, preencha todos os campos.</div>
-                <div id="loginIncorrect" style="display: none; color: red;">Email ou senha incorretos.</div>
-                <div class="button-container">
-                    <button class="custom-button" id="loginButton">LOGIN</button>
-                    <button class="custom-button pulse-button" id="paymentButton">Realizar Pagamento</button>
-                </div>
-                <div class="info-text" id="loginToggleText">Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></div>
+        <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo" class="logo">
+        <div class="welcome-text">Bem Vindo</div>
+        <!-- Formulário de Login -->
+        <div id="loginForm">
+            <div class="line">
+                <input type="email" id="loginEmail" placeholder=" " required>
+                <label for="loginEmail">Seu Email</label>
             </div>
+            <div class="line">
+                <input type="password" id="loginPassword" placeholder=" " required>
+                <label for="loginPassword">Sua Senha</label>
+                <i class="zmdi zmdi-eye" id="togglePassword" style="position: absolute; right: 10px; top: 10px; cursor: pointer;"></i>
+            </div>
+            <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <button class="custom-button" id="loginButton">LOGIN</button>
+            <button class="custom-button" id="registerButton">REGISTRAR</button>
+            <div class="info-text">
+                Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
+            </div>
+        </div>
 
-            <!-- Formulário de Cadastro -->
-            <div id="registerForm" style="display: none;">
-                <div class="line">
-                    <input type="text" id="registerName" placeholder="Seu Nome" required>
-                </div>
-                <div class="line">
-                    <input type="email" id="registerEmail" placeholder="Seu Email" required>
-                </div>
-                <div class="password-container">
-                    <div class="line">
-                        <input type="password" id="registerPassword" placeholder="Sua Senha" required>
-                        <span class="eye-icon" id="toggleRegisterPassword">👁️</span>
-                    </div>
-                </div>
-                <div id="registerError" style="display: none; color: red;">A senha deve ter pelo menos 6 caracteres.</div>
-                <div class="button-container">
-                    <button class="custom-button" id="registerButton">REGISTRAR</button>
-                </div>
-                <div class="info-text">Já tem uma conta? <a href="#" id="loginLink">Faça login</a></div>
+        <!-- Formulário de Cadastro -->
+        <div id="registerForm" style="display: none;">
+            <div class="line">
+                <input type="text" id="registerName" placeholder=" " required>
+                <label for="registerName">Seu Nome</label>
+            </div>
+            <div class="line">
+                <input type="email" id="registerEmail" placeholder=" " required>
+                <label for="registerEmail">Seu Email</label>
+            </div>
+            <div class="line">
+                <input type="password" id="registerPassword" placeholder=" " required>
+                <label for="registerPassword">Sua Senha</label>
+                <i class="zmdi zmdi-eye" id="toggleRegisterPassword" style="position: absolute; right: 10px; top: 10px; cursor: pointer;"></i>
+            </div>
+            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <button class="custom-button" id="registerSubmitButton">CADASTRAR</button>
+            <div class="info-text">
+                Já tem uma conta? <a href="#" id="loginLink">Faça o login</a>
             </div>
         </div>
     </div>
 
-    <!-- Pop-up Timer -->
-    <div id="popup" class="popup">
-        <h2>Bem-vindo!</h2>
-        <p>Você será redirecionado para o jogo em <span class="timer">5</span> segundos.</p>
-        <button class="button" id="closePopupButton">Fechar</button>
+    <!-- Popup de Redirecionamento -->
+    <div id="redirectPopup" class="popup">
+        <h2>Você será redirecionado em:</h2>
+        <p class="timer" id="countdown">5</p>
+        <button class="button" id="redirectButton">Ir Agora</button>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const togglePassword = document.getElementById('togglePassword');
+        // Função para exibir o popup de redirecionamento
+        function showRedirectPopup() {
+            document.getElementById('redirectPopup').style.display = 'block';
+            let countdown = 5;
+            const countdownElement = document.getElementById('countdown');
+            const interval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    window.location.href = 'https://botmillion.github.io/telm/';
+                }
+            }, 1000);
+        }
+
+        // Função para alternar a visibilidade da senha
+        function togglePasswordVisibility() {
             const passwordField = document.getElementById('loginPassword');
-            const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
-            const registerPasswordField = document.getElementById('registerPassword');
+            const passwordIcon = document.getElementById('togglePassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.replace('zmdi-eye', 'zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
+            }
+        }
 
-            togglePassword.addEventListener('click', () => {
-                const type = passwordField.type === 'password' ? 'text' : 'password';
-                passwordField.type = type;
-                togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
-            });
+        function toggleRegisterPasswordVisibility() {
+            const passwordField = document.getElementById('registerPassword');
+            const passwordIcon = document.getElementById('toggleRegisterPassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.replace('zmdi-eye', 'zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.replace('zmdi-eye-off', 'zmdi-eye');
+            }
+        }
 
-            toggleRegisterPassword.addEventListener('click', () => {
-                const type = registerPasswordField.type === 'password' ? 'text' : 'password';
-                registerPasswordField.type = type;
-                toggleRegisterPassword.textContent = type === 'password' ? '👁️' : '🙈';
-            });
+        // Função para validar o formulário de login
+        function validateLoginForm() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorElement = document.getElementById('loginError');
+            if (!email || !password) {
+                errorElement.textContent = 'Por favor, preencha todos os campos corretamente.';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            errorElement.style.display = 'none';
+            showRedirectPopup(); // Exibe o popup ao enviar o formulário
+            return true;
+        }
 
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const registerLink = document.getElementById('registerLink');
-            const loginLink = document.getElementById('loginLink');
-            const loginButton = document.getElementById('loginButton');
-            const loginError = document.getElementById('loginError');
-            const loginIncorrect = document.getElementById('loginIncorrect');
-            const registerButton = document.getElementById('registerButton');
-            const registerError = document.getElementById('registerError');
+        // Função para validar o formulário de registro
+        function validateRegisterForm() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const errorElement = document.getElementById('registerError');
+            if (!name || !email || !password) {
+                errorElement.textContent = 'Por favor, preencha todos os campos corretamente.';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            errorElement.style.display = 'none';
+            alert('Cadastro realizado com sucesso!');
+            return true;
+        }
 
-            registerLink.addEventListener('click', () => {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-            });
-
-            loginLink.addEventListener('click', () => {
-                registerForm.style.display = 'none';
-                loginForm.style.display = 'block';
-            });
-
-            // Timer Popup
-            const popup = document.getElementById('popup');
-            const closePopupButton = document.getElementById('closePopupButton');
-            const paymentButton = document.getElementById('paymentButton');
-
-            paymentButton.addEventListener('click', () => {
-                popup.style.display = 'block';
-                let timer = 5;
-                const timerElement = document.querySelector('.timer');
-                timerElement.textContent = timer;
-
-                const countdown = setInterval(() => {
-                    timer--;
-                    timerElement.textContent = timer;
-                    if (timer === 0) {
-                        clearInterval(countdown);
-                        // Redirecionar para o jogo
-                        // window.location.href = "https://seulink.com"; // Substitua pelo link do seu jogo
-                    }
-                }, 1000);
-            });
-
-            closePopupButton.addEventListener('click', () => {
-                popup.style.display = 'none';
-            });
-
-            // Login Form Validation
-            loginButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                loginError.style.display = 'none';
-                loginIncorrect.style.display = 'none';
-
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-
-                if (!email || !password) {
-                    loginError.style.display = 'block';
-                } else {
-                    // Aqui você pode adicionar a lógica para verificar o email e senha
-                    // Caso a verificação falhe, mostre a mensagem de erro abaixo
-                    // loginIncorrect.style.display = 'block';
-                }
-            });
-
-            // Register Form Validation
-            registerButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                registerError.style.display = 'none';
-
-                const password = registerPasswordField.value;
-
-                if (password.length < 6) {
-                    registerError.style.display = 'block';
-                } else {
-                    // Aqui você pode adicionar a lógica para o cadastro
-                }
-            });
+        // Adiciona eventos aos botões
+        document.getElementById('loginButton').addEventListener('click', validateLoginForm);
+        document.getElementById('registerButton').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
         });
+        document.getElementById('registerSubmitButton').addEventListener('click', validateRegisterForm);
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+        document.getElementById('registerLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+        document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
+        document.getElementById('toggleRegisterPassword').addEventListener('click', toggleRegisterPasswordVisibility);
     </script>
 </body>
 </html>
