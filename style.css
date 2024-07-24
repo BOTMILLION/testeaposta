@@ -221,6 +221,20 @@ body {
     text-align: center; /* Centraliza a mensagem no popup */
 }
 
+.popup #registerPopupMessage {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.popup #registerTimer {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 20px;
+}
+
 .popup .button {
     background: #c8102e; /* Vermelho mais forte */
     color: white;
@@ -229,6 +243,10 @@ body {
     font-size: 16px;
     border-radius: 25px;
     cursor: pointer;
+}
+
+.popup .button:hover {
+    background: #333;
 }
 
 /* Novo estilo para o formulário de redefinição de senha */
