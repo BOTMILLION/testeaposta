@@ -6,154 +6,7 @@
     <title>Bem-vindo ao Site</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
-            background-size: cover;
-            margin: 0;
-            padding: 0;
-            color: #fff;
-        }
-        .wrap-login {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        .logo {
-            margin-bottom: 20px;
-        }
-        .welcome-text {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .form-login {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-        }
-        .line {
-            margin-bottom: 15px;
-            position: relative;
-        }
-        .line input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background: #333;
-            color: #fff;
-        }
-        .line label {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #aaa;
-            pointer-events: none;
-            transition: 0.3s;
-        }
-        .line input:focus + label {
-            top: -10px;
-            left: 10px;
-            color: #fff;
-            font-size: 12px;
-        }
-        .line i {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            color: #aaa;
-            cursor: pointer;
-        }
-        .custom-button {
-            background-color: #f5a623;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .custom-button:hover {
-            background-color: #d48d1d;
-        }
-        .info-text {
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        .popup {
-            display: none;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .popup h2 {
-            margin-bottom: 10px;
-        }
-        .popup p {
-            margin-bottom: 10px;
-        }
-        .button {
-            background-color: #f5a623;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #d48d1d;
-        }
-    </style>
-    <!-- Firebase App (Firebase SDK) -->
-    <script type="module">
-        // Importa os módulos do Firebase
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
-
-        // Configuração do Firebase
-        const firebaseConfig = {
-  apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
-  authDomain: "projeto-notificacao-968d4.firebaseapp.com",
-  projectId: "projeto-notificacao-968d4",
-  storageBucket: "projeto-notificacao-968d4.appspot.com",
-  messagingSenderId: "236002612799",
-  appId: "1:236002612799:web:54719603091421b94aca8a",
-  measurementId: "G-KY69HG6ZNZ"
-        };
-
-        // Inicializa o Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const firestore = getFirestore(app);
-
-        // Função de login
-        window.login = function () {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Usuário logado com sucesso
-                    window.location.href = "https://botmillion.github.io/telm/";
-                })
-                .catch((error) => {
-                    document.getElementById('loginError').style.display = 'block';
-                });
-        };
-    </script>
+    <link rel="stylesheet" href="style.css"> <!-- Link para o CSS externo -->
 </head>
 <body>
     <div class="wrap-login">
@@ -170,48 +23,126 @@
                 <label for="loginPassword">Sua Senha</label>
                 <i class="zmdi zmdi-eye" id="togglePassword"></i>
             </div>
-            <div id="loginError" style="color: red; display: none;">Email ou senha incorretos</div>
-            <button class="custom-button pulse-button" onclick="login()">Login</button>
-            <div class="info-text">Não tem uma conta? <a href="#" onclick="showSignup()">Registre-se</a></div>
+            <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <button class="custom-button" id="loginButton">LOGIN</button>
+            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
+            <div class="info-text">
+                Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
+            </div>
         </div>
-        <div class="popup" id="signupPopup">
-            <h2>Cadastro</h2>
-            <p>Seu período de teste vai começar em breve.</p>
-            <p class="timer" id="timer">00:00</p>
-            <button class="button" onclick="hideSignup()">Fechar</button>
+
+        <!-- Formulário de Cadastro -->
+        <div class="form-login" id="registerForm" style="display: none;">
+            <div class="line">
+                <input type="text" id="registerName" placeholder=" " required>
+                <label for="registerName">Seu Nome</label>
+            </div>
+            <div class="line">
+                <input type="email" id="registerEmail" placeholder=" " required>
+                <label for="registerEmail">Seu Email</label>
+            </div>
+            <div class="line">
+                <input type="password" id="registerPassword" placeholder=" " required>
+                <label for="registerPassword">Sua Senha</label>
+                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
+            </div>
+            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
+            <button class="custom-button" id="registerButton">CADASTRAR</button>
+            <div class="info-text">
+                Já tem uma conta? <a href="#" id="loginLink">Login</a>
+            </div>
+        </div>
+
+        <!-- Popup -->
+        <div class="popup" id="redirectPopup">
+            <h2>Login Bem-sucedido!</h2>
+            <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
+            <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
     </div>
 
     <script>
-        document.getElementById('togglePassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-            this.classList.toggle('zmdi-eye');
-            this.classList.toggle('zmdi-eye-off');
+        document.getElementById('registerLink').addEventListener('click', function() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'flex';
         });
 
-        function showSignup() {
-            document.getElementById('signupPopup').style.display = 'block';
-            startTimer();
-        }
+        document.getElementById('loginLink').addEventListener('click', function() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'flex';
+        });
 
-        function hideSignup() {
-            document.getElementById('signupPopup').style.display = 'none';
-        }
+        document.getElementById('loginButton').addEventListener('click', function() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
-        function startTimer() {
-            let duration = 5 * 60; // 5 minutos
-            const timerDisplay = document.getElementById('timer');
-            const interval = setInterval(() => {
-                const minutes = Math.floor(duration / 60);
-                const seconds = duration % 60;
-                timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                if (--duration < 0) {
-                    clearInterval(interval);
-                }
-            }, 1000);
-        }
+            if (email === '' || password === '') {
+                document.getElementById('loginError').style.display = 'block';
+            } else {
+                document.getElementById('loginError').style.display = 'none';
+                // Exibir o popup de redirecionamento
+                document.getElementById('redirectPopup').style.display = 'block';
+                let countdown = 5;
+                const timer = setInterval(() => {
+                    countdown--;
+                    document.getElementById('redirectTimer').textContent = countdown;
+                    if (countdown === 0) {
+                        clearInterval(timer);
+                        window.location.href = 'https://seusite.com/jogo';
+                    }
+                }, 1000);
+            }
+        });
+
+        document.getElementById('registerButton').addEventListener('click', function() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            if (name === '' || email === '' || password === '' || password.length < 6) {
+                document.getElementById('registerError').style.display = 'block';
+            } else {
+                document.getElementById('registerError').style.display = 'none';
+                // Lógica de cadastro aqui
+                alert('Cadastro realizado com sucesso!');
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'flex';
+            }
+        });
+
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('loginPassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                this.classList.remove('zmdi-eye');
+                this.classList.add('zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                this.classList.remove('zmdi-eye-off');
+                this.classList.add('zmdi-eye');
+            }
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('registerPassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                this.classList.remove('zmdi-eye');
+                this.classList.add('zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                this.classList.remove('zmdi-eye-off');
+                this.classList.add('zmdi-eye');
+            }
+        });
+
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = 'https://seusite.com/jogo';
+        });
+
+        document.getElementById('paymentButton').addEventListener('click', function() {
+            window.location.href = 'https://www.yampi.com.br/checkout';
+        });
     </script>
 </body>
 </html>
