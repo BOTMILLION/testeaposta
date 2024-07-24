@@ -57,6 +57,8 @@
             </div>
             <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
             <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado. Verifique o seu email.</div>
+            <div id="trialStatus" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Status do Período de Teste -->
+            <div id="subscriptionStatus" style="color: green; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Status da Assinatura -->
             <div id="trialCountdown" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Temporizador do período de teste -->
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
@@ -147,77 +149,92 @@
                     const userSnapshot = await getDoc(userDoc);
                     const userData = userSnapshot.data();
                     const now = new Date();
-                    const trialEndDate = new Date(userData.trialStartDate);
-                    trialEndDate.setDate(trialEndDate.getDate() + 3); // Período de teste de 3 dias
+                    const trialEndDate = new Date(userData.trialEndDate);
                     
                     if (now > trialEndDate) {
-                        if (!userData.subscriptionEndDate || new Date(userData.subscriptionEndDate) < now) {
-                            document.getElementById('redirectPopup').style.display = 'block';
-                            startRedirectTimer();
-                        } else {
+                        document.getElementById('trialStatus').textContent = 'Período de teste expirado.';
+                        document.getElementById('subscriptionStatus').textContent = 'Você precisa se inscrever.';
+                    } else {
+                        document.getElementById('trialStatus').textContent = `Seu período de teste termina em ${trialEndDate.toLocaleDateString()}.`;
+                        document.getElementById('subscriptionStatus').textContent = 'Você está em período de teste.';
+                    }
+
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('redirectPopup').style.display = 'block';
+
+                    let timer = 5;
+                    const timerElement = document.getElementById('redirectTimer');
+                    const countdown = setInterval(() => {
+                        timer--;
+                        timerElement.textContent = timer;
+                        if (timer <= 0) {
+                            clearInterval(countdown);
                             window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                         }
-                    } else {
-                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-                    }
+                    }, 1000);
                 } else {
-                    alert('Por favor, verifique seu email antes de fazer login.');
+                    document.getElementById('loginError').textContent = 'Por favor, verifique seu email.';
                 }
             } catch (error) {
-                document.getElementById('loginError').style.display = 'block';
-                console.error('Erro ao fazer login:', error.message);
+                document.getElementById('loginError').textContent = 'Email ou senha incorretos.';
             }
         });
 
         document.getElementById('registerButton').addEventListener('click', async function() {
+            const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            const name = document.getElementById('registerName').value;
-            const registerError = document.getElementById('registerError');
-            const registerSuccess = document.getElementById('registerSuccess');
-            const trialCountdown = document.getElementById('trialCountdown');
+            
+            if (password.length < 6) {
+                document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
+                return;
+            }
 
-            registerError.style.display = 'none';
-            registerSuccess.style.display = 'none';
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                await sendEmailVerification(user);
+                await setDoc(doc(db, "users", user.uid), {
+                    name: name,
+                    trialEndDate: new Date(new Date().getTime() + (3 * 24 * 60 * 60 * 1000)).toISOString() // 3 dias de teste
+                });
 
-            if (name && email && password.length >= 6) {
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    await sendEmailVerification(user);
-                    await setDoc(doc(db, "users", user.uid), {
-                        name: name,
-                        email: email,
-                        trialStartDate: new Date().toISOString(),
-                    });
-                    document.getElementById('registerPopup').style.display = 'block';
-                    startRegisterTimer();
-                } catch (error) {
-                    registerError.style.display = 'block';
-                    console.error('Erro ao cadastrar:', error.message);
-                }
-            } else {
-                registerError.style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('registerPopup').style.display = 'block';
+
+                let timer = 3 * 24 * 60 * 60; // 3 dias em segundos
+                const registerTimerElement = document.getElementById('registerTimer');
+                const registerCountdown = setInterval(() => {
+                    timer--;
+                    const days = Math.floor(timer / (24 * 60 * 60));
+                    const hours = Math.floor((timer % (24 * 60 * 60)) / (60 * 60));
+                    const minutes = Math.floor((timer % (60 * 60)) / 60);
+                    const seconds = timer % 60;
+                    registerTimerElement.textContent = `Seu período de teste termina em ${days} dias, ${hours} horas, ${minutes} minutos e ${seconds} segundos.`;
+                    if (timer <= 0) {
+                        clearInterval(registerCountdown);
+                        document.getElementById('registerTimer').textContent = 'Período de teste expirado.';
+                    }
+                }, 1000);
+            } catch (error) {
+                document.getElementById('registerError').textContent = 'Erro ao cadastrar. Por favor, tente novamente.';
             }
         });
 
         document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
-            const resetError = document.getElementById('resetError');
-            
-            resetError.style.display = 'none';
-
-            if (email) {
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert('Um email de redefinição de senha foi enviado.');
-                } catch (error) {
-                    resetError.style.display = 'block';
-                    console.error('Erro ao enviar email de redefinição de senha:', error.message);
-                }
-            } else {
-                resetError.style.display = 'block';
+            try {
+                await sendPasswordResetEmail(auth, email);
+                document.getElementById('resetPasswordForm').style.display = 'none';
+                alert('Email de redefinição enviado!');
+            } catch (error) {
+                document.getElementById('resetError').textContent = 'Erro ao enviar email de redefinição.';
             }
+        });
+
+        document.getElementById('paymentButton').addEventListener('click', function() {
+            window.location.href = 'https://yampi.com.br/checkout'; // Substitua pelo link do checkout Yampi
         });
 
         document.getElementById('redirectNowButton').addEventListener('click', function() {
@@ -226,52 +243,18 @@
 
         document.getElementById('closeRegisterPopup').addEventListener('click', function() {
             document.getElementById('registerPopup').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'flex';
         });
 
-        function startRedirectTimer() {
-            let countdown = 5;
-            const timerElement = document.getElementById('redirectTimer');
-            const interval = setInterval(() => {
-                if (countdown <= 0) {
-                    clearInterval(interval);
-                    document.getElementById('redirectNowButton').click();
-                } else {
-                    timerElement.textContent = countdown;
-                    countdown--;
-                }
-            }, 1000);
-        }
-
-        function startRegisterTimer() {
-            const registerTimer = document.getElementById('registerTimer');
-            let countdown = 3 * 24 * 60 * 60; // 3 dias em segundos
-            const interval = setInterval(() => {
-                if (countdown <= 0) {
-                    clearInterval(interval);
-                } else {
-                    const days = Math.floor(countdown / (24 * 60 * 60));
-                    const hours = Math.floor((countdown % (24 * 60 * 60)) / (60 * 60));
-                    const minutes = Math.floor((countdown % (60 * 60)) / 60);
-                    const seconds = countdown % 60;
-                    registerTimer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-                    countdown--;
-                }
-            }, 1000);
-        }
-
         document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('loginPassword');
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-            this.classList.toggle('zmdi-eye-off');
+            const passwordField = document.getElementById('loginPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
         });
 
         document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('registerPassword');
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-            this.classList.toggle('zmdi-eye-off');
+            const passwordField = document.getElementById('registerPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
         });
     </script>
 </body>
