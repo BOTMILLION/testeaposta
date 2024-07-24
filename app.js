@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectTimer = document.getElementById('redirectTimer');
     const redirectNowButton = document.getElementById('redirectNowButton');
     const trialStatus = document.getElementById('trialStatus'); // Elemento para mostrar status do período de teste
+    const subscriptionStatus = document.getElementById('subscriptionStatus'); // Elemento para mostrar status da assinatura
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -72,15 +73,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     const isTrialValid = now <= trialEndDate;
                     const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
 
+                    // Mostrar status do período de teste
+                    if (isTrialValid) {
+                        trialStatus.style.display = 'block';
+                        trialStatus.textContent = `Seu período de teste vai até: ${trialEndDate.toLocaleDateString()}`;
+                    } else {
+                        trialStatus.style.display = 'none';
+                    }
+
+                    // Mostrar status da assinatura
+                    if (isSubscriptionValid) {
+                        subscriptionStatus.style.display = 'block';
+                        subscriptionStatus.textContent = `Sua assinatura é válida até: ${subscriptionEndDate.toLocaleDateString()}`;
+                    } else {
+                        subscriptionStatus.style.display = 'none';
+                    }
+
                     if (isTrialValid || isSubscriptionValid) {
                         // Exibir o popup e iniciar o cronômetro se o período de teste estiver válido ou a assinatura estiver ativa
                         loginForm.style.display = 'none';
-                        trialStatus.style.display = 'none';
                         redirectPopup.style.display = 'block';
                         let countdown = Math.ceil((isTrialValid ? trialEndDate - now : subscriptionEndDate - now) / 1000); // Convert milliseconds to seconds
                         const countdownInterval = setInterval(() => {
                             countdown -= 1;
-                            redirectTimer.textContent = countdown;
+                            redirectTimer.textContent = Math.ceil(countdown);
                             if (countdown <= 0) {
                                 clearInterval(countdownInterval);
                                 window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
@@ -149,24 +165,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userSnapshot.exists()) {
             const userData = userSnapshot.data();
             const now = new Date();
-            const currentEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : now;
-            const newEndDate = new Date(currentEndDate);
-            newEndDate.setDate(newEndDate.getDate() + 30); // Adiciona 30 dias
+            const newSubscriptionEndDate = userData.subscriptionEndDate
+                ? new Date(userData.subscriptionEndDate)
+                : now;
+            newSubscriptionEndDate.setDate(newSubscriptionEndDate.getDate() + 30); // Adiciona 30 dias
 
             await updateDoc(userDoc, {
-                subscriptionEndDate: newEndDate.toISOString()
+                subscriptionEndDate: newSubscriptionEndDate.toISOString()
             });
+            console.log('Subscription extended by 30 days');
         }
-    }
-
-    // Exemplo de chamada da função de adição de dias (deve ser chamada após a confirmação de pagamento)
-    // addSubscriptionDays('user-id'); // Substitua 'user-id' pelo ID do usuário atual
-
-    // Exibir o botão de pagamento se a página de pagamento estiver acessível
-    if (window.location.href.includes('payment.html')) {
-        paymentButton.style.display = 'block';
-        paymentButton.addEventListener('click', () => {
-            window.location.href = 'https://yampi.com.br/'; // Alterar para o link de pagamento
-        });
     }
 });
