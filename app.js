@@ -1,6 +1,6 @@
 // Importar as funções necessárias do SDK do Firebase
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Configuração do Firebase
@@ -125,25 +125,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 await setDoc(doc(db, 'users', user.uid), {
                     name: name,
                     email: email,
-                    trialStartDate: new Date().toISOString() // Save the current date and time as trial start date
+                    trialStartDate: new Date().toISOString()
                 });
-                // Enviar o email de verificação
+
+                // Enviar e-mail de verificação
                 await sendEmailVerification(user);
-                document.getElementById('registerError').style.display = 'none';
-                registerForm.style.display = 'none';
+
+                // Exibir mensagem de sucesso e instruções
                 registrationMessage.style.display = 'block';
-                registrationMessage.textContent = 'Cadastro realizado com sucesso! Verifique seu email para completar a verificação.';
+                registrationMessage.textContent = 'Cadastro realizado com sucesso! Verifique seu e-mail para confirmar o registro.';
+
+                // Redirecionar após um intervalo
+                setTimeout(() => {
+                    window.location.href = 'verify-email.html';
+                }, 3000); // 3 segundos para redirecionar
+
             } catch (error) {
-                document.getElementById('registerError').style.display = 'block';
-                document.getElementById('registerError').textContent = error.message;
+                registrationMessage.style.display = 'block';
+                registrationMessage.textContent = error.message;
             }
         }
     });
-
-    // Mostrar o botão de pagamento assim que a página carrega
-    paymentButton.style.display = 'block';
-    // Reiniciar a animação do botão de pagamento
-    paymentButton.classList.remove('pulse-button');
-    void paymentButton.offsetWidth; // Forçar reflow
-    paymentButton.classList.add('pulse-button');
 });
