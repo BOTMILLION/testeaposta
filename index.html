@@ -18,7 +18,6 @@
         
         <!-- Adicionando o elemento shine -->
         <div class="shine"></div>
-
         <!-- Formulário de Login -->
         <div class="form-login" id="loginForm">
             <div class="line">
@@ -40,7 +39,6 @@
                 Esqueceu a senha? <a href="#" id="resetPasswordLink">Redefinir Senha</a>
             </div>
         </div>
-
         <!-- Formulário de Cadastro -->
         <div class="form-login" id="registerForm" style="display: none;">
             <div class="line">
@@ -66,7 +64,6 @@
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
             </div>
         </div>
-
         <!-- Formulário de Redefinição de Senha -->
         <div class="form-login" id="resetPasswordForm" style="display: none;">
             <div class="line">
@@ -79,14 +76,12 @@
                 <a href="#" id="backToLoginLink">Voltar para o Login</a>
             </div>
         </div>
-
         <!-- Popup de Redirecionamento -->
-        <div class="popup" id="redirectPopup" style="display: none;">
+        <div class="popup" id="redirectPopup">
             <h2>Login Bem-sucedido!</h2>
             <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
             <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
-
         <!-- Popup de Cadastro -->
         <div class="popup" id="registerPopup" style="display: none;">
             <h2>Usuário cadastrado!</h2>
@@ -100,198 +95,140 @@
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">Fechar</button>
         </div>
-
     </div>
-
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
-
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
             authDomain: "projeto-notificacao-968d4.firebaseapp.com",
-            projectId: "projeto-notificacao-968d",
+            projectId: "projeto-notificacao-968d4",
             storageBucket: "projeto-notificacao-968d4.appspot.com",
             messagingSenderId: "236002612799",
             appId: "1:236002612799:web:54719603091421b94aca8a",
             measurementId: "G-KY69HG6ZNZ"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
         document.getElementById('registerLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'flex';
         });
-
         document.getElementById('loginLink').addEventListener('click', function() {
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'flex';
         });
-
         document.getElementById('resetPasswordLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('resetPasswordForm').style.display = 'flex';
         });
-
         document.getElementById('backToLoginLink').addEventListener('click', function() {
             document.getElementById('resetPasswordForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'flex';
         });
-
         document.getElementById('loginButton').addEventListener('click', async function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
             if (!email || !password) {
                 document.getElementById('loginError').style.display = 'block';
                 return;
             }
             document.getElementById('loginError').style.display = 'none';
-
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 if (user.emailVerified) {
                     const userDocRef = doc(db, 'users', user.uid);
                     const userDoc = await getDoc(userDocRef);
-                    const userData = userDoc.data();
-
-                    if (userData && userData.paymentStatus === 'paid') {
-                        window.location.href = 'YOUR_GAME_URL';
-                    } else if (userData && userData.paymentStatus === 'trial') {
-                        showPopup('redirectPopup');
-                        startRedirectTimer(5, 'YOUR_GAME_URL');
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const currentTime = new Date().getTime();
+                        const trialEndTime = userData.trialEndTime.toMillis();
+                        if (currentTime < trialEndTime) {
+                            document.getElementById('redirectPopup').style.display = 'flex';
+                            startRedirectTimer();
+                        } else {
+                            document.getElementById('loginError').textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
+                            document.getElementById('loginError').style.display = 'block';
+                        }
+                    } else {
+                        document.getElementById('loginError').textContent = 'Dados do usuário não encontrados.';
+                        document.getElementById('loginError').style.display = 'block';
                     }
                 } else {
-                    alert('Por favor, verifique o seu email antes de fazer login.');
+                    document.getElementById('loginError').textContent = 'Por favor, verifique seu email antes de fazer login.';
+                    document.getElementById('loginError').style.display = 'block';
                 }
             } catch (error) {
-                console.error('Erro de login:', error);
+                document.getElementById('loginError').textContent = error.message;
                 document.getElementById('loginError').style.display = 'block';
-                document.getElementById('loginError').innerText = 'Erro de login. Por favor, tente novamente.';
             }
         });
-
         document.getElementById('registerButton').addEventListener('click', async function() {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-
             if (!name || !email || !password || password.length < 6) {
                 document.getElementById('registerError').style.display = 'block';
                 return;
             }
             document.getElementById('registerError').style.display = 'none';
-
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
                 await sendEmailVerification(user);
-
                 const userDocRef = doc(db, 'users', user.uid);
+                const currentTime = new Date();
+                const trialEndTime = new Date(currentTime.getTime() + (3 * 24 * 60 * 60 * 1000)); // 3 dias
                 await setDoc(userDocRef, {
                     name: name,
                     email: email,
-                    createdAt: new Date(),
-                    paymentStatus: 'trial',
-                    trialEnd: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+                    trialEndTime: trialEndTime
                 });
-
-                document.getElementById('registerSuccess').style.display = 'block';
-                showPopup('registerPopup');
-                startTrialCountdown(user.uid);
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('registerPopup').style.display = 'flex';
+                startRegisterTimer(trialEndTime);
             } catch (error) {
-                console.error('Erro de registro:', error);
+                document.getElementById('registerError').textContent = error.message;
                 document.getElementById('registerError').style.display = 'block';
-                document.getElementById('registerError').innerText = 'Erro de registro. Por favor, tente novamente.';
             }
         });
-
         document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
-
             if (!email) {
                 document.getElementById('resetError').style.display = 'block';
                 return;
             }
             document.getElementById('resetError').style.display = 'none';
-
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('Email de redefinição enviado. Verifique o seu email.');
+                alert('Email de redefinição enviado. Verifique sua caixa de entrada.');
+                document.getElementById('resetPasswordForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'flex';
             } catch (error) {
-                console.error('Erro de redefinição de senha:', error);
+                document.getElementById('resetError').textContent = error.message;
                 document.getElementById('resetError').style.display = 'block';
-                document.getElementById('resetError').innerText = 'Erro de redefinição de senha. Por favor, tente novamente.';
             }
         });
+        document.getElementById('closeRegisterPopup').addEventListener('click', function() {
+            document.getElementById('registerPopup').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'flex';
+        });
 
-        function showPopup(popupId) {
-            const popup = document.getElementById(popupId);
-            popup.style.display = 'block';
-            setTimeout(() => {
-                popup.style.opacity = 1;
-            }, 100);
-        }
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = 'https://botmillion.github.io/telm/';
+            window.location.href = 'https://botmillion.github.io/telm/';
+        });
 
-        function hidePopup(popupId) {
-            const popup = document.getElementById(popupId);
-            popup.style.opacity = 0;
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 300);
-        }
-
-        function startRedirectTimer(seconds, url) {
-            let timer = seconds;
-            const redirectTimer = document.getElementById('redirectTimer');
-            const interval = setInterval(() => {
-                timer--;
-                redirectTimer.textContent = timer;
-                if (timer <= 0) {
+        function startRedirectTimer() {
+@@ -255,7 +255,7 @@ <h2>Usuário cadastrado!</h2>
+                countdown--;
+                if (countdown < 0) {
                     clearInterval(interval);
-                    window.location.href = url;
+                    window.location.href = 'https://botmillion.github.io/telm/';
+                    window.location.href = 'https://botmillion.github.io/telm/';
                 }
             }, 1000);
-
-            document.getElementById('redirectNowButton').addEventListener('click', function() {
-                clearInterval(interval);
-                window.location.href = url;
-            });
         }
-
-        async function startTrialCountdown(userId) {
-            const userDocRef = doc(db, 'users', userId);
-            const userDoc = await getDoc(userDocRef);
-            const userData = userDoc.data();
-
-            const trialEnd = userData.trialEnd.toDate();
-            const countdownElement = document.getElementById('registerTimer');
-
-            const interval = setInterval(() => {
-                const now = new Date();
-                const timeRemaining = trialEnd - now;
-
-                if (timeRemaining <= 0) {
-                    clearInterval(interval);
-                    countdownElement.innerText = 'O período de teste terminou. Por favor, realize o pagamento.';
-                    updateDoc(userDocRef, { paymentStatus: 'expired' });
-                    return;
-                }
-
-                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-                countdownElement.innerText = `Tempo restante: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-            }, 1000);
-        }
-    </script>
-</body>
-</html>
