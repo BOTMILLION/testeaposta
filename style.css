@@ -176,3 +176,44 @@ body {
     border-radius: 25px;
     cursor: pointer;
 }
+
+/* Novo estilo para o formulário de redefinição de senha */
+#resetPasswordForm {
+    display: none; /* Começa oculto */
+    width: 100%;
+}
+
+#resetPasswordForm .form-title {
+    font-size: 24px;
+    color: #c8102e; /* Vermelho mais forte */
+    margin-bottom: 20px;
+}
+
+#resetPasswordForm .line {
+    margin-bottom: 20px;
+}
+
+#resetPasswordForm .line input {
+    border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
+}
+
+#resetPasswordForm .custom-button {
+    background: #c8102e; /* Vermelho mais forte */
+}
+
+#resetPasswordForm .info-text {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+#resetPasswordForm .info-text a {
+    color: #c8102e; /* Vermelho mais forte */
+    text-decoration: none;
+}
+
+#errorMessage {
+    display: none;
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+}
