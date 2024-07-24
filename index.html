@@ -76,11 +76,18 @@
             </div>
         </div>
 
-        <!-- Popup -->
+        <!-- Popup de Redirecionamento -->
         <div class="popup" id="redirectPopup">
             <h2>Login Bem-sucedido!</h2>
             <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
             <button class="button" id="redirectNowButton">Ir Agora</button>
+        </div>
+
+        <!-- Popup de Registro -->
+        <div class="popup" id="registerPopup" style="display: none;">
+            <h2>Usuário cadastrado!</h2>
+            <p>Para realizar o login, verifique o seu email. Esse é o seu temporizador (temporizador de 3 dias contando quanto tempo resta). Após terminar, realize o pagamento para continuar utilizando os nossos serviços.</p>
+            <button class="button" id="closeRegisterPopup">Fechar</button>
         </div>
     </div>
 
@@ -139,7 +146,7 @@
                     const userData = userSnapshot.data();
                     const now = new Date();
                     const trialEndDate = new Date(userData.trialStartDate);
-                    trialEndDate.setDate(trialEndDate.getDate() + 7); // Período de teste de 7 dias
+                    trialEndDate.setDate(trialEndDate.getDate() + 3); // Período de teste de 3 dias
                     
                     if (now > trialEndDate) {
                         if (!userData.subscriptionEndDate || new Date(userData.subscriptionEndDate) < now) {
@@ -153,36 +160,24 @@
                                     window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
                                 }
                             }, 1000);
-                        } else {
-                            document.getElementById('redirectPopup').style.display = 'block';
-                            let timer = 5;
-                            const interval = setInterval(() => {
-                                document.getElementById('redirectTimer').innerText = timer;
-                                timer--;
-                                if (timer < 0) {
-                                    clearInterval(interval);
-                                    window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
-                                }
-                            }, 1000);
-                        }
-                    } else {
-                        document.getElementById('redirectPopup').style.display = 'block';
-                        let timer = 5;
-                        const interval = setInterval(() => {
-                            document.getElementById('redirectTimer').innerText = timer;
-                            timer--;
-                            if (timer < 0) {
+
+                            document.getElementById('redirectNowButton').addEventListener('click', function() {
                                 clearInterval(interval);
                                 window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
-                            }
-                        }, 1000);
+                            });
+                        } else {
+                            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+                        }
+                    } else {
+                        window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
                     }
                 } else {
                     document.getElementById('loginError').innerText = 'Por favor, verifique seu email antes de fazer login.';
                     document.getElementById('loginError').style.display = 'block';
                 }
             } catch (error) {
-                document.getElementById('loginError').innerText = 'Erro ao fazer login: ' + error.message;
+                console.error(error);
+                document.getElementById('loginError').innerText = 'Erro no login. Por favor, tente novamente.';
                 document.getElementById('loginError').style.display = 'block';
             }
         });
@@ -201,16 +196,16 @@
                 const user = userCredential.user;
                 await sendEmailVerification(user);
                 const userDoc = doc(db, "users", user.uid);
-                const trialStartDate = new Date();
                 await setDoc(userDoc, {
                     name: name,
                     email: email,
-                    trialStartDate: trialStartDate.toISOString()
+                    trialStartDate: new Date().toISOString()
                 });
                 document.getElementById('registerSuccess').style.display = 'block';
-                document.getElementById('registerError').style.display = 'none';
+                document.getElementById('registerPopup').style.display = 'block';
             } catch (error) {
-                document.getElementById('registerError').innerText = 'Erro ao cadastrar: ' + error.message;
+                console.error(error);
+                document.getElementById('registerError').innerText = 'Erro no cadastro. Por favor, tente novamente.';
                 document.getElementById('registerError').style.display = 'block';
             }
         });
@@ -219,33 +214,22 @@
             const email = document.getElementById('resetEmail').value;
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('Email de redefinição de senha enviado!');
+                document.getElementById('resetError').innerText = 'Email de redefinição enviado. Verifique sua caixa de entrada.';
+                document.getElementById('resetError').style.color = 'green';
+                document.getElementById('resetError').style.display = 'block';
             } catch (error) {
-                document.getElementById('resetError').innerText = 'Erro ao enviar email de redefinição: ' + error.message;
+                console.error(error);
+                document.getElementById('resetError').innerText = 'Erro ao enviar email de redefinição. Por favor, tente novamente.';
+                document.getElementById('resetError').style.color = 'red';
                 document.getElementById('resetError').style.display = 'block';
             }
         });
 
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordField.setAttribute('type', type);
-            this.classList.toggle('zmdi-eye-off');
-        });
-
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('registerPassword');
-            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordField.setAttribute('type', type);
-            this.classList.toggle('zmdi-eye-off');
-        });
-
-        document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = "https://example.com/pagamento"; // Substitua com o URL real de pagamento
-        });
-
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+        document.getElementById('closeRegisterPopup').addEventListener('click', function() {
+            document.getElementById('registerPopup').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'flex';
         });
     </script>
 </body>
