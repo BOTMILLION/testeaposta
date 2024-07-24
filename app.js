@@ -1,3 +1,24 @@
+// Importar as funções necessárias do SDK do Firebase
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+
+// Configuração do Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
+  authDomain: "projeto-notificacao-968d4.firebaseapp.com",
+  projectId: "projeto-notificacao-968d4",
+  storageBucket: "projeto-notificacao-968d4.appspot.com",
+  messagingSenderId: "236002612799",
+  appId: "1:236002612799:web:54719603091421b94aca8a",
+  measurementId: "G-KY69HG6ZNZ"
+};
+
+// Inicializar o Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -25,52 +46,63 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Manipular o clique no botão de login
-    loginButton.addEventListener('click', () => {
+    loginButton.addEventListener('click', async () => {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
-        if (email === '' || password === '') {
+        if (password.length < 6) {
             document.getElementById('loginError').style.display = 'block';
         } else {
-            document.getElementById('loginError').style.display = 'none';
-            // Simulação de login
-            // Normalmente você enviaria uma solicitação de login aqui
-            loginForm.style.display = 'none';
-            // Exibir o popup e iniciar o cronômetro
-            redirectPopup.style.display = 'block';
-            let countdown = 5;
-            const countdownInterval = setInterval(() => {
-                countdown -= 1;
-                redirectTimer.textContent = countdown;
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = 'https://seusite.com/jogo'; // Alterar o link conforme necessário
-                }
-            }, 1000);
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                document.getElementById('loginError').style.display = 'none';
+                loginForm.style.display = 'none';
+                // Exibir o popup e iniciar o cronômetro
+                redirectPopup.style.display = 'block';
+                let countdown = 5;
+                const countdownInterval = setInterval(() => {
+                    countdown -= 1;
+                    redirectTimer.textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                    }
+                }, 1000);
 
-            // Redirecionar após o clique no botão do popup
-            redirectNowButton.addEventListener('click', () => {
-                window.location.href = 'https://seusite.com/jogo'; // Alterar o link conforme necessário
-            });
+                // Redirecionar após o clique no botão do popup
+                redirectNowButton.addEventListener('click', () => {
+                    window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                });
+            } catch (error) {
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('loginError').textContent = error.message;
+            }
         }
     });
 
     // Manipular o clique no botão de cadastro
-    registerButton.addEventListener('click', () => {
+    registerButton.addEventListener('click', async () => {
         const name = document.getElementById('registerName').value;
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
         if (name === '' || email === '' || password === '' || password.length < 6) {
             document.getElementById('registerError').style.display = 'block';
         } else {
-            document.getElementById('registerError').style.display = 'none';
-            // Simulação de cadastro
-            // Normalmente você enviaria uma solicitação de cadastro aqui
-            registerForm.style.display = 'none';
-            // Mensagem de confirmação após o cadastro
-            setTimeout(() => {
-                alert('Cadastro realizado com sucesso!');
-                loginForm.style.display = 'flex';
-            }, 500);
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                await addDoc(collection(db, 'users'), {
+                    name: name,
+                    email: email
+                });
+                document.getElementById('registerError').style.display = 'none';
+                registerForm.style.display = 'none';
+                setTimeout(() => {
+                    alert('Cadastro realizado com sucesso!');
+                    loginForm.style.display = 'flex';
+                }, 500);
+            } catch (error) {
+                document.getElementById('registerError').style.display = 'block';
+                document.getElementById('registerError').textContent = error.message;
+            }
         }
     });
 
