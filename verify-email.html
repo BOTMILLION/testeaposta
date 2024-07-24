@@ -56,12 +56,12 @@
         <div class="check-icon">✅</div>
         <h1>TUDO CERTO</h1>
         <p>SEU EMAIL FOI VERIFICADO COM SUCESSO</p>
-        <p>VOCÊ SERÁ REDIRECIONADO PARA A TELA DE LOGIN EM <span class="timer" id="redirectTimer">3</span></p>
+        <p>VOCÊ SERÁ REDIRECIONADO PARA A TELA DE LOGIN EM <span class="timer" id="redirectTimer">3</span> SEGUNDOS</p>
     </div>
 
     <script>
         // Contador para redirecionar
-        let timer = 5;
+        let timer = 3;
         const interval = setInterval(() => {
             document.getElementById('redirectTimer').innerText = timer;
             timer--;
