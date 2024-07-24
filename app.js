@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (userSnapshot.exists()) {
                         processarLogin(userSnapshot.data());
                     } else {
-                        console.error('No user data found');
+                        console.error('Dados do usuário não encontrados.');
                     }
                 } else {
                     mostrarErro('loginError', 'Por favor, verifique seu e-mail antes de fazer login.');
@@ -115,12 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
             redirectTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
-                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                window.location.href = 'https://botmillion.github.io/telm/';
             }
         }, 1000);
 
         redirectNowButton.addEventListener('click', () => {
-            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+            window.location.href = 'https://botmillion.github.io/telm/';
         });
     };
 
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         document.getElementById('startButton').addEventListener('click', () => {
-            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+            window.location.href = 'https://botmillion.github.io/telm/';
         });
 
         let countdown = Math.ceil((trialEndDate - trialStartDate) / 1000);
@@ -207,13 +207,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (email) {
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('E-mail de redefinição de senha enviado.');
+                alert('E-mail de recuperação enviado.');
                 resetPasswordPopup.style.display = 'none';
             } catch (error) {
                 resetError.textContent = error.message;
             }
         } else {
-            resetError.textContent = 'Por favor, insira um e-mail.';
+            resetError.textContent = 'Por favor, insira seu e-mail.';
         }
     });
 
