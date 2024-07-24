@@ -18,7 +18,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
     text-align: center;
-    display: flex;
+    display: flex; /* Certifica-se de que a tela de login esteja visível */
     flex-direction: column;
     justify-content: center;
     align-items: center;
