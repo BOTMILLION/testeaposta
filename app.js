@@ -7,28 +7,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerButton = document.getElementById('registerButton');
     const paymentButton = document.getElementById('paymentButton');
     const redirectPopup = document.getElementById('redirectPopup');
-    const countdownElement = document.getElementById('countdown');
-    const redirectButton = document.getElementById('redirectButton');
+    const redirectTimer = document.getElementById('redirectTimer');
+    const redirectNowButton = document.getElementById('redirectNowButton');
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
         event.preventDefault();
         loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
+        registerForm.style.display = 'flex';
     });
 
     // Mostrar o formulário de login
     loginLink.addEventListener('click', (event) => {
         event.preventDefault();
         registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
+        loginForm.style.display = 'flex';
     });
 
     // Manipular o clique no botão de login
     loginButton.addEventListener('click', () => {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
-        if (password.length < 6) {
+        if (email === '' || password === '') {
             document.getElementById('loginError').style.display = 'block';
         } else {
             document.getElementById('loginError').style.display = 'none';
@@ -40,15 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
             let countdown = 5;
             const countdownInterval = setInterval(() => {
                 countdown -= 1;
-                countdownElement.textContent = countdown;
+                redirectTimer.textContent = countdown;
                 if (countdown <= 0) {
                     clearInterval(countdownInterval);
+                    window.location.href = 'https://seusite.com/jogo'; // Alterar o link conforme necessário
                 }
             }, 1000);
 
             // Redirecionar após o clique no botão do popup
-            redirectButton.addEventListener('click', () => {
-                window.location.href = 'https://botmillion.github.io/telm/';
+            redirectNowButton.addEventListener('click', () => {
+                window.location.href = 'https://seusite.com/jogo'; // Alterar o link conforme necessário
             });
         }
     });
@@ -58,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = document.getElementById('registerName').value;
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
-        if (password.length < 6) {
+        if (name === '' || email === '' || password === '' || password.length < 6) {
             document.getElementById('registerError').style.display = 'block';
         } else {
             document.getElementById('registerError').style.display = 'none';
@@ -68,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Mensagem de confirmação após o cadastro
             setTimeout(() => {
                 alert('Cadastro realizado com sucesso!');
+                loginForm.style.display = 'flex';
             }, 500);
         }
     });
