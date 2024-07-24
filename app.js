@@ -44,13 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                const userDoc = doc(db, 'users', user.uid);
-                const userSnapshot = await getDoc(userDoc);
 
-                if (userSnapshot.exists()) {
-                    processarLogin(userSnapshot.data());
+                // Recarregar o status do usuário
+                await user.reload();
+                
+                if (user.emailVerified) {
+                    const userDoc = doc(db, 'users', user.uid);
+                    const userSnapshot = await getDoc(userDoc);
+                    
+                    if (userSnapshot.exists()) {
+                        processarLogin(userSnapshot.data());
+                    } else {
+                        console.error('No user data found');
+                    }
                 } else {
-                    console.error('No user data found');
+                    mostrarErro('loginError', 'Por favor, verifique seu e-mail antes de fazer login.');
                 }
             } catch (error) {
                 mostrarErro('loginError', error.message);
@@ -195,15 +203,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = resetEmail.value;
         try {
             await sendPasswordResetEmail(auth, email);
-            resetError.style.display = 'block';
-            resetError.textContent = 'E-mail de recuperação enviado com sucesso!';
+            resetError.style.display = 'none';
+            alert('E-mail de redefinição de senha enviado com sucesso.');
+            resetPasswordPopup.style.display = 'none';
         } catch (error) {
             resetError.style.display = 'block';
-            resetError.textContent = error.message;
+            resetError.textContent = 'Ocorreu um erro ao enviar o e-mail de redefinição de senha. Verifique o e-mail e tente novamente.';
         }
     });
 
-    // Fechar popup de redirecionamento
+    // Fechar popup
     closePopupButton.addEventListener('click', () => {
         redirectPopup.style.display = 'none';
     });
