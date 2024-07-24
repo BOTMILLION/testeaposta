@@ -173,41 +173,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Função para iniciar o temporizador de teste
-    function startTrialCountdown(trialEndDate) {
-        const countdownInterval = setInterval(() => {
-            const now = new Date();
-            const timeLeft = trialEndDate - now;
-            if (timeLeft <= 0) {
-                clearInterval(countdownInterval);
-                trialStatus.textContent = 'Seu período de teste expirou.';
-                trialStatus.style.color = 'red';
-                paymentButton.style.display = 'block';
-            } else {
-                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                trialStatus.textContent = `Tempo restante do período de teste: ${hours}h ${minutes}m ${seconds}s`;
-            }
-        }, 1000);
-    }
-
-    // Manipular a redefinição de senha
+    // Manipular o clique no botão de redefinição de senha
     resetPasswordButton.addEventListener('click', async () => {
         const email = resetEmail.value;
-        try {
-            await sendPasswordResetEmail(auth, email);
-            resetError.style.display = 'none';
-            resetPasswordPopup.style.display = 'none';
-            alert('Um e-mail para redefinição de senha foi enviado.');
-        } catch (error) {
+        if (email === '') {
             resetError.style.display = 'block';
-            resetError.textContent = error.message;
+            resetError.textContent = 'Por favor, insira seu e-mail.';
+        } else {
+            try {
+                await sendPasswordResetEmail(auth, email);
+                resetError.style.display = 'none';
+                resetPasswordPopup.style.display = 'none';
+                alert('Um e-mail de redefinição de senha foi enviado para você.');
+            } catch (error) {
+                resetError.style.display = 'block';
+                resetError.textContent = error.message;
+            }
         }
     });
 
-    // Fechar popup de redefinição de senha
+    // Fechar o popup de redefinição de senha
     closeResetPopup.addEventListener('click', () => {
         resetPasswordPopup.style.display = 'none';
     });
+
+    // Função para iniciar o temporizador do período de teste
+    function startTrialCountdown(endDate) {
+        const countdown = Math.ceil((endDate - new Date()) / 1000); // Convert milliseconds to seconds
+        const countdownInterval = setInterval(() => {
+            const now = new Date();
+            const remainingTime = Math.ceil((endDate - now) / 1000);
+            const hours = Math.floor(remainingTime / 3600);
+            const minutes = Math.floor((remainingTime % 3600) / 60);
+            const seconds = remainingTime % 60;
+            redirectTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
+            if (remainingTime <= 0) {
+                clearInterval(countdownInterval);
+                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Alterar o link conforme necessário
+            }
+        }, 1000);
+    }
 });
