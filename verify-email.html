@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de E-mail</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
+</head>
+<body>
+    <div class="verification-container">
+        <h1>Seu e-mail foi verificado com sucesso!</h1>
+        <p>Agora você pode fazer login com sua nova conta.</p>
+        <a href="index.html">Voltar para a tela inicial</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+        import { getAuth, applyActionCode } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
+            authDomain: "projeto-notificacao-968d4.firebaseapp.com",
+            projectId: "projeto-notificacao-968d4",
+            storageBucket: "projeto-notificacao-968d4.appspot.com",
+            messagingSenderId: "236002612799",
+            appId: "1:236002612799:web:54719603091421b94aca8a",
+            measurementId: "G-KY69HG6ZNZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Verificar se a URL contém um código de ação
+        const urlParams = new URLSearchParams(window.location.search);
+        const oobCode = urlParams.get('oobCode');
+
+        if (oobCode) {
+            // Aplicar o código de ação para verificar o e-mail
+            applyActionCode(auth, oobCode)
+                .then(() => {
+                    // E-mail verificado com sucesso
+                })
+                .catch((error) => {
+                    console.error('Erro ao verificar o e-mail:', error);
+                });
+        }
+    </script>
+</body>
+</html>
