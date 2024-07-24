@@ -3,266 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo ao Site</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+    <title>Login</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase App (SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
-    <!-- Firebase Authentication (SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
 </head>
 <body>
-    <div class="wrap-login">
-        <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo" class="logo">
-        <div class="welcome-text">Bem Vindo</div>
-        <!-- Formulário de Login -->
-        <div class="form-login" id="loginForm">
-            <div class="line">
-                <input type="email" id="loginEmail" placeholder=" " required>
-                <label for="loginEmail">Seu Email</label>
-            </div>
-            <div class="line">
-                <input type="password" id="loginPassword" placeholder=" " required>
-                <label for="loginPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="togglePassword"></i>
-            </div>
-            <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
-            <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
-            <div class="info-text">
-                Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
-            </div>
-            <div class="info-text">
-                Esqueceu a senha? <a href="#" id="resetPasswordLink">Redefinir Senha</a>
-            </div>
-        </div>
-        <!-- Formulário de Cadastro -->
-        <div class="form-login" id="registerForm" style="display: none;">
-            <div class="line">
-                <input type="text" id="registerName" placeholder=" " required>
-                <label for="registerName">Seu Nome</label>
-            </div>
-            <div class="line">
-                <input type="email" id="registerEmail" placeholder=" " required>
-                <label for="registerEmail">Seu Email</label>
-            </div>
-            <div class="line">
-                <input type="password" id="registerPassword" placeholder=" " required>
-                <label for="registerPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
-            </div>
-            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
-            <button class="custom-button" id="registerButton">CADASTRAR</button>
-            <div class="info-text">
-                Já tem uma conta? <a href="#" id="loginLink">Login</a>
-            </div>
-        </div>
-        <!-- Formulário de Redefinição de Senha -->
-        <div class="form-login" id="resetPasswordForm" style="display: none;">
-            <div class="line">
-                <input type="email" id="resetEmail" placeholder=" " required>
-                <label for="resetEmail">Seu Email</label>
-            </div>
-            <div id="resetError" style="color: red; display: none;">Por favor, preencha o campo de email corretamente.</div>
-            <button class="custom-button" id="resetPasswordButton">ENVIAR EMAIL DE REDIFINIÇÃO</button>
-            <div class="info-text">
-                <a href="#" id="backToLoginLink">Voltar para o Login</a>
-            </div>
-        </div>
-        <!-- Popup -->
-        <div class="popup" id="redirectPopup">
-            <h2>Login Bem-sucedido!</h2>
-            <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
-            <button class="button" id="redirectNowButton">Ir Agora</button>
-        </div>
+    <div id="loginForm">
+        <h1>Login</h1>
+        <input type="email" id="loginEmail" placeholder="E-mail">
+        <input type="password" id="loginPassword" placeholder="Senha">
+        <button id="loginButton">Entrar</button>
+        <div id="loginError" style="display:none; color:red;"></div>
+        <a href="#" id="registerLink">Cadastrar-se</a>
     </div>
-    <script type="module">
-        // Configuração do Firebase
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-        const firebaseConfig = {
-            apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
-            authDomain: "projeto-notificacao-968d4.firebaseapp.com",
-            projectId: "projeto-notificacao-968d4",
-            storageBucket: "projeto-notificacao-968d4.appspot.com",
-            messagingSenderId: "236002612799",
-            appId: "1:236002612799:web:54719603091421b94aca8a",
-            measurementId: "G-KY69HG6ZNZ"
-        };
-        // Inicializar o Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        document.getElementById('registerLink').addEventListener('click', function() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'flex';
-        });
-        document.getElementById('loginLink').addEventListener('click', function() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'flex';
-        });
-        document.getElementById('resetPasswordLink').addEventListener('click', function() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('resetPasswordForm').style.display = 'flex';
-        });
-        document.getElementById('backToLoginLink').addEventListener('click', function() {
-            document.getElementById('resetPasswordForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'flex';
-        });
-        document.getElementById('loginButton').addEventListener('click', function() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (email === '' || password === '') {
-                document.getElementById('loginError').style.display = 'block';
-            } else {
-                document.getElementById('loginError').style.display = 'none';
-                // Autenticação com Firebase
-                signInWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        if (user.emailVerified) {
-                            // Exibir o popup de redirecionamento
-                            document.getElementById('redirectPopup').style.display = 'block';
-                            let countdown = 5;
-                            const timer = setInterval(() => {
-                                countdown--;
-                                document.getElementById('redirectTimer').textContent = countdown;
-                                if (countdown === 0) {
-                                    clearInterval(timer);
-                                    window.location.href = 'https://seusite.com/jogo';
-                                }
-                            }, 1000);
-                        } else {
-                            document.getElementById('loginError').textContent = 'Por favor, verifique seu e-mail.';
-                            document.getElementById('loginError').style.display = 'block';
-                        }
-                    })
-                    .catch((error) => {
-                        document.getElementById('loginError').textContent = error.message;
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    if (user.emailVerified) {
-                        document.getElementById('redirectPopup').style.display = 'block';
-                        let timer = 5;
-                        const interval = setInterval(() => {
-                            document.getElementById('redirectTimer').innerText = timer;
-                            timer--;
-                            if (timer < 0) {
-                                clearInterval(interval);
-                                window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
-                            }
-                        }, 1000);
-                    } else {
-                        document.getElementById('loginError').innerText = 'Por favor, verifique seu e-mail.';
-                        document.getElementById('loginError').style.display = 'block';
-                    });
-            }
-                    }
-                })
-                .catch((error) => {
-                    document.getElementById('loginError').innerText = 'Email ou senha incorretos.';
-                    document.getElementById('loginError').style.display = 'block';
-                });
-        });
-
-        document.getElementById('registerButton').addEventListener('click', function() {
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-
-            if (name === '' || email === '' || password.length < 6) {
-            if (password.length < 6) {
-                document.getElementById('registerError').innerText = 'A senha deve ter pelo menos 6 caracteres.';
-                document.getElementById('registerError').style.display = 'block';
-            } else {
-                document.getElementById('registerError').style.display = 'none';
-                // Cadastro com Firebase
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        // Enviar e-mail de verificação
-                        sendEmailVerification(user)
-                            .then(() => {
-                                alert('Um e-mail de verificação foi enviado para você. Por favor, verifique seu e-mail.');
-                            });
-                    })
-                    .catch((error) => {
-                        document.getElementById('registerError').textContent = error.message;
-                        document.getElementById('registerError').style.display = 'block';
-                    });
-                return;
-            }
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    return sendEmailVerification(user);
-                })
-                .then(() => {
-                    window.location.href = 'verify-email.html';
-                })
-                .catch((error) => {
-                    console.error('Erro ao criar a conta:', error);
-                    document.getElementById('registerError').innerText = 'Erro ao criar a conta. Verifique os dados e tente novamente.';
-                    document.getElementById('registerError').style.display = 'block';
-                });
-        });
-
-        document.getElementById('resetPasswordButton').addEventListener('click', function() {
-            const email = document.getElementById('resetEmail').value;
-
-            if (email === '') {
-                document.getElementById('resetError').style.display = 'block';
-            } else {
-                document.getElementById('resetError').style.display = 'none';
-                // Enviar e-mail de redefinição de senha
-                sendPasswordResetEmail(auth, email)
-                    .then(() => {
-                        alert('Um e-mail de redefinição de senha foi enviado.');
-                        document.getElementById('resetPasswordForm').style.display = 'none';
-                        document.getElementById('loginForm').style.display = 'flex';
-                    })
-                    .catch((error) => {
-                        document.getElementById('resetError').textContent = error.message;
-                        document.getElementById('resetError').style.display = 'block';
-                    });
-            }
-            sendPasswordResetEmail(auth, email)
-                .then(() => {
-                    alert('Email de redefinição de senha enviado.');
-                    document.getElementById('resetPasswordForm').style.display = 'none';
-                    document.getElementById('loginForm').style.display = 'flex';
-                })
-                .catch((error) => {
-                    console.error('Erro ao enviar o e-mail de redefinição de senha:', error);
-                    document.getElementById('resetError').innerText = 'Erro ao enviar o e-mail de redefinição de senha. Verifique o email e tente novamente.';
-                    document.getElementById('resetError').style.display = 'block';
-                });
-        });
-
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('loginPassword');
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-            const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-        });
-
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('registerPassword');
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-            const passwordField = document.getElementById('registerPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-        });
-
-        document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://yampi.com.br/checkout';
-        });
-
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
-        });
-    </script>
+    <div id="registerForm" style="display:none;">
+        <h1>Cadastro</h1>
+        <input type="text" id="registerName" placeholder="Nome">
+        <input type="email" id="registerEmail" placeholder="E-mail">
+        <input type="password" id="registerPassword" placeholder="Senha">
+        <button id="registerButton">Cadastrar</button>
+        <div id="registerError" style="display:none; color:red;"></div>
+        <div id="registrationMessage" style="display:none;"></div>
+        <a href="#" id="loginLink">Já tem uma conta? Faça login</a>
+    </div>
+    <div id="redirectPopup" style="display:none;">
+        <p>Você será redirecionado em <span id="redirectTimer">5</span> segundos...</p>
+        <button id="redirectNowButton">Redirecionar agora</button>
+    </div>
+    <button id="paymentButton" style="display:none;">Pagamento</button>
+    <script type="module" src="app.js"></script>
 </body>
+</html>
