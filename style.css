@@ -41,7 +41,7 @@ body {
     width: 150px;
     margin-bottom: 20px;
     position: relative;
-    animation: rotate 5s infinite linear;
+    animation: rotate 5s linear infinite;
 }
 
 /* Animação de brilho */
@@ -58,7 +58,7 @@ body {
     }
 }
 
-/* Animação de rotação */
+/* Animação de rotação (ajustada para girar de 5 em 5 segundos) */
 @keyframes rotate {
     from {
         transform: rotate(0deg);
@@ -214,6 +214,7 @@ body {
 .popup p {
     font-size: 16px;
     margin-bottom: 20px;
+    text-align: center; /* Centraliza a mensagem no popup */
 }
 
 .popup .button {
@@ -284,11 +285,41 @@ body {
     z-index: 1000; /* Garante que o popup fique acima de outros elementos */
 }
 
-#redirectPopup button, #resetPasswordPopup button {
-    display: block;
-    margin-top: 10px;
+/* Adiciona uma animação de giro rápido à logo */
+@keyframes rotateFast {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-#redirectPopup #redirectTimer {
-    font-weight: bold;
+.logo {
+    animation: rotateFast 0.5s linear infinite; /* Gira a logo rapidamente */
 }
+
+@keyframes shine {
+    0% {
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
+        background-size: 200% 200%;
+        background-position: -100% -100%;
+    }
+    100% {
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
+        background-size: 200% 200%;
+        background-position: 100% 100%;
+    }
+}
+
+/* Adiciona o efeito de brilho à logo */
+.logo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
+    background-size: 200% 200%;
+    animation: shine 5s infinite linear;
+    z-index: 1;
+    opacity: 0.5;
+}
+
