@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetEmail = document.getElementById('resetEmail');
     const resetError = document.getElementById('resetError');
     const closeResetPopup = document.getElementById('closeResetPopup');
+    const subscriptionStatus = document.getElementById('subscriptionStatus'); // Novo elemento para o status da assinatura
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -172,48 +173,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Função para iniciar o temporizador do período de teste
-    function startTrialCountdown(endDate) {
-        function updateCountdown() {
+    // Função para iniciar o temporizador de teste
+    function startTrialCountdown(trialEndDate) {
+        const countdownInterval = setInterval(() => {
             const now = new Date();
-            const timeRemaining = endDate - now;
-            if (timeRemaining <= 0) {
+            const timeLeft = trialEndDate - now;
+            if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
-                trialStatus.textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
+                trialStatus.textContent = 'Seu período de teste expirou.';
+                trialStatus.style.color = 'red';
                 paymentButton.style.display = 'block';
             } else {
-                const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
-                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-                trialStatus.textContent = `${hours}h ${minutes}m ${seconds}s restantes`;
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                trialStatus.textContent = `Tempo restante do período de teste: ${hours}h ${minutes}m ${seconds}s`;
             }
-        }
-
-        updateCountdown();
-        const countdownInterval = setInterval(updateCountdown, 1000);
+        }, 1000);
     }
 
-    // Redefinir a senha
-    resetPasswordButton.addEventListener('click', () => {
+    // Manipular a redefinição de senha
+    resetPasswordButton.addEventListener('click', async () => {
         const email = resetEmail.value;
-        if (email) {
-            sendPasswordResetEmail(auth, email)
-                .then(() => {
-                    resetError.style.display = 'none';
-                    resetPasswordPopup.style.display = 'none';
-                    alert('Email de redefinição de senha enviado.');
-                })
-                .catch((error) => {
-                    resetError.style.display = 'block';
-                    resetError.textContent = error.message;
-                });
-        } else {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            resetError.style.display = 'none';
+            resetPasswordPopup.style.display = 'none';
+            alert('Um e-mail para redefinição de senha foi enviado.');
+        } catch (error) {
             resetError.style.display = 'block';
-            resetError.textContent = 'Por favor, insira um e-mail.';
+            resetError.textContent = error.message;
         }
     });
 
-    // Fechar o popup de redefinição de senha
+    // Fechar popup de redefinição de senha
     closeResetPopup.addEventListener('click', () => {
         resetPasswordPopup.style.display = 'none';
     });
