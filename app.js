@@ -1,7 +1,7 @@
 // Importar as funções necessárias do SDK do Firebase
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectPopup = document.getElementById('redirectPopup');
     const redirectTimer = document.getElementById('redirectTimer');
     const redirectNowButton = document.getElementById('redirectNowButton');
+    const registrationMessage = document.getElementById('registrationMessage');
+    const loginErrorMessage = document.getElementById('loginError');
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -50,7 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         if (password.length < 6) {
-            document.getElementById('loginError').style.display = 'block';
+            loginErrorMessage.style.display = 'block';
+            loginErrorMessage.textContent = 'A senha deve ter pelo menos 6 caracteres.';
         } else {
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -67,24 +70,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     trialEndDate.setDate(trialEndDate.getDate() + trialPeriodDays);
 
                     if (now <= trialEndDate) {
-                        // User is within the trial period
-                        loginForm.style.display = 'none';
-                        // Exibir o popup e iniciar o cronômetro
-                        redirectPopup.style.display = 'block';
-                        let countdown = 5;
-                        const countdownInterval = setInterval(() => {
-                            countdown -= 1;
-                            redirectTimer.textContent = countdown;
-                            if (countdown <= 0) {
-                                clearInterval(countdownInterval);
-                                window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
-                            }
-                        }, 1000);
+                        // Verificar se o email do usuário foi verificado
+                        if (user.emailVerified) {
+                            // User is within the trial period
+                            loginForm.style.display = 'none';
+                            // Exibir o popup e iniciar o cronômetro
+                            redirectPopup.style.display = 'block';
+                            let countdown = 5;
+                            const countdownInterval = setInterval(() => {
+                                countdown -= 1;
+                                redirectTimer.textContent = countdown;
+                                if (countdown <= 0) {
+                                    clearInterval(countdownInterval);
+                                    window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                                }
+                            }, 1000);
 
-                        // Redirecionar após o clique no botão do popup
-                        redirectNowButton.addEventListener('click', () => {
-                            window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
-                        });
+                            // Redirecionar após o clique no botão do popup
+                            redirectNowButton.addEventListener('click', () => {
+                                window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                            });
+                        } else {
+                            // Email not verified
+                            loginErrorMessage.style.display = 'block';
+                            loginErrorMessage.textContent = 'Por favor, verifique seu email antes de fazer login.';
+                        }
                     } else {
                         // Trial period has expired
                         alert('Seu período de teste expirou. Por favor, faça o pagamento para continuar.');
@@ -94,8 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('No user data found');
                 }
             } catch (error) {
-                document.getElementById('loginError').style.display = 'block';
-                document.getElementById('loginError').textContent = error.message;
+                loginErrorMessage.style.display = 'block';
+                loginErrorMessage.textContent = error.message;
             }
         }
     });
@@ -107,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('registerPassword').value;
         if (name === '' || email === '' || password === '' || password.length < 6) {
             document.getElementById('registerError').style.display = 'block';
+            document.getElementById('registerError').textContent = 'Todos os campos são obrigatórios e a senha deve ter pelo menos 6 caracteres.';
         } else {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -116,12 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     email: email,
                     trialStartDate: new Date().toISOString() // Save the current date and time as trial start date
                 });
+                // Enviar o email de verificação
+                await sendEmailVerification(user);
                 document.getElementById('registerError').style.display = 'none';
                 registerForm.style.display = 'none';
-                setTimeout(() => {
-                    alert('Cadastro realizado com sucesso!');
-                    loginForm.style.display = 'flex';
-                }, 500);
+                registrationMessage.style.display = 'block';
+                registrationMessage.textContent = 'Cadastro realizado com sucesso! Verifique seu email para completar a verificação.';
             } catch (error) {
                 document.getElementById('registerError').style.display = 'block';
                 document.getElementById('registerError').textContent = error.message;
