@@ -50,26 +50,66 @@
             color: #4CAF50;
         }
     </style>
+    <!-- Adicione o Firebase ao seu HTML -->
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"></script>
+    <script>
+        // Sua configuração do Firebase
+        const firebaseConfig = {
+  apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
+  authDomain: "projeto-notificacao-968d4.firebaseapp.com",
+  projectId: "projeto-notificacao-968d4",
+  storageBucket: "projeto-notificacao-968d4.appspot.com",
+  messagingSenderId: "236002612799",
+  appId: "1:236002612799:web:54719603091421b94aca8a",
+  measurementId: "G-KY69HG6ZNZ"
+        };
+
+        // Inicialize o Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            const code = urlParams.get('oobCode');
+
+            if (mode === 'verifyEmail' && code) {
+                const auth = firebase.auth();
+                auth.applyActionCode(code)
+                    .then(() => {
+                        console.log('Email verificado com sucesso');
+                        // Atualize a interface do usuário conforme necessário
+                        document.getElementById('verification-status').innerText = 'Seu e-mail foi verificado com sucesso!';
+                    })
+                    .catch((error) => {
+                        console.error('Erro ao verificar o e-mail:', error);
+                        // Atualize a interface do usuário para informar sobre o erro
+                        document.getElementById('verification-status').innerText = 'Ocorreu um erro ao verificar seu e-mail. Por favor, tente novamente.';
+                    });
+            } else {
+                console.error('Parâmetros inválidos ou não fornecidos');
+                // Atualize a interface do usuário para informar sobre o erro
+                document.getElementById('verification-status').innerText = 'Parâmetros inválidos ou não fornecidos.';
+            }
+
+            // Contador para redirecionar
+            let timer = 5;
+            const interval = setInterval(() => {
+                document.getElementById('redirectTimer').innerText = timer;
+                timer--;
+                if (timer < 0) {
+                    clearInterval(interval);
+                    window.location.href = 'index.html'; // Redireciona para a página de login
+                }
+            }, 1000);
+        });
+    </script>
 </head>
 <body>
     <div class="verification-container">
         <div class="check-icon">✅</div>
-        <h1>TUDO CERTO</h1>
-        <p>SEU EMAIL FOI VERIFICADO COM SUCESSO</p>
+        <h1 id="verification-status">SEU EMAIL ESTÁ SENDO VERIFICADO...</h1>
         <p>VOCÊ SERÁ REDIRECIONADO PARA A TELA DE LOGIN EM <span class="timer" id="redirectTimer">5</span> SEGUNDOS</p>
     </div>
-
-    <script>
-        // Contador para redirecionar
-        let timer = 5;
-        const interval = setInterval(() => {
-            document.getElementById('redirectTimer').innerText = timer;
-            timer--;
-            if (timer < 0) {
-                clearInterval(interval);
-                window.location.href = 'index.html'; // Redireciona para a página de login
-            }
-        }, 1000);
-    </script>
 </body>
 </html>
