@@ -1,6 +1,6 @@
 // Importa os módulos necessários do Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
 
 // Configuração do Firebase
@@ -32,6 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectNowButton = document.getElementById('redirectNowButton');
     const trialStatus = document.getElementById('trialStatus'); // Elemento para mostrar status do período de teste
     const registrationMessage = document.getElementById('registrationMessage'); // Mensagem de registro
+    const resetPasswordButton = document.getElementById('resetPasswordButton');
+    const resetPasswordPopup = document.getElementById('resetPasswordPopup');
+    const resetEmail = document.getElementById('resetEmail');
+    const resetError = document.getElementById('resetError');
+    const closeResetPopup = document.getElementById('closeResetPopup');
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -100,13 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             redirectTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
                             if (countdown <= 0) {
                                 clearInterval(countdownInterval);
-                                window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Alterar o link conforme necessário
                             }
                         }, 1000);
 
                         // Redirecionar após o clique no botão do popup
                         redirectNowButton.addEventListener('click', () => {
-                            window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Alterar o link conforme necessário
                         });
                     } else {
                         // Trial period and subscription both have expired
@@ -171,41 +176,45 @@ document.addEventListener('DOMContentLoaded', () => {
     function startTrialCountdown(endDate) {
         function updateCountdown() {
             const now = new Date();
-            const timeRemaining = new Date(endDate) - now;
+            const timeRemaining = endDate - now;
             if (timeRemaining <= 0) {
-                document.getElementById('trialCountdown').innerHTML = 'Seu período de teste expirou!';
-                return;
+                clearInterval(countdownInterval);
+                trialStatus.textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
+                paymentButton.style.display = 'block';
+            } else {
+                const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                trialStatus.textContent = `${hours}h ${minutes}m ${seconds}s restantes`;
             }
-
-            const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
-            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-            document.getElementById('trialCountdown').innerHTML = `${hours}h ${minutes}m ${seconds}s restantes`;
-
-            setTimeout(updateCountdown, 1000);
         }
 
         updateCountdown();
+        const countdownInterval = setInterval(updateCountdown, 1000);
     }
 
-    // Função para adicionar 30 dias à assinatura após o pagamento
-    async function addSubscriptionDays(userId) {
-        const userDoc = doc(db, 'users', userId);
-        const userSnapshot = await getDoc(userDoc);
-
-        if (userSnapshot.exists()) {
-            const userData = userSnapshot.data();
-            const now = new Date();
-            const newSubscriptionEndDate = userData.subscriptionEndDate
-                ? new Date(userData.subscriptionEndDate)
-                : now;
-            newSubscriptionEndDate.setDate(newSubscriptionEndDate.getDate() + 30); // Adiciona 30 dias
-
-            await updateDoc(userDoc, {
-                subscriptionEndDate: newSubscriptionEndDate.toISOString()
-            });
-            console.log('Subscription extended by 30 days');
+    // Redefinir a senha
+    resetPasswordButton.addEventListener('click', () => {
+        const email = resetEmail.value;
+        if (email) {
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    resetError.style.display = 'none';
+                    resetPasswordPopup.style.display = 'none';
+                    alert('Email de redefinição de senha enviado.');
+                })
+                .catch((error) => {
+                    resetError.style.display = 'block';
+                    resetError.textContent = error.message;
+                });
+        } else {
+            resetError.style.display = 'block';
+            resetError.textContent = 'Por favor, insira um e-mail.';
         }
-    }
+    });
+
+    // Fechar o popup de redefinição de senha
+    closeResetPopup.addEventListener('click', () => {
+        resetPasswordPopup.style.display = 'none';
+    });
 });
