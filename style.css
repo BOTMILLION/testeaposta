@@ -22,6 +22,19 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-bottom: 70px; /* Aumentado para garantir visibilidade em dispositivos móveis */
+}
+
+/* Estilo ajustado para dispositivos móveis */
+@media (max-width: 600px) {
+    .wrap-login {
+        margin-bottom: 100px; /* Aumentado para garantir visibilidade em dispositivos móveis */
+        padding: 20px 10px; /* Ajustado o padding para dispositivos móveis */
+    }
+
+    .welcome-text {
+        font-size: 20px; /* Reduzido o tamanho da fonte para dispositivos móveis */
+    }
 }
 
 .logo {
