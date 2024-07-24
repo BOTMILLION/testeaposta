@@ -1,7 +1,7 @@
 // Importa os módulos necessários do Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
+import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -163,9 +163,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 registrationMessage.innerHTML = `
                     Cadastro realizado!<br>
                     Para começar, verifique seu e-mail para concluir o processo de login. Você tem um período de teste gratuito de 3 dias, e o temporizador abaixo mostra o tempo restante. Após o período de teste, realize o pagamento de R$20 para continuar acessando nossos serviços.<br><br>
-                    Se tiver alguma dúvida, entre em contato com o suporte.
+                    <button id="startButton">Iniciar</button>
                 `;
-                startTrialCountdown(trialEndDate); // Inicia o temporizador
+
+                document.getElementById('startButton').addEventListener('click', () => {
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Alterar o link conforme necessário
+                });
+
+                // Exibir o temporizador de teste
+                let countdown = Math.ceil((trialEndDate - trialStartDate) / 1000); // Convert milliseconds to seconds
+                const countdownInterval = setInterval(() => {
+                    countdown -= 1;
+                    const hours = Math.floor(countdown / 3600);
+                    const minutes = Math.floor((countdown % 3600) / 60);
+                    const seconds = countdown % 60;
+                    registrationMessage.innerHTML += `<br>${hours}h ${minutes}m ${seconds}s restantes.`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        registrationMessage.innerHTML += '<br>Seu período de teste expirou.';
+                    }
+                }, 1000);
             } catch (error) {
                 document.getElementById('registerError').style.display = 'block';
                 document.getElementById('registerError').textContent = error.message;
@@ -173,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Manipular o clique no botão de redefinição de senha
+    // Manipular o clique no botão de recuperação de senha
     resetPasswordButton.addEventListener('click', async () => {
         const email = resetEmail.value;
         if (email === '') {
@@ -184,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await sendPasswordResetEmail(auth, email);
                 resetError.style.display = 'none';
                 resetPasswordPopup.style.display = 'none';
-                alert('Um e-mail de redefinição de senha foi enviado para você.');
+                alert('E-mail de redefinição de senha enviado.');
             } catch (error) {
                 resetError.style.display = 'block';
                 resetError.textContent = error.message;
@@ -192,25 +209,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Fechar o popup de redefinição de senha
+    // Fechar o popup de recuperação de senha
     closeResetPopup.addEventListener('click', () => {
         resetPasswordPopup.style.display = 'none';
     });
 
-    // Função para iniciar o temporizador do período de teste
-    function startTrialCountdown(endDate) {
-        const countdown = Math.ceil((endDate - new Date()) / 1000); // Convert milliseconds to seconds
-        const countdownInterval = setInterval(() => {
-            const now = new Date();
-            const remainingTime = Math.ceil((endDate - now) / 1000);
-            const hours = Math.floor(remainingTime / 3600);
-            const minutes = Math.floor((remainingTime % 3600) / 60);
-            const seconds = remainingTime % 60;
-            redirectTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
-            if (remainingTime <= 0) {
-                clearInterval(countdownInterval);
-                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Alterar o link conforme necessário
-            }
-        }, 1000);
-    }
+    // Fechar o popup de redirecionamento e exibir a tela de login novamente
+    document.getElementById('closePopup').addEventListener('click', () => {
+        redirectPopup.style.display = 'none';
+        loginForm.style.display = 'flex'; // Mostrar a tela de login novamente
+    });
 });
