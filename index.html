@@ -145,30 +145,20 @@
         document.getElementById('loginButton').addEventListener('click', async function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                document.getElementById('loginError').style.display = 'block';
+                return;
+            }
+            document.getElementById('loginError').style.display = 'none';
+
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                if (user.emailVerified) {
-                    const userDoc = doc(db, "users", user.uid);
-                    const userSnapshot = await getDoc(userDoc);
-                    if (userSnapshot.exists()) {
-                        const trialEnd = userSnapshot.data().trialEnd;
-                        const now = new Date().getTime();
-                        const trialEndDate = new Date(trialEnd).getTime();
-                        if (now < trialEndDate) {
-                            showRedirectPopup();
-                        } else {
-                            document.getElementById('loginError').textContent = 'Seu período de teste expirou. Por favor, realize o pagamento.';
-                        }
-                    } else {
-                        document.getElementById('loginError').textContent = 'Usuário não encontrado.';
-                    }
-                } else {
-                    document.getElementById('loginError').textContent = 'Por favor, verifique seu email primeiro.';
-                }
+                await signInWithEmailAndPassword(auth, email, password);
+                document.getElementById('redirectPopup').style.display = 'flex';
+                startRedirectTimer();
             } catch (error) {
-                document.getElementById('loginError').textContent = 'Erro ao fazer login. Verifique suas credenciais.';
+                document.getElementById('loginError').textContent = error.message;
+                document.getElementById('loginError').style.display = 'block';
             }
         });
 
@@ -177,106 +167,84 @@
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
 
-            if (password.length < 6) {
-                document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
+            if (!name || !email || !password || password.length < 6) {
+                document.getElementById('registerError').style.display = 'block';
                 return;
             }
+            document.getElementById('registerError').style.display = 'none';
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
                 await sendEmailVerification(user);
-
-                const trialEndDate = new Date();
-                trialEndDate.setDate(trialEndDate.getDate() + 3); // Período de teste de 3 dias
-                await setDoc(doc(db, "users", user.uid), {
-                    trialEnd: trialEndDate.toISOString()
-                });
-
-                document.getElementById('registerSuccess').style.display = 'block';
-                document.getElementById('registerPopup').style.display = 'block';
-                startTimer(3); // Iniciar temporizador de 3 dias
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('registerPopup').style.display = 'flex';
+                startRegisterTimer();
             } catch (error) {
-                document.getElementById('registerError').textContent = 'Erro ao criar conta. Tente novamente.';
+                document.getElementById('registerError').textContent = error.message;
+                document.getElementById('registerError').style.display = 'block';
             }
         });
 
         document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
+
+            if (!email) {
+                document.getElementById('resetError').style.display = 'block';
+                return;
+            }
+            document.getElementById('resetError').style.display = 'none';
+
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('Email de redefinição de senha enviado.');
+                alert('Email de redefinição enviado. Verifique sua caixa de entrada.');
                 document.getElementById('resetPasswordForm').style.display = 'none';
                 document.getElementById('loginForm').style.display = 'flex';
             } catch (error) {
-                document.getElementById('resetError').textContent = 'Erro ao enviar email de redefinição.';
+                document.getElementById('resetError').textContent = error.message;
+                document.getElementById('resetError').style.display = 'block';
             }
         });
 
         document.getElementById('closeRegisterPopup').addEventListener('click', function() {
             document.getElementById('registerPopup').style.display = 'none';
-            window.location.href = 'botmillion.github.io/testeaposta/'; // Redirecionar após o fechamento do popup
+            document.getElementById('loginForm').style.display = 'flex';
         });
 
         document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = 'botmillion.github.io/testeaposta/'; // Redirecionar agora
+            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
         });
 
-        document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://checkout.yampi.com.br'; // Redirecionar para a página de pagamento
-        });
-
-        // Função para exibir o popup de redirecionamento
-        function showRedirectPopup() {
-            document.getElementById('redirectPopup').style.display = 'block';
-            startRedirectTimer();
-        }
-
-        // Função para iniciar o temporizador de redirecionamento
         function startRedirectTimer() {
-            let timeLeft = 5; // Tempo em segundos
+            let countdown = 5;
             const timerElement = document.getElementById('redirectTimer');
-            const interval = setInterval(function() {
-                timeLeft--;
-                timerElement.textContent = timeLeft;
-                if (timeLeft <= 0) {
+            const interval = setInterval(() => {
+                timerElement.textContent = countdown;
+                countdown--;
+                if (countdown < 0) {
                     clearInterval(interval);
-                    window.location.href = 'https://seubet.com';
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                 }
             }, 1000);
         }
 
-        // Função para iniciar o temporizador de 3 dias
-        function startTimer(days) {
-            let timeLeft = days * 24 * 60 * 60 * 1000; // Tempo em milissegundos
+        function startRegisterTimer() {
+            let countdown = 259200; // 3 dias em segundos
             const timerElement = document.getElementById('registerTimer');
-            const interval = setInterval(function() {
-                timeLeft -= 1000;
-                const daysLeft = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
-                const hoursLeft = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-                const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-                const secondsLeft = Math.floor((timeLeft % (60 * 1000)) / 1000);
-                timerElement.textContent = `${daysLeft}d ${hoursLeft}h ${minutesLeft}m ${secondsLeft}s`;
-                if (timeLeft <= 0) {
+            const interval = setInterval(() => {
+                const days = Math.floor(countdown / (3600 * 24));
+                const hours = Math.floor((countdown % (3600 * 24)) / 3600);
+                const minutes = Math.floor((countdown % 3600) / 60);
+                const seconds = countdown % 60;
+                timerElement.textContent = `Tempo restante: ${days} dias, ${hours} horas, ${minutes} minutos, ${seconds} segundos`;
+                countdown--;
+                if (countdown < 0) {
                     clearInterval(interval);
-                    timerElement.textContent = 'Período de teste expirado.';
+                    document.getElementById('registerPopup').style.display = 'none';
+                    alert('Seu período de teste terminou. Por favor, faça o pagamento para continuar.');
                 }
             }, 1000);
         }
-
-        // Inicializar a visualização da senha
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('loginPassword');
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-        });
-
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('registerPassword');
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-        });
     </script>
 </body>
 </html>
