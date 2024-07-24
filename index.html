@@ -167,7 +167,7 @@
                         });
                 })
                 .catch((error) => {
-                    document.getElementById('registerError').innerText = 'Erro ao criar conta. Por favor, tente novamente.';
+                    document.getElementById('registerError').innerText = 'Erro ao criar conta. Verifique os detalhes e tente novamente.';
                     document.getElementById('registerError').style.display = 'block';
                 });
         });
@@ -176,34 +176,26 @@
             const email = document.getElementById('resetEmail').value;
             sendPasswordResetEmail(auth, email)
                 .then(() => {
-                    alert('Email de redefinição enviado.');
                     document.getElementById('resetPasswordForm').style.display = 'none';
                     document.getElementById('loginForm').style.display = 'flex';
                 })
                 .catch((error) => {
-                    document.getElementById('resetError').innerText = 'Erro ao enviar email de redefinição.';
+                    document.getElementById('resetError').innerText = 'Erro ao enviar e-mail de redefinição. Verifique o e-mail e tente novamente.';
                     document.getElementById('resetError').style.display = 'block';
                 });
         });
 
+        // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
         });
 
         document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
             const passwordField = document.getElementById('registerPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-        });
-
-        document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://checkout.yampi.com.br/';
-        });
-
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
         });
     </script>
 </body>
