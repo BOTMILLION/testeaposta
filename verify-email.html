@@ -51,17 +51,10 @@
         }
     </style>
     <!-- Adicione o Firebase ao seu HTML -->
-    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"></script>
-</head>
-<body>
-    <div class="verification-container">
-        <div class="check-icon">✅</div>
-        <h1 id="verification-status">SEU EMAIL ESTÁ SENDO VERIFICADO...</h1>
-        <p>VOCÊ SERÁ REDIRECIONADO PARA A TELA DE LOGIN EM <span class="timer" id="redirectTimer">5</span> SEGUNDOS</p>
-    </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js';
+        import { getAuth, applyActionCode } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js';
 
-    <script>
         // Sua configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
@@ -74,7 +67,8 @@
         };
 
         // Inicialize o Firebase
-        firebase.initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -82,8 +76,7 @@
             const code = urlParams.get('oobCode');
 
             if (mode === 'verifyEmail' && code) {
-                const auth = firebase.auth();
-                auth.applyActionCode(code)
+                applyActionCode(auth, code)
                     .then(() => {
                         console.log('Email verificado com sucesso');
                         // Atualize a interface do usuário conforme necessário
@@ -112,5 +105,12 @@
             }, 1000);
         });
     </script>
+</head>
+<body>
+    <div class="verification-container">
+        <div class="check-icon">✅</div>
+        <h1 id="verification-status">SEU EMAIL ESTÁ SENDO VERIFICADO...</h1>
+        <p>VOCÊ SERÁ REDIRECIONADO PARA A TELA DE LOGIN EM <span class="timer" id="redirectTimer">5</span> SEGUNDOS</p>
+    </div>
 </body>
 </html>
