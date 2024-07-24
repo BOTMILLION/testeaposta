@@ -1,116 +1,129 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificação de E-mail</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
-    <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #f2f2f2;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-        }
+// Importa os módulos necessários do Firebase
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
 
-        .verification-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            padding: 20px;
-            max-width: 400px;
-            width: 100%;
-        }
+// Configuração do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
+    authDomain: "projeto-notificacao-968d4.firebaseapp.com",
+    projectId: "projeto-notificacao-968d4",
+    storageBucket: "projeto-notificacao-968d4.appspot.com",
+    messagingSenderId: "236002612799",
+    appId: "1:236002612799:web:54719603091421b94aca8a",
+    measurementId: "G-KY69HG6ZNZ"
+};
 
-        .verification-container h1 {
-            color: #4CAF50;
-            font-size: 24px;
-            margin: 20px 0;
-        }
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-        .verification-container p {
-            color: #555;
-            font-size: 18px;
-        }
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const loginLink = document.getElementById('loginLink');
+    const registerLink = document.getElementById('registerLink');
+    const loginButton = document.getElementById('loginButton');
+    const registerButton = document.getElementById('registerButton');
+    const paymentButton = document.getElementById('paymentButton');
+    const redirectPopup = document.getElementById('redirectPopup');
+    const redirectTimer = document.getElementById('redirectTimer');
+    const redirectNowButton = document.getElementById('redirectNowButton');
 
-        .verification-container .check-icon {
-            font-size: 60px;
-            color: #4CAF50;
-        }
+    // Mostrar o formulário de cadastro
+    registerLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'flex';
+    });
 
-        .timer {
-            font-size: 30px;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-    </style>
-    <!-- Adicione o Firebase ao seu HTML -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js';
-        import { getAuth, applyActionCode } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js';
+    // Mostrar o formulário de login
+    loginLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        registerForm.style.display = 'none';
+        loginForm.style.display = 'flex';
+    });
 
-        // Sua configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
-            authDomain: "projeto-notificacao-968d4.firebaseapp.com",
-            projectId: "projeto-notificacao-968d4",
-            storageBucket: "projeto-notificacao-968d4.appspot.com",
-            messagingSenderId: "236002612799",
-            appId: "1:236002612799:web:54719603091421b94aca8a",
-            measurementId: "G-KY69HG6ZNZ"
-        };
+    // Manipular o clique no botão de login
+    loginButton.addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        if (password.length < 6) {
+            document.getElementById('loginError').style.display = 'block';
+            document.getElementById('loginError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
+        } else {
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const userDoc = doc(db, 'users', user.uid);
+                const userSnapshot = await getDoc(userDoc);
 
-        // Inicialize o Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    const trialStartDate = new Date(userData.trialStartDate);
+                    const now = new Date();
+                    const trialPeriodDays = 3;
+                    const trialEndDate = new Date(trialStartDate);
+                    trialEndDate.setDate(trialEndDate.getDate() + trialPeriodDays);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const mode = urlParams.get('mode');
-            const code = urlParams.get('oobCode');
+                    if (now <= trialEndDate) {
+                        // User is within the trial period
+                        loginForm.style.display = 'none';
+                        // Exibir o popup e iniciar o cronômetro
+                        redirectPopup.style.display = 'block';
+                        let countdown = 5;
+                        const countdownInterval = setInterval(() => {
+                            countdown -= 1;
+                            redirectTimer.textContent = countdown;
+                            if (countdown <= 0) {
+                                clearInterval(countdownInterval);
+                                window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                            }
+                        }, 1000);
 
-            if (mode === 'verifyEmail' && code) {
-                applyActionCode(auth, code)
-                    .then(() => {
-                        console.log('Email verificado com sucesso');
-                        // Atualize a interface do usuário conforme necessário
-                        document.getElementById('verification-status').innerText = 'Seu e-mail foi verificado com sucesso!';
-                    })
-                    .catch((error) => {
-                        console.error('Erro ao verificar o e-mail:', error);
-                        // Atualize a interface do usuário para informar sobre o erro
-                        document.getElementById('verification-status').innerText = 'Ocorreu um erro ao verificar seu e-mail. Por favor, tente novamente.';
-                    });
-            } else {
-                console.error('Parâmetros inválidos ou não fornecidos');
-                // Atualize a interface do usuário para informar sobre o erro
-                document.getElementById('verification-status').innerText = 'Parâmetros inválidos ou não fornecidos.';
-            }
-
-            // Contador para redirecionar
-            let timer = 5;
-            const interval = setInterval(() => {
-                document.getElementById('redirectTimer').innerText = timer;
-                timer--;
-                if (timer < 0) {
-                    clearInterval(interval);
-                    window.location.href = 'index.html'; // Redireciona para a página de login
+                        // Redirecionar após o clique no botão do popup
+                        redirectNowButton.addEventListener('click', () => {
+                            window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                        });
+                    } else {
+                        // Trial period has expired
+                        alert('Seu período de teste expirou. Por favor, faça o pagamento para continuar.');
+                        window.location.href = 'payment.html'; // Redirecionar para a página de pagamento
+                    }
+                } else {
+                    console.error('No user data found');
                 }
-            }, 1000);
-        });
-    </script>
-</head>
-<body>
-    <div class="verification-container">
-        <div class="check-icon">✅</div>
-        <h1 id="verification-status">SEU EMAIL ESTÁ SENDO VERIFICADO...</h1>
-        <p>VOCÊ SERÁ REDIRECIONADO PARA A TELA DE LOGIN EM <span class="timer" id="redirectTimer">5</span> SEGUNDOS</p>
-    </div>
-</body>
-</html>
+            } catch (error) {
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('loginError').textContent = error.message;
+            }
+        }
+    });
+
+    // Manipular o clique no botão de cadastro
+    registerButton.addEventListener('click', async () => {
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        if (name === '' || email === '' || password === '' || password.length < 6) {
+            document.getElementById('registerError').style.display = 'block';
+            document.getElementById('registerError').textContent = 'Por favor, preencha todos os campos corretamente.';
+        } else {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: name,
+                    email: email,
+                    trialStartDate: new Date().toISOString() // Save the current date and time as trial start date
+                });
+                document.getElementById('registerError').style.display = 'none';
+                registerForm.style.display = 'none';
+                // Enviar e-mail de verificação
+                await sendEmailVerification(user);
+                document.getElementById('registrationMessage').style.display = 'block';
+                document.getElementById('registrationMessage').textContent = 'Por favor, verifique seu e-mail.';
+            } catch (error) {
+                document.getElementById('registerError').style.display = 'block';
+                document.getElementById('
