@@ -152,9 +152,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     trialEndDate: trialEndDate.toISOString(),
                     subscriptionEndDate: null
                 });
+
+                // Enviar e-mail de verificação
+                await sendEmailVerification(user);
+
                 document.getElementById('registerError').style.display = 'none';
                 registerForm.style.display = 'none';
-                await sendEmailVerification(user);
                 mostrarMensagemCadastro(trialStartDate, trialEndDate);
             } catch (error) {
                 mostrarErro('registerError', error.message);
@@ -201,18 +204,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Manipular recuperação de senha
     document.getElementById('resetPasswordSubmit').addEventListener('click', async () => {
         const email = resetEmail.value;
-        try {
-            await sendPasswordResetEmail(auth, email);
-            resetError.style.display = 'none';
-            alert('E-mail de redefinição de senha enviado com sucesso.');
-            resetPasswordPopup.style.display = 'none';
-        } catch (error) {
-            resetError.style.display = 'block';
-            resetError.textContent = 'Ocorreu um erro ao enviar o e-mail de redefinição de senha. Verifique o e-mail e tente novamente.';
+        if (email) {
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('E-mail de redefinição de senha enviado.');
+                resetPasswordPopup.style.display = 'none';
+            } catch (error) {
+                resetError.textContent = error.message;
+            }
+        } else {
+            resetError.textContent = 'Por favor, insira um e-mail.';
         }
     });
 
-    // Fechar popup
+    // Fechar popups
     closePopupButton.addEventListener('click', () => {
         redirectPopup.style.display = 'none';
     });
