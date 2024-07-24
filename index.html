@@ -7,11 +7,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase App (SDK) -->
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
-    <!-- Firebase Authentication (SDK) -->
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
-    <!-- Firebase Firestore (SDK) -->
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js"></script>
 </head>
 <body>
@@ -90,10 +87,16 @@
             <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
 
-        <!-- Popup de Registro -->
+        <!-- Popup de Cadastro -->
         <div class="popup" id="registerPopup" style="display: none;">
             <h2>Usuário cadastrado!</h2>
-            <p>Para realizar o login, verifique o seu email. Esse é o seu temporizador de 3 dias. Após o período, realize o pagamento para continuar utilizando nossos serviços.</p>
+            <p id="registerPopupMessage" style="text-align: center; font-size: 16px;">
+                Para realizar o login, verifique o seu email. 
+                <br> 
+                Este é o seu temporizador de 3 dias. 
+                <br> 
+                Após o período, realize o pagamento para continuar utilizando nossos serviços.
+            </p>
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">Fechar</button>
         </div>
@@ -101,9 +104,8 @@
     </div>
 
     <script type="module">
-        // Configuração do Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -116,12 +118,10 @@
             measurementId: "G-KY69HG6ZNZ"
         };
 
-        // Inicializar o Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Funções de Manipulação de Eventos
         document.getElementById('registerLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'flex';
@@ -153,9 +153,30 @@
             document.getElementById('loginError').style.display = 'none';
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                document.getElementById('redirectPopup').style.display = 'flex';
-                startRedirectTimer();
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                if (user.emailVerified) {
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const currentTime = new Date().getTime();
+                        const trialEndTime = userData.trialEndTime.toMillis();
+                        if (currentTime < trialEndTime) {
+                            document.getElementById('redirectPopup').style.display = 'flex';
+                            startRedirectTimer();
+                        } else {
+                            document.getElementById('loginError').textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
+                            document.getElementById('loginError').style.display = 'block';
+                        }
+                    } else {
+                        document.getElementById('loginError').textContent = 'Dados do usuário não encontrados.';
+                        document.getElementById('loginError').style.display = 'block';
+                    }
+                } else {
+                    document.getElementById('loginError').textContent = 'Por favor, verifique seu email antes de fazer login.';
+                    document.getElementById('loginError').style.display = 'block';
+                }
             } catch (error) {
                 document.getElementById('loginError').textContent = error.message;
                 document.getElementById('loginError').style.display = 'block';
@@ -177,9 +198,20 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 await sendEmailVerification(user);
+
+                const userDocRef = doc(db, 'users', user.uid);
+                const currentTime = new Date();
+                const trialEndTime = new Date(currentTime.getTime() + (3 * 24 * 60 * 60 * 1000)); // 3 dias
+
+                await setDoc(userDocRef, {
+                    name: name,
+                    email: email,
+                    trialEndTime: trialEndTime
+                });
+
                 document.getElementById('registerForm').style.display = 'none';
                 document.getElementById('registerPopup').style.display = 'flex';
-                startRegisterTimer();
+                startRegisterTimer(trialEndTime);
             } catch (error) {
                 document.getElementById('registerError').textContent = error.message;
                 document.getElementById('registerError').style.display = 'block';
@@ -228,8 +260,8 @@
             }, 1000);
         }
 
-        function startRegisterTimer() {
-            let countdown = 259200; // 3 dias em segundos
+        function startRegisterTimer(trialEndTime) {
+            let countdown = Math.floor((trialEndTime.getTime() - new Date().getTime()) / 1000);
             const timerElement = document.getElementById('registerTimer');
             const interval = setInterval(() => {
                 const days = Math.floor(countdown / (3600 * 24));
