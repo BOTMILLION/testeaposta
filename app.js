@@ -1,8 +1,3 @@
-// Importar as funções necessárias do SDK do Firebase
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-
 // Configuração do Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
@@ -15,9 +10,9 @@ const firebaseConfig = {
 };
 
 // Inicializar o Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
@@ -54,12 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
         } else {
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
-                const userDoc = doc(db, 'users', user.uid);
-                const userSnapshot = await getDoc(userDoc);
+                const userDoc = db.collection('users').doc(user.uid);
+                const userSnapshot = await userDoc.get();
 
-                if (userSnapshot.exists()) {
+                if (userSnapshot.exists) {
                     const userData = userSnapshot.data();
                     const trialStartDate = new Date(userData.trialStartDate);
                     const now = new Date();
@@ -111,9 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('registerError').textContent = 'Por favor, preencha todos os campos corretamente.';
         } else {
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
-                await setDoc(doc(db, 'users', user.uid), {
+                await db.collection('users').doc(user.uid).set({
                     name: name,
                     email: email,
                     trialStartDate: new Date().toISOString() // Save the current date and time as trial start date
@@ -121,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('registerError').style.display = 'none';
                 registerForm.style.display = 'none';
                 // Enviar e-mail de verificação
-                await sendEmailVerification(user);
+                await user.sendEmailVerification();
                 document.getElementById('registrationMessage').style.display = 'block';
                 document.getElementById('registrationMessage').textContent = 'Por favor, verifique seu e-mail.';
             } catch (error) {
