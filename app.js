@@ -1,3 +1,8 @@
+// Importa os módulos necessários do Firebase
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
+
 // Configuração do Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
@@ -9,10 +14,10 @@ const firebaseConfig = {
     measurementId: "G-KY69HG6ZNZ"
 };
 
-// Inicializar o Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
@@ -49,12 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
         } else {
             try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                const userDoc = db.collection('users').doc(user.uid);
-                const userSnapshot = await userDoc.get();
+                const userDoc = doc(db, 'users', user.uid);
+                const userSnapshot = await getDoc(userDoc);
 
-                if (userSnapshot.exists) {
+                if (userSnapshot.exists()) {
                     const userData = userSnapshot.data();
                     const trialStartDate = new Date(userData.trialStartDate);
                     const now = new Date();
@@ -106,9 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('registerError').textContent = 'Por favor, preencha todos os campos corretamente.';
         } else {
             try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                await db.collection('users').doc(user.uid).set({
+                await setDoc(doc(db, 'users', user.uid), {
                     name: name,
                     email: email,
                     trialStartDate: new Date().toISOString() // Save the current date and time as trial start date
@@ -116,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('registerError').style.display = 'none';
                 registerForm.style.display = 'none';
                 // Enviar e-mail de verificação
-                await user.sendEmailVerification();
+                await sendEmailVerification(user);
                 document.getElementById('registrationMessage').style.display = 'block';
                 document.getElementById('registrationMessage').textContent = 'Por favor, verifique seu e-mail.';
             } catch (error) {
@@ -126,8 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Mostrar o botão de pagamento
-    paymentButton.addEventListener('click', () => {
-        window.location.href = 'https://example.com/payment'; // Link de pagamento
-    });
+    // Exibir o botão de pagamento se a página de pagamento estiver acessível
+    if (window.location.href.includes('payment.html')) {
+        paymentButton.style.display = 'block';
+        paymentButton.addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br/'; // Alterar para o link de pagamento
+        });
+    }
 });
