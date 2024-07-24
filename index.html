@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase App (SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+    <!-- Firebase Authentication (SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
 </head>
 <body>
     <div class="wrap-login">
@@ -28,6 +32,9 @@
             <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
             <div class="info-text">
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
+            </div>
+            <div class="info-text">
+                Esqueceu a senha? <a href="#" id="resetPasswordLink">Redefinir Senha</a>
             </div>
         </div>
 
@@ -53,6 +60,19 @@
             </div>
         </div>
 
+        <!-- Formulário de Redefinição de Senha -->
+        <div class="form-login" id="resetPasswordForm" style="display: none;">
+            <div class="line">
+                <input type="email" id="resetEmail" placeholder=" " required>
+                <label for="resetEmail">Seu Email</label>
+            </div>
+            <div id="resetError" style="color: red; display: none;">Por favor, preencha o campo de email corretamente.</div>
+            <button class="custom-button" id="resetPasswordButton">ENVIAR EMAIL DE REDIFINIÇÃO</button>
+            <div class="info-text">
+                <a href="#" id="backToLoginLink">Voltar para o Login</a>
+            </div>
+        </div>
+
         <!-- Popup -->
         <div class="popup" id="redirectPopup">
             <h2>Login Bem-sucedido!</h2>
@@ -61,13 +81,11 @@
         </div>
     </div>
 
-    <!-- Inclua o seu script como um módulo -->
     <script type="module">
-        // Importação dos módulos Firebase
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-
         // Configuração do Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
             authDomain: "projeto-notificacao-968d4.firebaseapp.com",
@@ -92,6 +110,16 @@
             document.getElementById('loginForm').style.display = 'flex';
         });
 
+        document.getElementById('resetPasswordLink').addEventListener('click', function() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'flex';
+        });
+
+        document.getElementById('backToLoginLink').addEventListener('click', function() {
+            document.getElementById('resetPasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'flex';
+        });
+
         document.getElementById('loginButton').addEventListener('click', function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -103,17 +131,23 @@
                 // Autenticação com Firebase
                 signInWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
-                        // Exibir o popup de redirecionamento
-                        document.getElementById('redirectPopup').style.display = 'block';
-                        let countdown = 5;
-                        const timer = setInterval(() => {
-                            countdown--;
-                            document.getElementById('redirectTimer').textContent = countdown;
-                            if (countdown === 0) {
-                                clearInterval(timer);
-                                window.location.href = 'https://seusite.com/jogo';
-                            }
-                        }, 1000);
+                        const user = userCredential.user;
+                        if (user.emailVerified) {
+                            // Exibir o popup de redirecionamento
+                            document.getElementById('redirectPopup').style.display = 'block';
+                            let countdown = 5;
+                            const timer = setInterval(() => {
+                                countdown--;
+                                document.getElementById('redirectTimer').textContent = countdown;
+                                if (countdown === 0) {
+                                    clearInterval(timer);
+                                    window.location.href = 'https://seusite.com/jogo';
+                                }
+                            }, 1000);
+                        } else {
+                            document.getElementById('loginError').textContent = 'Por favor, verifique seu e-mail.';
+                            document.getElementById('loginError').style.display = 'block';
+                        }
                     })
                     .catch((error) => {
                         document.getElementById('loginError').textContent = error.message;
@@ -127,17 +161,19 @@
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
 
-            if (name === '' || email === '' || password === '' || password.length < 6) {
+            if (name === '' || email === '' || password.length < 6) {
                 document.getElementById('registerError').style.display = 'block';
             } else {
                 document.getElementById('registerError').style.display = 'none';
                 // Cadastro com Firebase
                 createUserWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
-                        // Lógica após o cadastro
-                        alert('Cadastro realizado com sucesso!');
-                        document.getElementById('registerForm').style.display = 'none';
-                        document.getElementById('loginForm').style.display = 'flex';
+                        const user = userCredential.user;
+                        // Enviar e-mail de verificação
+                        sendEmailVerification(user)
+                            .then(() => {
+                                alert('Um e-mail de verificação foi enviado para você. Por favor, verifique seu e-mail.');
+                            });
                     })
                     .catch((error) => {
                         document.getElementById('registerError').textContent = error.message;
@@ -146,38 +182,35 @@
             }
         });
 
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('loginPassword');
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                this.classList.remove('zmdi-eye');
-                this.classList.add('zmdi-eye-off');
+        document.getElementById('resetPasswordButton').addEventListener('click', function() {
+            const email = document.getElementById('resetEmail').value;
+
+            if (email === '') {
+                document.getElementById('resetError').style.display = 'block';
             } else {
-                passwordField.type = 'password';
-                this.classList.remove('zmdi-eye-off');
-                this.classList.add('zmdi-eye');
+                document.getElementById('resetError').style.display = 'none';
+                // Enviar e-mail de redefinição de senha
+                sendPasswordResetEmail(auth, email)
+                    .then(() => {
+                        alert('Um e-mail de redefinição de senha foi enviado.');
+                        document.getElementById('resetPasswordForm').style.display = 'none';
+                        document.getElementById('loginForm').style.display = 'flex';
+                    })
+                    .catch((error) => {
+                        document.getElementById('resetError').textContent = error.message;
+                        document.getElementById('resetError').style.display = 'block';
+                    });
             }
+        });
+
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('loginPassword');
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
         });
 
         document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('registerPassword');
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                this.classList.remove('zmdi-eye');
-                this.classList.add('zmdi-eye-off');
-            } else {
-                passwordField.type = 'password';
-                this.classList.remove('zmdi-eye-off');
-                this.classList.add('zmdi-eye');
-            }
-        });
-
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = 'https://seusite.com/jogo';
-        });
-
-        document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://www.yampi.com.br/checkout';
+            const passwordInput = document.getElementById('registerPassword');
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
         });
     </script>
 </body>
