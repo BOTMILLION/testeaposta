@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectTimer = document.getElementById('redirectTimer');
     const redirectNowButton = document.getElementById('redirectNowButton');
     const trialStatus = document.getElementById('trialStatus'); // Elemento para mostrar status do período de teste
-    const subscriptionStatus = document.getElementById('subscriptionStatus'); // Elemento para mostrar status da assinatura
+    const registrationMessage = document.getElementById('registrationMessage'); // Mensagem de registro
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -64,11 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (userSnapshot.exists()) {
                     const userData = userSnapshot.data();
                     const trialStartDate = new Date(userData.trialStartDate);
+                    const trialEndDate = new Date(userData.trialEndDate);
                     const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : null;
                     const now = new Date();
-                    const trialPeriodDays = 3;
-                    const trialEndDate = new Date(trialStartDate);
-                    trialEndDate.setDate(trialEndDate.getDate() + trialPeriodDays);
 
                     const isTrialValid = now <= trialEndDate;
                     const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
@@ -96,7 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         let countdown = Math.ceil((isTrialValid ? trialEndDate - now : subscriptionEndDate - now) / 1000); // Convert milliseconds to seconds
                         const countdownInterval = setInterval(() => {
                             countdown -= 1;
-                            redirectTimer.textContent = Math.ceil(countdown);
+                            const hours = Math.floor(countdown / 3600);
+                            const minutes = Math.floor((countdown % 3600) / 60);
+                            const seconds = countdown % 60;
+                            redirectTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
                             if (countdown <= 0) {
                                 clearInterval(countdownInterval);
                                 window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
@@ -138,24 +139,55 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
+                const trialStartDate = new Date();
+                const trialEndDate = new Date(trialStartDate.getTime() + 3 * 24 * 60 * 60 * 1000); // Adiciona 3 dias
+
                 await setDoc(doc(db, 'users', user.uid), {
                     name: name,
                     email: email,
-                    trialStartDate: new Date().toISOString(), // Save the current date and time as trial start date
+                    trialStartDate: trialStartDate.toISOString(), // Save the current date and time as trial start date
+                    trialEndDate: trialEndDate.toISOString(), // Save the calculated end date for the trial
                     subscriptionEndDate: null // Inicialmente, sem assinatura
                 });
                 document.getElementById('registerError').style.display = 'none';
                 registerForm.style.display = 'none';
                 // Enviar e-mail de verificação
                 await sendEmailVerification(user);
-                document.getElementById('registrationMessage').style.display = 'block';
-                document.getElementById('registrationMessage').textContent = 'Por favor, verifique seu e-mail.';
+                registrationMessage.style.display = 'block';
+                registrationMessage.innerHTML = `
+                    Cadastro realizado!<br>
+                    Para começar, verifique seu e-mail para concluir o processo de login. Você tem um período de teste gratuito de 3 dias, e o temporizador abaixo mostra o tempo restante. Após o período de teste, realize o pagamento de R$20 para continuar acessando nossos serviços.<br><br>
+                    Se tiver alguma dúvida, entre em contato com o suporte.
+                `;
+                startTrialCountdown(trialEndDate); // Inicia o temporizador
             } catch (error) {
                 document.getElementById('registerError').style.display = 'block';
                 document.getElementById('registerError').textContent = error.message;
             }
         }
     });
+
+    // Função para iniciar o temporizador do período de teste
+    function startTrialCountdown(endDate) {
+        function updateCountdown() {
+            const now = new Date();
+            const timeRemaining = new Date(endDate) - now;
+            if (timeRemaining <= 0) {
+                document.getElementById('trialCountdown').innerHTML = 'Seu período de teste expirou!';
+                return;
+            }
+
+            const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            document.getElementById('trialCountdown').innerHTML = `${hours}h ${minutes}m ${seconds}s restantes`;
+
+            setTimeout(updateCountdown, 1000);
+        }
+
+        updateCountdown();
+    }
 
     // Função para adicionar 30 dias à assinatura após o pagamento
     async function addSubscriptionDays(userId) {
