@@ -195,7 +195,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80%;
+    width: 90%; /* Ajustado para preencher a largura da tela */
     max-width: 400px; /* Define uma largura máxima para o popup */
     background: white;
     padding: 20px;
@@ -213,12 +213,14 @@ body {
 .popup h2 {
     font-size: 24px;
     margin-bottom: 10px;
+    color: #c8102e; /* Vermelho mais forte */
 }
 
 .popup p {
     font-size: 16px;
     margin-bottom: 20px;
     text-align: center; /* Centraliza a mensagem no popup */
+    line-height: 1.5; /* Aumenta o espaçamento entre linhas */
 }
 
 .popup #registerPopupMessage {
@@ -243,6 +245,7 @@ body {
     font-size: 16px;
     border-radius: 25px;
     cursor: pointer;
+    transition: background 0.3s;
 }
 
 .popup .button:hover {
