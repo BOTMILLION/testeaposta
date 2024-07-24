@@ -7,10 +7,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase App (SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
-    <!-- Firebase Authentication (SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>>
 </head>
 <body>
     <div class="wrap-login">
@@ -65,7 +61,12 @@
         </div>
     </div>
 
-    <script>
+    <!-- Inclua o seu script como um módulo -->
+    <script type="module">
+        // Importação dos módulos Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+
         // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
@@ -78,8 +79,8 @@
         };
 
         // Inicializar o Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
         document.getElementById('registerLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
@@ -100,7 +101,7 @@
             } else {
                 document.getElementById('loginError').style.display = 'none';
                 // Autenticação com Firebase
-                auth.signInWithEmailAndPassword(email, password)
+                signInWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
                         // Exibir o popup de redirecionamento
                         document.getElementById('redirectPopup').style.display = 'block';
@@ -131,7 +132,7 @@
             } else {
                 document.getElementById('registerError').style.display = 'none';
                 // Cadastro com Firebase
-                auth.createUserWithEmailAndPassword(email, password)
+                createUserWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
                         // Lógica após o cadastro
                         alert('Cadastro realizado com sucesso!');
