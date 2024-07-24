@@ -1,7 +1,7 @@
 // Importar as funções necessárias do SDK do Firebase
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -53,25 +53,46 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginError').style.display = 'block';
         } else {
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                document.getElementById('loginError').style.display = 'none';
-                loginForm.style.display = 'none';
-                // Exibir o popup e iniciar o cronômetro
-                redirectPopup.style.display = 'block';
-                let countdown = 5;
-                const countdownInterval = setInterval(() => {
-                    countdown -= 1;
-                    redirectTimer.textContent = countdown;
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
-                    }
-                }, 1000);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const userDoc = doc(db, 'users', user.uid);
+                const userSnapshot = await getDoc(userDoc);
 
-                // Redirecionar após o clique no botão do popup
-                redirectNowButton.addEventListener('click', () => {
-                    window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
-                });
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    const trialStartDate = new Date(userData.trialStartDate);
+                    const now = new Date();
+                    const trialPeriodDays = 3;
+                    const trialEndDate = new Date(trialStartDate);
+                    trialEndDate.setDate(trialEndDate.getDate() + trialPeriodDays);
+
+                    if (now <= trialEndDate) {
+                        // User is within the trial period
+                        loginForm.style.display = 'none';
+                        // Exibir o popup e iniciar o cronômetro
+                        redirectPopup.style.display = 'block';
+                        let countdown = 5;
+                        const countdownInterval = setInterval(() => {
+                            countdown -= 1;
+                            redirectTimer.textContent = countdown;
+                            if (countdown <= 0) {
+                                clearInterval(countdownInterval);
+                                window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                            }
+                        }, 1000);
+
+                        // Redirecionar após o clique no botão do popup
+                        redirectNowButton.addEventListener('click', () => {
+                            window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
+                        });
+                    } else {
+                        // Trial period has expired
+                        alert('Seu período de teste expirou. Por favor, faça o pagamento para continuar.');
+                        window.location.href = 'payment.html'; // Redirecionar para a página de pagamento
+                    }
+                } else {
+                    console.error('No user data found');
+                }
             } catch (error) {
                 document.getElementById('loginError').style.display = 'block';
                 document.getElementById('loginError').textContent = error.message;
@@ -88,10 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('registerError').style.display = 'block';
         } else {
             try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                await addDoc(collection(db, 'users'), {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                await setDoc(doc(db, 'users', user.uid), {
                     name: name,
-                    email: email
+                    email: email,
+                    trialStartDate: new Date().toISOString() // Save the current date and time as trial start date
                 });
                 document.getElementById('registerError').style.display = 'none';
                 registerForm.style.display = 'none';
