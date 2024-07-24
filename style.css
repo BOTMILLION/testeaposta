@@ -192,9 +192,9 @@ body {
 .popup {
     display: none; /* Começa oculto */
     position: fixed; /* Mudado para fixed para permanecer na tela */
-    top: 50%;
+    bottom: 0; /* Alinhado na parte inferior */
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     width: 90%; /* Ajustado para preencher a largura da tela */
     max-width: 400px; /* Define uma largura máxima para o popup */
     background: white;
@@ -204,6 +204,7 @@ body {
     text-align: center;
     z-index: 1000;
     overflow: auto; /* Adiciona rolagem se o conteúdo for maior que o popup */
+    box-sizing: border-box; /* Inclui padding e borda na largura e altura do elemento */
 }
 
 .popup.hidden {
@@ -214,11 +215,12 @@ body {
     font-size: 24px;
     margin-bottom: 10px;
     color: #c8102e; /* Vermelho mais forte */
+    text-align: center; /* Garante que o título esteja centralizado */
 }
 
 .popup p {
     font-size: 16px;
-    margin-bottom: 20px;
+    margin: 10px 0; /* Adiciona margem para separar as mensagens do título */
     text-align: center; /* Centraliza a mensagem no popup */
     line-height: 1.5; /* Aumenta o espaçamento entre linhas */
 }
@@ -227,7 +229,7 @@ body {
     font-size: 16px;
     line-height: 1.5;
     color: #333;
-    margin-bottom: 20px;
+    margin-bottom: 10px; /* Espaçamento abaixo da mensagem */
 }
 
 .popup #registerTimer {
@@ -246,6 +248,8 @@ body {
     border-radius: 25px;
     cursor: pointer;
     transition: background 0.3s;
+    display: block;
+    margin: 0 auto; /* Centraliza o botão */
 }
 
 .popup .button:hover {
@@ -262,6 +266,7 @@ body {
     font-size: 24px;
     color: #c8102e; /* Vermelho mais forte */
     margin-bottom: 20px;
+    text-align: center; /* Centraliza o título */
 }
 
 #resetPasswordForm .line {
@@ -284,11 +289,4 @@ body {
 #resetPasswordForm .info-text a {
     color: #c8102e; /* Vermelho mais forte */
     text-decoration: none;
-}
-
-#errorMessage {
-    display: none;
-    color: red;
-    margin-top: 10px;
-    font-size: 14px;
 }
