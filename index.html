@@ -54,6 +54,7 @@
                 <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
             </div>
             <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
+            <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado com sucesso! Verifique seu e-mail para confirmar sua conta.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
@@ -143,7 +144,7 @@
                     }
                 })
                 .catch((error) => {
-                    document.getElementById('loginError').innerText = 'Email ou senha incorretos.';
+                    document.getElementById('loginError').innerText = 'Erro ao fazer login. Verifique suas credenciais.';
                     document.getElementById('loginError').style.display = 'block';
                 });
         });
@@ -151,20 +152,19 @@
         document.getElementById('registerButton').addEventListener('click', function() {
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            if (password.length < 6) {
-                document.getElementById('registerError').innerText = 'A senha deve ter pelo menos 6 caracteres.';
-                document.getElementById('registerError').style.display = 'block';
-                return;
-            }
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    return sendEmailVerification(user);
-                })
-                .then(() => {
-                    // Remover o redirecionamento para 'verify-email.html'
-                    document.getElementById('registerForm').style.display = 'none';
-                    document.getElementById('loginForm').style.display = 'flex';
+                    sendEmailVerification(user)
+                        .then(() => {
+                            document.getElementById('registerForm').style.display = 'none';
+                            document.getElementById('loginForm').style.display = 'flex';
+                            document.getElementById('registerSuccess').style.display = 'block';
+                        })
+                        .catch((error) => {
+                            document.getElementById('registerError').innerText = 'Erro ao enviar e-mail de verificação. Por favor, tente novamente.';
+                            document.getElementById('registerError').style.display = 'block';
+                        });
                 })
                 .catch((error) => {
                     document.getElementById('registerError').innerText = 'Erro ao criar conta. Por favor, tente novamente.';
