@@ -266,3 +266,29 @@ body {
     margin-top: 10px;
     font-size: 14px;
 }
+
+/* Novos estilos para popups */
+#redirectPopup, #resetPasswordPopup {
+    display: none; /* Inicialmente oculto */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 500px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 1000; /* Garante que o popup fique acima de outros elementos */
+}
+
+#redirectPopup button, #resetPasswordPopup button {
+    display: block;
+    margin-top: 10px;
+}
+
+#redirectPopup #redirectTimer {
+    font-weight: bold;
+}
