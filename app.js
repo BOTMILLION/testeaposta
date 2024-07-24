@@ -1,24 +1,3 @@
-// Importa os módulos necessários do Firebase
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
-
-// Configuração do Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
-    authDomain: "projeto-notificacao-968d4.firebaseapp.com",
-    projectId: "projeto-notificacao-968d4",
-    storageBucket: "projeto-notificacao-968d4.appspot.com",
-    messagingSenderId: "236002612799",
-    appId: "1:236002612799:web:54719603091421b94aca8a",
-    measurementId: "G-KY69HG6ZNZ"
-};
-
-// Inicializa o Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -30,14 +9,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectPopup = document.getElementById('redirectPopup');
     const redirectTimer = document.getElementById('redirectTimer');
     const redirectNowButton = document.getElementById('redirectNowButton');
-    const trialStatus = document.getElementById('trialStatus'); // Elemento para mostrar status do período de teste
-    const registrationMessage = document.getElementById('registrationMessage'); // Mensagem de registro
+    const trialStatus = document.getElementById('trialStatus');
+    const registrationMessage = document.getElementById('registrationMessage');
     const resetPasswordButton = document.getElementById('resetPasswordButton');
     const resetPasswordPopup = document.getElementById('resetPasswordPopup');
     const resetEmail = document.getElementById('resetEmail');
     const resetError = document.getElementById('resetError');
     const closeResetPopup = document.getElementById('closeResetPopup');
-    const subscriptionStatus = document.getElementById('subscriptionStatus'); // Novo elemento para o status da assinatura
+    const subscriptionStatus = document.getElementById('subscriptionStatus');
+    const closePopupButton = document.getElementById('closePopup');
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -77,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const isTrialValid = now <= trialEndDate;
                     const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
 
-                    // Mostrar status do período de teste
                     if (isTrialValid) {
                         trialStatus.style.display = 'block';
                         trialStatus.textContent = `Seu período de teste vai até: ${trialEndDate.toLocaleDateString()}`;
@@ -85,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         trialStatus.style.display = 'none';
                     }
 
-                    // Mostrar status da assinatura
                     if (isSubscriptionValid) {
                         subscriptionStatus.style.display = 'block';
                         subscriptionStatus.textContent = `Sua assinatura é válida até: ${subscriptionEndDate.toLocaleDateString()}`;
@@ -94,10 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (isTrialValid || isSubscriptionValid) {
-                        // Exibir o popup e iniciar o cronômetro se o período de teste estiver válido ou a assinatura estiver ativa
                         loginForm.style.display = 'none';
                         redirectPopup.style.display = 'block';
-                        let countdown = Math.ceil((isTrialValid ? trialEndDate - now : subscriptionEndDate - now) / 1000); // Convert milliseconds to seconds
+                        let countdown = Math.ceil((isTrialValid ? trialEndDate - now : subscriptionEndDate - now) / 1000);
                         const countdownInterval = setInterval(() => {
                             countdown -= 1;
                             const hours = Math.floor(countdown / 3600);
@@ -106,21 +83,19 @@ document.addEventListener('DOMContentLoaded', () => {
                             redirectTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
                             if (countdown <= 0) {
                                 clearInterval(countdownInterval);
-                                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Alterar o link conforme necessário
+                                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                             }
                         }, 1000);
 
-                        // Redirecionar após o clique no botão do popup
                         redirectNowButton.addEventListener('click', () => {
-                            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Alterar o link conforme necessário
+                            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                         });
                     } else {
-                        // Trial period and subscription both have expired
                         trialStatus.style.display = 'block';
                         trialStatus.textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
                         paymentButton.style.display = 'block';
                         paymentButton.addEventListener('click', () => {
-                            window.location.href = 'https://yampi.com.br/'; // Alterar para o link de pagamento
+                            window.location.href = 'https://yampi.com.br/';
                         });
                     }
                 } else {
@@ -146,18 +121,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 const trialStartDate = new Date();
-                const trialEndDate = new Date(trialStartDate.getTime() + 3 * 24 * 60 * 60 * 1000); // Adiciona 3 dias
+                const trialEndDate = new Date(trialStartDate.getTime() + 3 * 24 * 60 * 60 * 1000);
 
                 await setDoc(doc(db, 'users', user.uid), {
                     name: name,
                     email: email,
-                    trialStartDate: trialStartDate.toISOString(), // Save the current date and time as trial start date
-                    trialEndDate: trialEndDate.toISOString(), // Save the calculated end date for the trial
-                    subscriptionEndDate: null // Inicialmente, sem assinatura
+                    trialStartDate: trialStartDate.toISOString(),
+                    trialEndDate: trialEndDate.toISOString(),
+                    subscriptionEndDate: null
                 });
                 document.getElementById('registerError').style.display = 'none';
                 registerForm.style.display = 'none';
-                // Enviar e-mail de verificação
                 await sendEmailVerification(user);
                 registrationMessage.style.display = 'block';
                 registrationMessage.innerHTML = `
@@ -167,11 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
 
                 document.getElementById('startButton').addEventListener('click', () => {
-                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Alterar o link conforme necessário
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                 });
 
-                // Exibir o temporizador de teste
-                let countdown = Math.ceil((trialEndDate - trialStartDate) / 1000); // Convert milliseconds to seconds
+                let countdown = Math.ceil((trialEndDate - trialStartDate) / 1000);
                 const countdownInterval = setInterval(() => {
                     countdown -= 1;
                     const hours = Math.floor(countdown / 3600);
@@ -215,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Fechar o popup de redirecionamento e exibir a tela de login novamente
-    document.getElementById('closePopup').addEventListener('click', () => {
+    closePopupButton.addEventListener('click', () => {
         redirectPopup.style.display = 'none';
         loginForm.style.display = 'flex'; // Mostrar a tela de login novamente
     });
