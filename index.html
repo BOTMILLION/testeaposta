@@ -11,6 +11,8 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
     <!-- Firebase Authentication (SDK) -->
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
+    <!-- Firebase Firestore (SDK) -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js"></script>
 </head>
 <body>
     <div class="wrap-login">
@@ -86,6 +88,7 @@
         // Configuração do Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
@@ -100,6 +103,7 @@
         // Inicializar o Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
         document.getElementById('registerLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
@@ -152,22 +156,28 @@
         document.getElementById('registerButton').addEventListener('click', function() {
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName').value;
+
             if (password.length < 6) {
                 document.getElementById('registerError').innerText = 'A senha deve ter pelo menos 6 caracteres.';
                 document.getElementById('registerError').style.display = 'block';
                 return;
             }
+
             createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
+                .then(async (userCredential) => {
                     const user = userCredential.user;
-                    return sendEmailVerification(user);
-                })
-                .then(() => {
+                    await sendEmailVerification(user);
+
+                    const userDocRef = doc(db, 'users', user.uid);
+                    await setDoc(userDocRef, {
+                        name: name,
+                        email: email,
+                        createdAt: new Date()
+                    });
+
+                    document.getElementById('registerSuccess').innerText = 'Cadastro realizado. Verifique o seu email.';
                     document.getElementById('registerSuccess').style.display = 'block';
-                    setTimeout(() => {
-                        document.getElementById('registerForm').style.display = 'none';
-                        document.getElementById('loginForm').style.display = 'flex';
-                    }, 2000);
                 })
                 .catch((error) => {
                     document.getElementById('registerError').innerText = 'Erro ao cadastrar. Tente novamente.';
@@ -179,17 +189,36 @@
             const email = document.getElementById('resetEmail').value;
             sendPasswordResetEmail(auth, email)
                 .then(() => {
-                    alert('Email de redefinição de senha enviado!');
-                    document.getElementById('resetPasswordForm').style.display = 'none';
-                    document.getElementById('loginForm').style.display = 'flex';
+                    document.getElementById('resetError').innerText = 'Email de redefinição enviado.';
+                    document.getElementById('resetError').style.display = 'block';
                 })
                 .catch((error) => {
-                    document.getElementById('resetError').innerText = 'Erro ao enviar email de redefinição.';
+                    document.getElementById('resetError').innerText = 'Erro ao enviar email. Verifique o email digitado.';
                     document.getElementById('resetError').style.display = 'block';
                 });
         });
-    </script>
 
-    <script type="module" src="app.js"></script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('loginPassword');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.classList.toggle('zmdi-eye-off');
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('registerPassword');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.classList.toggle('zmdi-eye-off');
+        });
+
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+        });
+
+        document.getElementById('paymentButton').addEventListener('click', function() {
+            window.location.href = "https://www.yampi.com.br/checkout";
+        });
+    </script>
 </body>
 </html>
