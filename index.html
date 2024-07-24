@@ -248,104 +248,127 @@
             <div class="line">
                 <input type="password" id="registerPassword" placeholder=" " required>
                 <label for="registerPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
+                <i class="zmdi zmdi-eye" id="togglePasswordRegister"></i>
+                <div id="passwordError" style="color: red; display: none;">A senha deve ter pelo menos 6 caracteres.</div>
             </div>
-            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
-                Já tem uma conta? <a href="#" id="loginLink">Login</a>
+                Já tem uma conta? <a href="#" id="loginLink">Faça login</a>
             </div>
-        </div>
-
-        <!-- Popup -->
-        <div class="popup" id="redirectPopup">
-            <h2>Login Bem-sucedido!</h2>
-            <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
-            <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
     </div>
 
+    <!-- Popup de Mensagem -->
+    <div class="popup" id="popupMessage">
+        <h2>Bem-vindo!</h2>
+        <p>Você será redirecionado para o jogo em:</p>
+        <div class="timer" id="timer">5</div>
+        <button class="button" id="closePopup">Fechar</button>
+    </div>
+
     <script>
-        document.getElementById('registerLink').addEventListener('click', function() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'flex';
-        });
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos do formulário
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginButton = document.getElementById('loginButton');
+            const registerButton = document.getElementById('registerButton');
+            const registerLink = document.getElementById('registerLink');
+            const loginLink = document.getElementById('loginLink');
+            const passwordError = document.getElementById('passwordError');
+            const loginError = document.getElementById('loginError');
+            const popup = document.getElementById('popupMessage');
+            const timer = document.getElementById('timer');
+            const closePopupButton = document.getElementById('closePopup');
+            let countdown;
 
-        document.getElementById('loginLink').addEventListener('click', function() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'flex';
-        });
+            // Mostrar formulário de cadastro
+            registerLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            });
 
-        document.getElementById('loginButton').addEventListener('click', function() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
+            // Mostrar formulário de login
+            loginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            });
 
-            if (email === '' || password === '') {
-                document.getElementById('loginError').style.display = 'block';
-            } else {
-                document.getElementById('loginError').style.display = 'none';
-                // Exibir o popup de redirecionamento
-                document.getElementById('redirectPopup').style.display = 'block';
-                let countdown = 5;
-                const timer = setInterval(() => {
-                    countdown--;
-                    document.getElementById('redirectTimer').textContent = countdown;
-                    if (countdown === 0) {
-                        clearInterval(timer);
-                        window.location.href = 'https://seusite.com/jogo';
+            // Mostrar popup de redirecionamento
+            loginButton.addEventListener('click', () => {
+                popup.style.display = 'block';
+                let timeLeft = 5;
+                countdown = setInterval(() => {
+                    timeLeft--;
+                    timer.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        // Redirecionar para o jogo
+                        window.location.href = 'https://botmillion.github.io/telm/';
                     }
                 }, 1000);
-            }
-        });
+            });
 
-        document.getElementById('registerButton').addEventListener('click', function() {
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
+            // Fechar popup
+            closePopupButton.addEventListener('click', () => {
+                popup.style.display = 'none';
+                clearInterval(countdown);
+            });
 
-            if (name === '' || email === '' || password === '' || password.length < 6) {
-                document.getElementById('registerError').style.display = 'block';
-            } else {
-                document.getElementById('registerError').style.display = 'none';
-                // Lógica de cadastro aqui
-                alert('Cadastro realizado com sucesso!');
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'flex';
-            }
-        });
+            // Toggle senha visível
+            const togglePassword = document.getElementById('togglePassword');
+            const togglePasswordRegister = document.getElementById('togglePasswordRegister');
+            const passwordInput = document.getElementById('loginPassword');
+            const passwordInputRegister = document.getElementById('registerPassword');
 
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('loginPassword');
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                this.classList.remove('zmdi-eye');
-                this.classList.add('zmdi-eye-off');
-            } else {
-                passwordField.type = 'password';
-                this.classList.remove('zmdi-eye-off');
-                this.classList.add('zmdi-eye');
-            }
-        });
+            togglePassword.addEventListener('click', () => {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    togglePassword.classList.remove('zmdi-eye');
+                    togglePassword.classList.add('zmdi-eye-off');
+                } else {
+                    passwordInput.type = 'password';
+                    togglePassword.classList.remove('zmdi-eye-off');
+                    togglePassword.classList.add('zmdi-eye');
+                }
+            });
 
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('registerPassword');
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                this.classList.remove('zmdi-eye');
-                this.classList.add('zmdi-eye-off');
-            } else {
-                passwordField.type = 'password';
-                this.classList.remove('zmdi-eye-off');
-                this.classList.add('zmdi-eye');
-            }
-        });
+            togglePasswordRegister.addEventListener('click', () => {
+                if (passwordInputRegister.type === 'password') {
+                    passwordInputRegister.type = 'text';
+                    togglePasswordRegister.classList.remove('zmdi-eye');
+                    togglePasswordRegister.classList.add('zmdi-eye-off');
+                } else {
+                    passwordInputRegister.type = 'password';
+                    togglePasswordRegister.classList.remove('zmdi-eye-off');
+                    togglePasswordRegister.classList.add('zmdi-eye');
+                }
+            });
 
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = 'https://seusite.com/jogo';
-        });
+            // Validação do formulário de cadastro
+            registerButton.addEventListener('click', () => {
+                const passwordValue = passwordInputRegister.value;
+                if (passwordValue.length < 6) {
+                    passwordError.style.display = 'block';
+                } else {
+                    passwordError.style.display = 'none';
+                    // Aqui você pode adicionar a lógica para enviar os dados do formulário de registro
+                }
+            });
 
-        document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://www.yampi.com.br/checkout';
+            // Validação do formulário de login
+            loginButton.addEventListener('click', () => {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                if (email === '' || password === '') {
+                    loginError.style.display = 'block';
+                } else {
+                    loginError.style.display = 'none';
+                    // Aqui você pode adicionar a lógica para enviar os dados do formulário de login
+                }
+            });
         });
     </script>
 </body>
