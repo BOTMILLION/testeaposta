@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectPopup = document.getElementById('redirectPopup');
     const redirectTimer = document.getElementById('redirectTimer');
     const redirectNowButton = document.getElementById('redirectNowButton');
+    const trialStatus = document.getElementById('trialStatus'); // Elemento para mostrar status do período de teste
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -67,12 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const trialEndDate = new Date(trialStartDate);
                     trialEndDate.setDate(trialEndDate.getDate() + trialPeriodDays);
 
-                    if (now <= trialEndDate) {
+                    const timeRemaining = trialEndDate - now;
+
+                    if (timeRemaining > 0) {
                         // User is within the trial period
                         loginForm.style.display = 'none';
+                        trialStatus.style.display = 'none';
                         // Exibir o popup e iniciar o cronômetro
                         redirectPopup.style.display = 'block';
-                        let countdown = 5;
+                        let countdown = Math.ceil(timeRemaining / 1000); // Convert milliseconds to seconds
                         const countdownInterval = setInterval(() => {
                             countdown -= 1;
                             redirectTimer.textContent = countdown;
@@ -88,8 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     } else {
                         // Trial period has expired
-                        alert('Seu período de teste expirou. Por favor, faça o pagamento para continuar.');
-                        window.location.href = 'payment.html'; // Redirecionar para a página de pagamento
+                        trialStatus.style.display = 'block';
+                        trialStatus.textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
+                        document.getElementById('paymentButton').style.display = 'block';
                     }
                 } else {
                     console.error('No user data found');
