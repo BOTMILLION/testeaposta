@@ -123,94 +123,87 @@
         document.getElementById('loginButton').addEventListener('click', function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
-            if (email === '' || password === '') {
-                document.getElementById('loginError').style.display = 'block';
-            } else {
-                document.getElementById('loginError').style.display = 'none';
-                // Autenticação com Firebase
-                signInWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        if (user.emailVerified) {
-                            // Exibir o popup de redirecionamento
-                            document.getElementById('redirectPopup').style.display = 'block';
-                            let countdown = 5;
-                            const timer = setInterval(() => {
-                                countdown--;
-                                document.getElementById('redirectTimer').textContent = countdown;
-                                if (countdown === 0) {
-                                    clearInterval(timer);
-                                    window.location.href = 'https://seusite.com/jogo';
-                                }
-                            }, 1000);
-                        } else {
-                            document.getElementById('loginError').textContent = 'Por favor, verifique seu e-mail.';
-                            document.getElementById('loginError').style.display = 'block';
-                        }
-                    })
-                    .catch((error) => {
-                        document.getElementById('loginError').textContent = error.message;
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    if (user.emailVerified) {
+                        document.getElementById('redirectPopup').style.display = 'block';
+                        let timer = 5;
+                        const interval = setInterval(() => {
+                            document.getElementById('redirectTimer').innerText = timer;
+                            timer--;
+                            if (timer < 0) {
+                                clearInterval(interval);
+                                window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+                            }
+                        }, 1000);
+                    } else {
+                        document.getElementById('loginError').innerText = 'Por favor, verifique seu e-mail.';
                         document.getElementById('loginError').style.display = 'block';
-                    });
-            }
+                    }
+                })
+                .catch((error) => {
+                    document.getElementById('loginError').innerText = 'Email ou senha incorretos.';
+                    document.getElementById('loginError').style.display = 'block';
+                });
         });
 
         document.getElementById('registerButton').addEventListener('click', function() {
-            const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-
-            if (name === '' || email === '' || password.length < 6) {
+            if (password.length < 6) {
+                document.getElementById('registerError').innerText = 'A senha deve ter pelo menos 6 caracteres.';
                 document.getElementById('registerError').style.display = 'block';
-            } else {
-                document.getElementById('registerError').style.display = 'none';
-                // Cadastro com Firebase
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        // Enviar e-mail de verificação
-                        sendEmailVerification(user)
-                            .then(() => {
-                                alert('Um e-mail de verificação foi enviado para você. Por favor, verifique seu e-mail.');
-                            });
-                    })
-                    .catch((error) => {
-                        document.getElementById('registerError').textContent = error.message;
-                        document.getElementById('registerError').style.display = 'block';
-                    });
+                return;
             }
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    return sendEmailVerification(user);
+                })
+                .then(() => {
+                    window.location.href = 'verify-email.html';
+                })
+                .catch((error) => {
+                    console.error('Erro ao criar a conta:', error);
+                    document.getElementById('registerError').innerText = 'Erro ao criar a conta. Verifique os dados e tente novamente.';
+                    document.getElementById('registerError').style.display = 'block';
+                });
         });
 
         document.getElementById('resetPasswordButton').addEventListener('click', function() {
             const email = document.getElementById('resetEmail').value;
-
-            if (email === '') {
-                document.getElementById('resetError').style.display = 'block';
-            } else {
-                document.getElementById('resetError').style.display = 'none';
-                // Enviar e-mail de redefinição de senha
-                sendPasswordResetEmail(auth, email)
-                    .then(() => {
-                        alert('Um e-mail de redefinição de senha foi enviado.');
-                        document.getElementById('resetPasswordForm').style.display = 'none';
-                        document.getElementById('loginForm').style.display = 'flex';
-                    })
-                    .catch((error) => {
-                        document.getElementById('resetError').textContent = error.message;
-                        document.getElementById('resetError').style.display = 'block';
-                    });
-            }
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    alert('Email de redefinição de senha enviado.');
+                    document.getElementById('resetPasswordForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'flex';
+                })
+                .catch((error) => {
+                    console.error('Erro ao enviar o e-mail de redefinição de senha:', error);
+                    document.getElementById('resetError').innerText = 'Erro ao enviar o e-mail de redefinição de senha. Verifique o email e tente novamente.';
+                    document.getElementById('resetError').style.display = 'block';
+                });
         });
 
         document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('loginPassword');
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+            const passwordField = document.getElementById('loginPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
         });
 
         document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('registerPassword');
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+            const passwordField = document.getElementById('registerPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        });
+
+        document.getElementById('paymentButton').addEventListener('click', function() {
+            window.location.href = 'https://yampi.com.br/checkout';
+        });
+
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
         });
     </script>
 </body>
