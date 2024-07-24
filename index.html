@@ -88,7 +88,7 @@
         // Configuração do Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
@@ -126,14 +126,46 @@
             document.getElementById('loginForm').style.display = 'flex';
         });
 
-        document.getElementById('loginButton').addEventListener('click', function() {
+        document.getElementById('loginButton').addEventListener('click', async function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    console.log("Login bem-sucedido. Verificação de e-mail:", user.emailVerified);
-                    if (user.emailVerified) {
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                if (user.emailVerified) {
+                    const userDoc = doc(db, "users", user.uid);
+                    const userSnapshot = await getDoc(userDoc);
+                    const userData = userSnapshot.data();
+                    const now = new Date();
+                    const trialEndDate = new Date(userData.trialStartDate);
+                    trialEndDate.setDate(trialEndDate.getDate() + 7); // Período de teste de 7 dias
+                    
+                    if (now > trialEndDate) {
+                        if (!userData.subscriptionEndDate || new Date(userData.subscriptionEndDate) < now) {
+                            document.getElementById('redirectPopup').style.display = 'block';
+                            let timer = 5;
+                            const interval = setInterval(() => {
+                                document.getElementById('redirectTimer').innerText = timer;
+                                timer--;
+                                if (timer < 0) {
+                                    clearInterval(interval);
+                                    window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+                                }
+                            }, 1000);
+                        } else {
+                            document.getElementById('redirectPopup').style.display = 'block';
+                            let timer = 5;
+                            const interval = setInterval(() => {
+                                document.getElementById('redirectTimer').innerText = timer;
+                                timer--;
+                                if (timer < 0) {
+                                    clearInterval(interval);
+                                    window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+                                }
+                            }, 1000);
+                        }
+                    } else {
                         document.getElementById('redirectPopup').style.display = 'block';
                         let timer = 5;
                         const interval = setInterval(() => {
@@ -144,73 +176,58 @@
                                 window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
                             }
                         }, 1000);
-                    } else {
-                        document.getElementById('loginError').innerText = 'Por favor, verifique seu e-mail.';
-                        document.getElementById('loginError').style.display = 'block';
                     }
-                })
-                .catch((error) => {
-                    console.error("Erro no login:", error);
-                    document.getElementById('loginError').innerText = 'Email ou senha incorretos.';
-                    document.getElementById('loginError').style.display = 'block';
-                });
+                } else {
+                    alert("Por favor, verifique seu e-mail.");
+                }
+            } catch (error) {
+                document.getElementById('loginError').innerText = "Erro no login. Verifique seu e-mail e senha.";
+                document.getElementById('loginError').style.display = 'block';
+            }
         });
 
-        document.getElementById('registerButton').addEventListener('click', function() {
+        document.getElementById('registerButton').addEventListener('click', async function() {
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-
-            if (password.length < 6) {
-                document.getElementById('registerError').innerText = 'A senha deve ter pelo menos 6 caracteres.';
-                document.getElementById('registerError').style.display = 'block';
-                return;
-            }
-
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    console.log("Usuário criado com sucesso:", user);
-                    sendEmailVerification(user)
-                        .then(() => {
-                            console.log("E-mail de verificação enviado.");
-                            document.getElementById('registerSuccess').innerText = 'Cadastro realizado. Verifique o seu email.';
-                            document.getElementById('registerSuccess').style.display = 'block';
-                        })
-                        .catch((error) => {
-                            console.error("Erro ao enviar e-mail de verificação:", error);
-                            document.getElementById('registerError').innerText = 'Erro ao enviar e-mail de verificação. Tente novamente.';
-                            document.getElementById('registerError').style.display = 'block';
-                        });
-
-                    const userDoc = doc(db, "users", user.uid);
-                    setDoc(userDoc, {
-                        email: email,
-                        createdAt: new Date()
-                    });
-                })
-                .catch((error) => {
-                    console.error("Erro ao criar usuário:", error);
-                    document.getElementById('registerError').innerText = 'Erro ao criar usuário. Tente novamente.';
+            try {
+                if (password.length < 6) {
+                    document.getElementById('registerError').innerText = "A senha deve ter pelo menos 6 caracteres.";
                     document.getElementById('registerError').style.display = 'block';
+                    return;
+                }
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                await sendEmailVerification(user);
+                await setDoc(doc(db, "users", user.uid), {
+                    trialStartDate: new Date(),
+                    subscriptionEndDate: null
                 });
+                document.getElementById('registerSuccess').style.display = 'block';
+            } catch (error) {
+                document.getElementById('registerError').innerText = "Erro no cadastro. Verifique seu e-mail e senha.";
+                document.getElementById('registerError').style.display = 'block';
+            }
         });
 
-        document.getElementById('resetPasswordButton').addEventListener('click', function() {
+        document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
-            sendPasswordResetEmail(auth, email)
-                .then(() => {
-                    console.log("E-mail de redefinição de senha enviado.");
-                    document.getElementById('resetError').style.display = 'none';
-                })
-                .catch((error) => {
-                    console.error("Erro ao enviar e-mail de redefinição de senha:", error);
-                    document.getElementById('resetError').innerText = 'Erro ao enviar e-mail de redefinição de senha. Tente novamente.';
-                    document.getElementById('resetError').style.display = 'block';
-                });
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("E-mail de redefinição de senha enviado.");
+                document.getElementById('resetPasswordForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'flex';
+            } catch (error) {
+                document.getElementById('resetError').innerText = "Erro ao enviar e-mail de redefinição. Verifique o email.";
+                document.getElementById('resetError').style.display = 'block';
+            }
+        });
+
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
         });
 
         document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://yampi.me/produto-url';
+            window.location.href = "https://checkout.yampi.com.br";
         });
     </script>
 </body>
