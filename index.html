@@ -7,6 +7,23 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
+            authDomain: "projeto-notificacao-968d4.firebaseapp.com",
+            projectId: "projeto-notificacao-968d4",
+            storageBucket: "projeto-notificacao-968d4.appspot.com",
+            messagingSenderId: "236002612799",
+            appId: "1:236002612799:web:54719603091421b94aca8a",
+            measurementId: "G-KY69HG6ZNZ"
+        };
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+    </script>
 </head>
 <body>
     <div class="wrap-login">
@@ -80,17 +97,24 @@
                 document.getElementById('loginError').style.display = 'block';
             } else {
                 document.getElementById('loginError').style.display = 'none';
-                // Exibir o popup de redirecionamento
-                document.getElementById('redirectPopup').style.display = 'block';
-                let countdown = 5;
-                const timer = setInterval(() => {
-                    countdown--;
-                    document.getElementById('redirectTimer').textContent = countdown;
-                    if (countdown === 0) {
-                        clearInterval(timer);
-                        window.location.href = 'https://seusite.com/jogo';
-                    }
-                }, 1000);
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Exibir o popup de redirecionamento
+                        document.getElementById('redirectPopup').style.display = 'block';
+                        let countdown = 5;
+                        const timer = setInterval(() => {
+                            countdown--;
+                            document.getElementById('redirectTimer').textContent = countdown;
+                            if (countdown === 0) {
+                                clearInterval(timer);
+                                window.location.href = 'https://seusite.com/jogo';
+                            }
+                        }, 1000);
+                    })
+                    .catch((error) => {
+                        document.getElementById('loginError').textContent = error.message;
+                        document.getElementById('loginError').style.display = 'block';
+                    });
             }
         });
 
@@ -103,10 +127,17 @@
                 document.getElementById('registerError').style.display = 'block';
             } else {
                 document.getElementById('registerError').style.display = 'none';
-                // Lógica de cadastro aqui
-                alert('Cadastro realizado com sucesso!');
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'flex';
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Lógica de cadastro aqui
+                        alert('Cadastro realizado com sucesso!');
+                        document.getElementById('registerForm').style.display = 'none';
+                        document.getElementById('loginForm').style.display = 'flex';
+                    })
+                    .catch((error) => {
+                        document.getElementById('registerError').textContent = error.message;
+                        document.getElementById('registerError').style.display = 'block';
+                    });
             }
         });
 
