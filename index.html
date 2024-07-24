@@ -90,12 +90,13 @@
             <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
 
-<!-- Popup de Redirecionamento -->
-<div class="popup" id="redirectPopup">
-    <h2>Login Bem-sucedido!</h2>
-    <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
-    <button class="button" id="redirectNowButton">Ir Agora</button>
-</div>
+        <!-- Popup de Registro -->
+        <div class="popup" id="registerPopup" style="display: none;">
+            <h2>Usuário cadastrado!</h2>
+            <p>Para realizar o login, verifique o seu email. Esse é o seu temporizador de 3 dias. Após o período, realize o pagamento para continuar utilizando nossos serviços.</p>
+            <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
+            <button class="button" id="closeRegisterPopup">Fechar</button>
+        </div>
 
     </div>
 
@@ -151,30 +152,23 @@
                 if (user.emailVerified) {
                     const userDoc = doc(db, "users", user.uid);
                     const userSnapshot = await getDoc(userDoc);
-
                     if (userSnapshot.exists()) {
-                        // Mensagem de boas-vindas e redirecionamento
-                        document.getElementById('redirectPopup').style.display = 'block';
-
-                        let countdown = 5;
-                        document.getElementById('redirectTimer').textContent = countdown;
-                        const timer = setInterval(() => {
-                            countdown--;
-                            document.getElementById('redirectTimer').textContent = countdown;
-                            if (countdown <= 0) {
-                                clearInterval(timer);
-                                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Link do jogo
-                            }
-                        }, 1000);
+                        const trialEnd = userSnapshot.data().trialEnd;
+                        const now = new Date().getTime();
+                        const trialEndDate = new Date(trialEnd).getTime();
+                        if (now < trialEndDate) {
+                            showRedirectPopup();
+                        } else {
+                            document.getElementById('loginError').textContent = 'Seu período de teste expirou. Por favor, realize o pagamento.';
+                        }
                     } else {
-                        // Se o documento não existir, exiba uma mensagem de erro ou redirecione para o cadastro
-                        document.getElementById('loginError').style.display = 'block';
+                        document.getElementById('loginError').textContent = 'Usuário não encontrado.';
                     }
                 } else {
-                    document.getElementById('loginError').style.display = 'block';
+                    document.getElementById('loginError').textContent = 'Por favor, verifique seu email primeiro.';
                 }
             } catch (error) {
-                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('loginError').textContent = 'Erro ao fazer login. Verifique suas credenciais.';
             }
         });
 
@@ -183,91 +177,105 @@
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
 
-            if (name && email && password.length >= 6) {
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    await sendEmailVerification(user);
+            if (password.length < 6) {
+                document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
+                return;
+            }
 
-                    // Criar documento do usuário no Firestore
-                    const userDoc = doc(db, "users", user.uid);
-                    await setDoc(userDoc, {
-                        name: name,
-                        email: email,
-                        createdAt: new Date(),
-                        trialEnd: new Date(new Date().getTime() + (3 * 24 * 60 * 60 * 1000)) // Adiciona 3 dias ao tempo atual
-                    });
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
 
-                    // Exibir popup de registro
-                    document.getElementById('registerPopup').style.display = 'block';
+                await sendEmailVerification(user);
 
-                    // Configurar temporizador do popup de registro
-                    let registerCountdown = 3 * 24 * 60 * 60; // 3 dias em segundos
-                    const registerTimer = document.getElementById('registerTimer');
-                    const interval = setInterval(() => {
-                        const days = Math.floor(registerCountdown / (24 * 60 * 60));
-                        const hours = Math.floor((registerCountdown % (24 * 60 * 60)) / (60 * 60));
-                        const minutes = Math.floor((registerCountdown % (60 * 60)) / 60);
-                        const seconds = registerCountdown % 60;
+                const trialEndDate = new Date();
+                trialEndDate.setDate(trialEndDate.getDate() + 3); // Período de teste de 3 dias
+                await setDoc(doc(db, "users", user.uid), {
+                    trialEnd: trialEndDate.toISOString()
+                });
 
-                        registerTimer.textContent = `${days} dias ${hours} horas ${minutes} minutos ${seconds} segundos`;
-
-                        registerCountdown--;
-                        if (registerCountdown < 0) {
-                            clearInterval(interval);
-                            registerTimer.textContent = 'Seu período de teste expirou. Por favor, realize o pagamento.';
-                        }
-                    }, 1000);
-
-                } catch (error) {
-                    document.getElementById('registerError').style.display = 'block';
-                }
-            } else {
-                document.getElementById('registerError').style.display = 'block';
+                document.getElementById('registerSuccess').style.display = 'block';
+                document.getElementById('registerPopup').style.display = 'block';
+                startTimer(3); // Iniciar temporizador de 3 dias
+            } catch (error) {
+                document.getElementById('registerError').textContent = 'Erro ao criar conta. Tente novamente.';
             }
         });
 
         document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
-
-            if (email) {
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert('Email de redefinição enviado!');
-                    document.getElementById('resetPasswordForm').style.display = 'none';
-                    document.getElementById('loginForm').style.display = 'flex';
-                } catch (error) {
-                    document.getElementById('resetError').style.display = 'block';
-                }
-            } else {
-                document.getElementById('resetError').style.display = 'block';
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Email de redefinição de senha enviado.');
+                document.getElementById('resetPasswordForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'flex';
+            } catch (error) {
+                document.getElementById('resetError').textContent = 'Erro ao enviar email de redefinição.';
             }
-        });
-
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Link do jogo
         });
 
         document.getElementById('closeRegisterPopup').addEventListener('click', function() {
             document.getElementById('registerPopup').style.display = 'none';
+            window.location.href = 'https://seubet.com'; // Redirecionar após o fechamento do popup
+        });
+
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = 'https://seubet.com'; // Redirecionar agora
         });
 
         document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://checkout.yampi.com.br'; // Substitua pelo link de checkout da Yampi
+            window.location.href = 'https://checkout.yampi.com.br'; // Redirecionar para a página de pagamento
         });
 
+        // Função para exibir o popup de redirecionamento
+        function showRedirectPopup() {
+            document.getElementById('redirectPopup').style.display = 'block';
+            startRedirectTimer();
+        }
+
+        // Função para iniciar o temporizador de redirecionamento
+        function startRedirectTimer() {
+            let timeLeft = 5; // Tempo em segundos
+            const timerElement = document.getElementById('redirectTimer');
+            const interval = setInterval(function() {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    window.location.href = 'https://seubet.com';
+                }
+            }, 1000);
+        }
+
+        // Função para iniciar o temporizador de 3 dias
+        function startTimer(days) {
+            let timeLeft = days * 24 * 60 * 60 * 1000; // Tempo em milissegundos
+            const timerElement = document.getElementById('registerTimer');
+            const interval = setInterval(function() {
+                timeLeft -= 1000;
+                const daysLeft = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
+                const hoursLeft = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+                const secondsLeft = Math.floor((timeLeft % (60 * 1000)) / 1000);
+                timerElement.textContent = `${daysLeft}d ${hoursLeft}h ${minutesLeft}m ${secondsLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    timerElement.textContent = 'Período de teste expirado.';
+                }
+            }, 1000);
+        }
+
+        // Inicializar a visualização da senha
         document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-            this.classList.toggle('zmdi-eye-off');
+            const passwordInput = document.getElementById('loginPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
         });
 
         document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('registerPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-            this.classList.toggle('zmdi-eye-off');
+            const passwordInput = document.getElementById('registerPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
         });
     </script>
 </body>
