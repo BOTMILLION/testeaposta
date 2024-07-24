@@ -1,7 +1,7 @@
 // Importar as funções necessárias do SDK do Firebase
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, fetchSignInMethodsForEmail } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -58,20 +58,21 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                const userDoc = doc(db, 'users', user.uid);
-                const userSnapshot = await getDoc(userDoc);
 
-                if (userSnapshot.exists()) {
-                    const userData = userSnapshot.data();
-                    const trialStartDate = new Date(userData.trialStartDate);
-                    const now = new Date();
-                    const trialPeriodDays = 3;
-                    const trialEndDate = new Date(trialStartDate);
-                    trialEndDate.setDate(trialEndDate.getDate() + trialPeriodDays);
+                // Verificar se o e-mail do usuário foi verificado
+                if (user.emailVerified) {
+                    const userDoc = doc(db, 'users', user.uid);
+                    const userSnapshot = await getDoc(userDoc);
 
-                    if (now <= trialEndDate) {
-                        // Verificar se o email do usuário foi verificado
-                        if (user.emailVerified) {
+                    if (userSnapshot.exists()) {
+                        const userData = userSnapshot.data();
+                        const trialStartDate = new Date(userData.trialStartDate);
+                        const now = new Date();
+                        const trialPeriodDays = 3;
+                        const trialEndDate = new Date(trialStartDate);
+                        trialEndDate.setDate(trialEndDate.getDate() + trialPeriodDays);
+
+                        if (now <= trialEndDate) {
                             // User is within the trial period
                             loginForm.style.display = 'none';
                             // Exibir o popup e iniciar o cronômetro
@@ -91,17 +92,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                 window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
                             });
                         } else {
-                            // Email not verified
-                            loginErrorMessage.style.display = 'block';
-                            loginErrorMessage.textContent = 'Por favor, verifique seu email antes de fazer login.';
+                            // Trial period has expired
+                            alert('Seu período de teste expirou. Por favor, faça o pagamento para continuar.');
+                            window.location.href = 'payment.html'; // Redirecionar para a página de pagamento
                         }
                     } else {
-                        // Trial period has expired
-                        alert('Seu período de teste expirou. Por favor, faça o pagamento para continuar.');
-                        window.location.href = 'payment.html'; // Redirecionar para a página de pagamento
+                        console.error('No user data found');
                     }
                 } else {
-                    console.error('No user data found');
+                    // Email not verified
+                    loginErrorMessage.style.display = 'block';
+                    loginErrorMessage.textContent = 'Por favor, verifique seu email antes de fazer login.';
                 }
             } catch (error) {
                 loginErrorMessage.style.display = 'block';
@@ -134,16 +135,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Exibir mensagem de sucesso e instruções
                 registrationMessage.style.display = 'block';
                 registrationMessage.textContent = 'Cadastro realizado com sucesso! Verifique seu e-mail para confirmar o registro.';
-
-                // Redirecionar após um intervalo
-                setTimeout(() => {
-                    window.location.href = 'verify-email.html';
-                }, 3000); // 3 segundos para redirecionar
+                registrationMessage.style.color = 'green'; // Ajuste a cor da mensagem se necessário
 
             } catch (error) {
                 registrationMessage.style.display = 'block';
                 registrationMessage.textContent = error.message;
+                registrationMessage.style.color = 'red'; // Ajuste a cor da mensagem se necessário
             }
         }
     });
+
+    // Mostrar o botão de pagamento assim que a página carrega
+    paymentButton.style.display = 'block';
+    // Reiniciar a animação do botão de pagamento
+    paymentButton.classList.remove('pulse-button');
+    void paymentButton.offsetWidth; // Forçar reflow
+    paymentButton.classList.add('pulse-button');
 });
