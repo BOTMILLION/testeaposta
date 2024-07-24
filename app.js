@@ -1,6 +1,5 @@
-// Importa os módulos necessários do Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
 
 // Configuração do Firebase
@@ -26,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerLink = document.getElementById('registerLink');
     const loginButton = document.getElementById('loginButton');
     const registerButton = document.getElementById('registerButton');
+    const resetPasswordButton = document.getElementById('resetPasswordButton'); // Adicionado botão de redefinição de senha
     const paymentButton = document.getElementById('paymentButton');
     const redirectPopup = document.getElementById('redirectPopup');
     const redirectTimer = document.getElementById('redirectTimer');
@@ -128,6 +128,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('registerError').style.display = 'block';
                 document.getElementById('registerError').textContent = error.message;
             }
+        }
+    });
+
+    // Adicionado manipulador de clique para o botão de redefinição de senha
+    resetPasswordButton.addEventListener('click', async () => {
+        const email = document.getElementById('resetEmail').value;
+        try {
+            await sendPasswordResetEmail(auth, email);
+            document.getElementById('resetMessage').style.display = 'block';
+            document.getElementById('resetMessage').textContent = 'Email de redefinição de senha enviado.';
+        } catch (error) {
+            document.getElementById('resetError').style.display = 'block';
+            document.getElementById('resetError').textContent = error.message;
         }
     });
 
