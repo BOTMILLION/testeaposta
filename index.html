@@ -153,31 +153,27 @@
                     const userSnapshot = await getDoc(userDoc);
 
                     if (userSnapshot.exists()) {
-                        const trialStatus = userSnapshot.data().trialStatus || "Inativo";
-                        const subscriptionStatus = userSnapshot.data().subscriptionStatus || "Não Assinante";
+                        // Mensagem de boas-vindas e redirecionamento
+                        document.getElementById('redirectPopup').style.display = 'block';
 
-                        document.getElementById('trialStatus').textContent = `Status do Período de Teste: ${trialStatus}`;
-                        document.getElementById('subscriptionStatus').textContent = `Status da Assinatura: ${subscriptionStatus}`;
-                        document.getElementById('trialStatus').style.display = 'block';
-                        document.getElementById('subscriptionStatus').style.display = 'block';
-
-                        const trialEndDate = userSnapshot.data().trialEndDate?.toDate();
-                        if (trialEndDate) {
-                            const remainingTime = Math.max(0, trialEndDate - new Date());
-                            document.getElementById('trialCountdown').textContent = `Seu período de teste termina em: ${Math.ceil(remainingTime / (1000 * 60))} minutos`;
-                            document.getElementById('trialCountdown').style.display = 'block';
-                            setTimeout(() => location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL', 5000);
-                        }
+                        let countdown = 5;
+                        document.getElementById('redirectTimer').textContent = countdown;
+                        const timer = setInterval(() => {
+                            countdown--;
+                            document.getElementById('redirectTimer').textContent = countdown;
+                            if (countdown <= 0) {
+                                clearInterval(timer);
+                                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Link do jogo
+                            }
+                        }, 1000);
                     } else {
-                        document.getElementById('loginError').textContent = 'Usuário não encontrado.';
+                        // Se o documento não existir, exiba uma mensagem de erro ou redirecione para o cadastro
                         document.getElementById('loginError').style.display = 'block';
                     }
                 } else {
-                    document.getElementById('loginError').textContent = 'Por favor, verifique seu email.';
                     document.getElementById('loginError').style.display = 'block';
                 }
             } catch (error) {
-                document.getElementById('loginError').textContent = 'Email ou senha incorretos.';
                 document.getElementById('loginError').style.display = 'block';
             }
         });
@@ -187,82 +183,91 @@
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
 
-            if (password.length < 6) {
-                document.getElementById('registerError').style.display = 'block';
-                return;
-            }
+            if (name && email && password.length >= 6) {
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    await sendEmailVerification(user);
 
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
+                    // Criar documento do usuário no Firestore
+                    const userDoc = doc(db, "users", user.uid);
+                    await setDoc(userDoc, {
+                        name: name,
+                        email: email,
+                        createdAt: new Date(),
+                        trialEnd: new Date(new Date().getTime() + (3 * 24 * 60 * 60 * 1000)) // Adiciona 3 dias ao tempo atual
+                    });
 
-                await sendEmailVerification(user);
-                await setDoc(doc(db, "users", user.uid), {
-                    name: name,
-                    email: email,
-                    trialStatus: "Ativo",
-                    trialEndDate: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000), // 3 dias a partir de agora
-                    subscriptionStatus: "Não Assinante"
-                });
+                    // Exibir popup de registro
+                    document.getElementById('registerPopup').style.display = 'block';
 
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('registerPopup').style.display = 'flex';
+                    // Configurar temporizador do popup de registro
+                    let registerCountdown = 3 * 24 * 60 * 60; // 3 dias em segundos
+                    const registerTimer = document.getElementById('registerTimer');
+                    const interval = setInterval(() => {
+                        const days = Math.floor(registerCountdown / (24 * 60 * 60));
+                        const hours = Math.floor((registerCountdown % (24 * 60 * 60)) / (60 * 60));
+                        const minutes = Math.floor((registerCountdown % (60 * 60)) / 60);
+                        const seconds = registerCountdown % 60;
 
-                // Atualizar o temporizador
-                const endDate = new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000);
-                const updateTimer = () => {
-                    const now = new Date();
-                    const remainingTime = Math.max(0, endDate - now);
-                    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+                        registerTimer.textContent = `${days} dias ${hours} horas ${minutes} minutos ${seconds} segundos`;
 
-                    document.getElementById('registerTimer').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-                    if (remainingTime <= 0) {
-                        clearInterval(timerInterval);
-                        document.getElementById('registerTimer').textContent = 'Tempo Expirado';
-                    }
-                };
-                const timerInterval = setInterval(updateTimer, 1000);
-                updateTimer();
-            } catch (error) {
+                        registerCountdown--;
+                        if (registerCountdown < 0) {
+                            clearInterval(interval);
+                            registerTimer.textContent = 'Seu período de teste expirou. Por favor, realize o pagamento.';
+                        }
+                    }, 1000);
+
+                } catch (error) {
+                    document.getElementById('registerError').style.display = 'block';
+                }
+            } else {
                 document.getElementById('registerError').style.display = 'block';
             }
         });
 
         document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
-            try {
-                await sendPasswordResetEmail(auth, email);
-                document.getElementById('resetPasswordForm').style.display = 'none';
-                alert('Email de redefinição enviado.');
-            } catch (error) {
+
+            if (email) {
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert('Email de redefinição enviado!');
+                    document.getElementById('resetPasswordForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'flex';
+                } catch (error) {
+                    document.getElementById('resetError').style.display = 'block';
+                }
+            } else {
                 document.getElementById('resetError').style.display = 'block';
             }
         });
 
-        // Toggle password visibility
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Link do jogo
+        });
+
+        document.getElementById('closeRegisterPopup').addEventListener('click', function() {
+            document.getElementById('registerPopup').style.display = 'none';
+        });
+
+        document.getElementById('paymentButton').addEventListener('click', function() {
+            window.location.href = 'https://checkout.yampi.com.br'; // Substitua pelo link de checkout da Yampi
+        });
+
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordField.setAttribute('type', type);
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
             this.classList.toggle('zmdi-eye-off');
         });
 
         document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
             const passwordField = document.getElementById('registerPassword');
-            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordField.setAttribute('type', type);
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
             this.classList.toggle('zmdi-eye-off');
-        });
-
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-        });
-
-        document.getElementById('closeRegisterPopup').addEventListener('click', function() {
-            document.getElementById('registerPopup').style.display = 'none';
         });
     </script>
 </body>
