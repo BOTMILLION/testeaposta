@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
     <!-- Firebase App (SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
     <!-- Firebase Authentication (SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
 </head>
 <body>
     <div class="wrap-login">
@@ -167,11 +167,10 @@
                     setTimeout(() => {
                         document.getElementById('registerForm').style.display = 'none';
                         document.getElementById('loginForm').style.display = 'flex';
-                    }, 3000);
+                    }, 2000);
                 })
                 .catch((error) => {
-                    console.error('Erro ao criar a conta:', error);
-                    document.getElementById('registerError').innerText = 'Ocorreu um erro ao criar a conta.';
+                    document.getElementById('registerError').innerText = 'Erro ao cadastrar. Tente novamente.';
                     document.getElementById('registerError').style.display = 'block';
                 });
         });
@@ -180,28 +179,17 @@
             const email = document.getElementById('resetEmail').value;
             sendPasswordResetEmail(auth, email)
                 .then(() => {
-                    alert('Email de redefinição de senha enviado.');
+                    alert('Email de redefinição de senha enviado!');
+                    document.getElementById('resetPasswordForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'flex';
                 })
                 .catch((error) => {
-                    console.error('Erro ao enviar o email de redefinição de senha:', error);
-                    document.getElementById('resetError').innerText = 'Ocorreu um erro ao enviar o email de redefinição de senha.';
+                    document.getElementById('resetError').innerText = 'Erro ao enviar email de redefinição.';
                     document.getElementById('resetError').style.display = 'block';
                 });
         });
-
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
-        });
-
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('loginPassword');
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-        });
-
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('registerPassword');
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-        });
     </script>
+
+    <script type="module" src="app.js"></script>
 </body>
 </html>
