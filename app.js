@@ -1,7 +1,7 @@
 // Importa os módulos necessários do Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
+import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js';
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -63,20 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (userSnapshot.exists()) {
                     const userData = userSnapshot.data();
                     const trialStartDate = new Date(userData.trialStartDate);
+                    const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : null;
                     const now = new Date();
                     const trialPeriodDays = 3;
                     const trialEndDate = new Date(trialStartDate);
                     trialEndDate.setDate(trialEndDate.getDate() + trialPeriodDays);
 
-                    const timeRemaining = trialEndDate - now;
+                    const isTrialValid = now <= trialEndDate;
+                    const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
 
-                    if (timeRemaining > 0) {
-                        // User is within the trial period
+                    if (isTrialValid || isSubscriptionValid) {
+                        // Exibir o popup e iniciar o cronômetro se o período de teste estiver válido ou a assinatura estiver ativa
                         loginForm.style.display = 'none';
                         trialStatus.style.display = 'none';
-                        // Exibir o popup e iniciar o cronômetro
                         redirectPopup.style.display = 'block';
-                        let countdown = Math.ceil(timeRemaining / 1000); // Convert milliseconds to seconds
+                        let countdown = Math.ceil((isTrialValid ? trialEndDate - now : subscriptionEndDate - now) / 1000); // Convert milliseconds to seconds
                         const countdownInterval = setInterval(() => {
                             countdown -= 1;
                             redirectTimer.textContent = countdown;
@@ -91,10 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             window.location.href = 'https://botmillion.github.io/telm/'; // Alterar o link conforme necessário
                         });
                     } else {
-                        // Trial period has expired
+                        // Trial period and subscription both have expired
                         trialStatus.style.display = 'block';
                         trialStatus.textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
-                        document.getElementById('paymentButton').style.display = 'block';
+                        paymentButton.style.display = 'block';
+                        paymentButton.addEventListener('click', () => {
+                            window.location.href = 'https://yampi.com.br/'; // Alterar para o link de pagamento
+                        });
                     }
                 } else {
                     console.error('No user data found');
@@ -121,7 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 await setDoc(doc(db, 'users', user.uid), {
                     name: name,
                     email: email,
-                    trialStartDate: new Date().toISOString() // Save the current date and time as trial start date
+                    trialStartDate: new Date().toISOString(), // Save the current date and time as trial start date
+                    subscriptionEndDate: null // Inicialmente, sem assinatura
                 });
                 document.getElementById('registerError').style.display = 'none';
                 registerForm.style.display = 'none';
@@ -135,6 +140,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Função para adicionar 30 dias à assinatura após o pagamento
+    async function addSubscriptionDays(userId) {
+        const userDoc = doc(db, 'users', userId);
+        const userSnapshot = await getDoc(userDoc);
+
+        if (userSnapshot.exists()) {
+            const userData = userSnapshot.data();
+            const now = new Date();
+            const currentEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : now;
+            const newEndDate = new Date(currentEndDate);
+            newEndDate.setDate(newEndDate.getDate() + 30); // Adiciona 30 dias
+
+            await updateDoc(userDoc, {
+                subscriptionEndDate: newEndDate.toISOString()
+            });
+        }
+    }
+
+    // Exemplo de chamada da função de adição de dias (deve ser chamada após a confirmação de pagamento)
+    // addSubscriptionDays('user-id'); // Substitua 'user-id' pelo ID do usuário atual
 
     // Exibir o botão de pagamento se a página de pagamento estiver acessível
     if (window.location.href.includes('payment.html')) {
