@@ -178,33 +178,39 @@
                         }, 1000);
                     }
                 } else {
-                    alert("Por favor, verifique seu e-mail.");
+                    document.getElementById('loginError').innerText = 'Por favor, verifique seu email antes de fazer login.';
+                    document.getElementById('loginError').style.display = 'block';
                 }
             } catch (error) {
-                document.getElementById('loginError').innerText = "Erro no login. Verifique seu e-mail e senha.";
+                document.getElementById('loginError').innerText = 'Erro ao fazer login: ' + error.message;
                 document.getElementById('loginError').style.display = 'block';
             }
         });
 
         document.getElementById('registerButton').addEventListener('click', async function() {
+            const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
+            if (password.length < 6) {
+                document.getElementById('registerError').innerText = 'A senha deve ter pelo menos 6 caracteres.';
+                document.getElementById('registerError').style.display = 'block';
+                return;
+            }
             try {
-                if (password.length < 6) {
-                    document.getElementById('registerError').innerText = "A senha deve ter pelo menos 6 caracteres.";
-                    document.getElementById('registerError').style.display = 'block';
-                    return;
-                }
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 await sendEmailVerification(user);
-                await setDoc(doc(db, "users", user.uid), {
-                    trialStartDate: new Date(),
-                    subscriptionEndDate: null
+                const userDoc = doc(db, "users", user.uid);
+                const trialStartDate = new Date();
+                await setDoc(userDoc, {
+                    name: name,
+                    email: email,
+                    trialStartDate: trialStartDate.toISOString()
                 });
                 document.getElementById('registerSuccess').style.display = 'block';
+                document.getElementById('registerError').style.display = 'none';
             } catch (error) {
-                document.getElementById('registerError').innerText = "Erro no cadastro. Verifique seu e-mail e senha.";
+                document.getElementById('registerError').innerText = 'Erro ao cadastrar: ' + error.message;
                 document.getElementById('registerError').style.display = 'block';
             }
         });
@@ -213,21 +219,33 @@
             const email = document.getElementById('resetEmail').value;
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert("E-mail de redefinição de senha enviado.");
-                document.getElementById('resetPasswordForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'flex';
+                alert('Email de redefinição de senha enviado!');
             } catch (error) {
-                document.getElementById('resetError').innerText = "Erro ao enviar e-mail de redefinição. Verifique o email.";
+                document.getElementById('resetError').innerText = 'Erro ao enviar email de redefinição: ' + error.message;
                 document.getElementById('resetError').style.display = 'block';
             }
         });
 
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('loginPassword');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.classList.toggle('zmdi-eye-off');
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('registerPassword');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.classList.toggle('zmdi-eye-off');
         });
 
         document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = "https://checkout.yampi.com.br";
+            window.location.href = "https://example.com/pagamento"; // Substitua com o URL real de pagamento
+        });
+
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
         });
     </script>
 </body>
