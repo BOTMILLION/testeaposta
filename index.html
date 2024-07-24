@@ -126,79 +126,105 @@
             document.getElementById('loginForm').style.display = 'flex';
         });
 
-        document.getElementById('loginButton').addEventListener('click', function() {
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('loginPassword');
+            const passwordType = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', passwordType);
+            this.classList.toggle('zmdi-eye-off');
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('registerPassword');
+            const passwordType = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', passwordType);
+            this.classList.toggle('zmdi-eye-off');
+        });
+
+        // Função de Login
+        document.getElementById('loginButton').addEventListener('click', async function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
+
+            if (email && password) {
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     if (user.emailVerified) {
-                        document.getElementById('redirectPopup').style.display = 'block';
-                        let timer = 5;
+                        // Redirecionar para o jogo
+                        document.getElementById('redirectPopup').style.display = 'flex';
+                        let countdown = 5;
                         const interval = setInterval(() => {
-                            document.getElementById('redirectTimer').innerText = timer;
-                            timer--;
-                            if (timer < 0) {
+                            countdown--;
+                            document.getElementById('redirectTimer').textContent = countdown;
+                            if (countdown === 0) {
                                 clearInterval(interval);
-                                window.location.href = "https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL";
+                                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                             }
                         }, 1000);
                     } else {
-                        document.getElementById('loginError').innerText = 'Por favor, verifique seu e-mail.';
-                        document.getElementById('loginError').style.display = 'block';
+                        alert('Por favor, verifique seu email antes de fazer login.');
                     }
-                })
-                .catch((error) => {
-                    document.getElementById('loginError').innerText = 'Email ou senha incorretos.';
+                } catch (error) {
                     document.getElementById('loginError').style.display = 'block';
-                });
+                    console.error(error);
+                }
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
         });
 
-        document.getElementById('registerButton').addEventListener('click', function() {
+        // Função de Cadastro
+        document.getElementById('registerButton').addEventListener('click', async function() {
+            const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            const name = document.getElementById('registerName').value;
 
-            if (password.length < 6) {
-                document.getElementById('registerError').innerText = 'A senha deve ter pelo menos 6 caracteres.';
-                document.getElementById('registerError').style.display = 'block';
-                return;
-            }
-
-            createUserWithEmailAndPassword(auth, email, password)
-                .then(async (userCredential) => {
+            if (name && email && password && password.length >= 6) {
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     await sendEmailVerification(user);
-
-                    const userDocRef = doc(db, 'users', user.uid);
-                    await setDoc(userDocRef, {
+                    await setDoc(doc(db, 'users', user.uid), {
                         name: name,
-                        email: email,
-                        createdAt: new Date()
+                        email: email
                     });
-                    console.log("Usuário adicionado ao Firestore:", { name, email, createdAt: new Date() });
-
-                    document.getElementById('registerSuccess').innerText = 'Cadastro realizado. Verifique o seu email.';
                     document.getElementById('registerSuccess').style.display = 'block';
-                })
-                .catch((error) => {
-                    console.error("Erro ao cadastrar:", error);
-                    document.getElementById('registerError').innerText = 'Erro ao cadastrar. Tente novamente.';
+                    document.getElementById('registerError').style.display = 'none';
+                } catch (error) {
                     document.getElementById('registerError').style.display = 'block';
-                });
+                    console.error(error);
+                }
+            } else {
+                document.getElementById('registerError').style.display = 'block';
+            }
         });
 
-        document.getElementById('resetPasswordButton').addEventListener('click', function() {
+        // Função de Redefinição de Senha
+        document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
-            sendPasswordResetEmail(auth, email)
-                .then(() => {
+
+            if (email) {
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert('Email de redefinição de senha enviado.');
                     document.getElementById('resetError').style.display = 'none';
-                    alert('Email de redefinição enviado.');
-                })
-                .catch((error) => {
-                    document.getElementById('resetError').innerText = 'Erro ao enviar email de redefinição. Tente novamente.';
+                } catch (error) {
                     document.getElementById('resetError').style.display = 'block';
-                });
+                    console.error(error);
+                }
+            } else {
+                document.getElementById('resetError').style.display = 'block';
+            }
+        });
+
+        // Botão de Pagamento
+        document.getElementById('paymentButton').addEventListener('click', function() {
+            window.location.href = 'https://yampi.com.br/checkout/12345';
+        });
+
+        // Botão de Redirecionamento Agora
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
         });
     </script>
 </body>
