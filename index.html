@@ -3,20 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login com Firebase</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Teste Firebase</title>
 </head>
 <body>
-    <h1>Login</h1>
-    <form id="login-form">
-        <input type="email" id="email" placeholder="E-mail" required>
-        <input type="password" id="password" placeholder="Senha" required>
-        <button type="submit">Login</button>
-    </form>
+    <h1>Teste Firebase</h1>
+
+    <!-- Inclui o Firebase e o módulo de autenticação -->
     <script type="module">
-        // Importa o Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js';
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -31,25 +25,7 @@
 
         // Inicializa o Firebase
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        // Manipula o formulário de login
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Login bem-sucedido
-                    const user = userCredential.user;
-                    alert('Login bem-sucedido: ' + user.email);
-                })
-                .catch((error) => {
-                    // Erro no login
-                    alert('Erro: ' + error.message);
-                });
-        });
+        console.log('Firebase inicializado com sucesso.');
     </script>
 </body>
 </html>
