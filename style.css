@@ -23,27 +23,6 @@ body {
     justify-content: center;
     align-items: center;
     margin-bottom: 70px; /* Aumentado para garantir visibilidade em dispositivos móveis */
-    overflow: hidden; /* Para garantir que o brilho não exceda o container */
-    animation: shineEffect 5s infinite; /* Adiciona a animação de brilho */
-}
-
-/* Animação de brilho diagonal */
-@keyframes shineEffect {
-    0% {
-        background: rgba(255, 255, 255, 0.1);
-        background-image: linear-gradient(45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
-        background-size: 200% 200%;
-    }
-    50% {
-        background: rgba(255, 255, 255, 0.5);
-        background-image: linear-gradient(45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0) 100%);
-        background-size: 200% 200%;
-    }
-    100% {
-        background: rgba(255, 255, 255, 0.1);
-        background-image: linear-gradient(45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
-        background-size: 200% 200%;
-    }
 }
 
 /* Estilo ajustado para dispositivos móveis */
@@ -268,41 +247,35 @@ body {
 }
 
 #resetPasswordForm .info-text {
+    margin-top: 20px;
     font-size: 14px;
 }
 
 #resetPasswordForm .info-text a {
     color: #c8102e; /* Vermelho mais forte */
+    text-decoration: none;
 }
 
-/* Novo estilo para a página de registro */
-#registerForm {
-    display: none; /* Começa oculto */
-    width: 100%;
-}
-
-#registerForm .form-title {
-    font-size: 24px;
-    color: #c8102e; /* Vermelho mais forte */
-    margin-bottom: 20px;
-}
-
-#registerForm .line {
-    margin-bottom: 20px;
-}
-
-#registerForm .line input {
-    border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
-}
-
-#registerForm .custom-button {
-    background: #c8102e; /* Vermelho mais forte */
-}
-
-#registerForm .info-text {
+#errorMessage {
+    display: none;
+    color: red;
+    margin-top: 10px;
     font-size: 14px;
 }
 
-#registerForm .info-text a {
-    color: #c8102e; /* Vermelho mais forte */
+/* Novos estilos para popups */
+#redirectPopup, #resetPasswordPopup {
+    display: none; /* Inicialmente oculto */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 500px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 1000; /* Garante que o popup fique acima de outros elementos */
 }
