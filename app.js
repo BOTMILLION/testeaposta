@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeResetPopup = document.getElementById('closeResetPopup');
     const subscriptionStatus = document.getElementById('subscriptionStatus');
     const closePopupButton = document.getElementById('closePopup');
+    const helpButton = document.getElementById('helpButton'); // Botão de ajuda
+    const helpPopup = document.getElementById('helpPopup'); // Popup de ajuda
+    const helpForm = document.getElementById('helpForm'); // Formulário de ajuda
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -201,24 +204,27 @@ document.addEventListener('DOMContentLoaded', () => {
         resetPasswordPopup.style.display = 'none';
     });
 
-    // Manipular recuperação de senha
-    document.getElementById('resetPasswordSubmit').addEventListener('click', async () => {
-        const email = resetEmail.value;
-        if (email) {
+    // Manipular o envio do formulário de recuperação de senha
+    helpButton.addEventListener('click', () => {
+        helpPopup.style.display = 'block';
+    });
+
+    closePopupButton.addEventListener('click', () => {
+        helpPopup.style.display = 'none';
+    });
+
+    helpForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const email = document.getElementById('helpEmail').value;
+        if (email === '') {
+            resetError.textContent = 'O campo de e-mail não pode estar vazio.';
+        } else {
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('E-mail de recuperação enviado.');
-                resetPasswordPopup.style.display = 'none';
+                resetError.textContent = 'E-mail de recuperação enviado.';
             } catch (error) {
                 resetError.textContent = error.message;
             }
-        } else {
-            resetError.textContent = 'Por favor, insira seu e-mail.';
         }
-    });
-
-    // Fechar popups
-    closePopupButton.addEventListener('click', () => {
-        redirectPopup.style.display = 'none';
     });
 });
