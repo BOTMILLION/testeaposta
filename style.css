@@ -40,7 +40,7 @@ body {
     width: 150px;
     margin-bottom: 20px;
     position: relative;
-    animation: rotateFast 0.5s linear infinite; /* Gira a logo rapidamente */
+    animation: rotateWithPause 5.5s linear infinite; /* Duração total do ciclo é 5.5 segundos (0.5s rotação + 5s pausa) */
 }
 
 /* Animação de rotação rápida */
@@ -50,20 +50,10 @@ body {
     100% { transform: rotate(360deg); } /* A logo para após o giro */
 }
 
-.logo {
-    width: 150px;
-    margin-bottom: 20px;
-    animation: rotateWithPause 5.5s linear infinite; /* Duração total do ciclo é 5.5 segundos (0.5s rotação + 5s pausa) */
-}
-
-}
-
 /* Aplica a animação à logo */
 .logo {
     animation: rotate 5s linear infinite;
 }
-
-
 
 /* Adiciona o efeito de brilho à logo */
 .logo::before {
@@ -141,6 +131,16 @@ body {
     right: 0;
     top: 10px;
     cursor: pointer;
+}
+
+/* Estilos para os ícones de olho */
+.zmdi-eye, .zmdi-eye-off {
+    cursor: pointer;
+    font-size: 20px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #333;
 }
 
 .custom-button {
