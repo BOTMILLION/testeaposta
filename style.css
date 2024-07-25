@@ -44,20 +44,18 @@ body {
 }
 
 /* Animação de rotação rápida */
-@keyframes rotateFast {
+@keyframes rotateWithPause {
     0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    20% { transform: rotate(360deg); }
+    100% { transform: rotate(360deg); } /* A logo para após o giro */
 }
 
-/* Animação de brilho */
-/* Define a animação de rotação */
-@keyframes rotate {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+.logo {
+    width: 150px;
+    margin-bottom: 20px;
+    animation: rotateWithPause 5.5s linear infinite; /* Duração total do ciclo é 5.5 segundos (0.5s rotação + 5s pausa) */
+}
+
 }
 
 /* Aplica a animação à logo */
