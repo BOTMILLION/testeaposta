@@ -112,6 +112,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
         document.getElementById('registerLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'flex';
@@ -131,127 +132,115 @@
         document.getElementById('loginButton').addEventListener('click', async function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            if (!email || !password) {
-                document.getElementById('loginError').style.display = 'block';
-                return;
-            }
-            document.getElementById('loginError').style.display = 'none';
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                if (user.emailVerified) {
-                    const userDocRef = doc(db, 'users', user.uid);
-                    const userDoc = await getDoc(userDocRef);
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        const currentTime = new Date().getTime();
-                        const trialEndTime = userData.trialEndTime.toMillis();
-                        if (currentTime < trialEndTime) {
-                            document.getElementById('redirectPopup').style.display = 'flex';
-                            startRedirectTimer();
-                        } else {
-                            document.getElementById('loginError').textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
-                            document.getElementById('loginError').style.display = 'block';
-                        }
-                    } else {
-                        document.getElementById('loginError').textContent = 'Dados do usuário não encontrados.';
-                        document.getElementById('loginError').style.display = 'block';
-                    }
-                } else {
-                    document.getElementById('loginError').textContent = 'Por favor, verifique seu email antes de fazer login.';
-                    document.getElementById('loginError').style.display = 'block';
+            const errorDiv = document.getElementById('loginError');
+            if (email && password) {
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    document.getElementById('redirectPopup').style.display = 'flex';
+                    startRedirectTimer();
+                } catch (error) {
+                    errorDiv.textContent = 'Email ou senha incorretos.';
+                    errorDiv.style.display = 'block';
                 }
-            } catch (error) {
-                document.getElementById('loginError').textContent = error.message;
-                document.getElementById('loginError').style.display = 'block';
+            } else {
+                errorDiv.textContent = 'Por favor, preencha todos os campos.';
+                errorDiv.style.display = 'block';
             }
         });
+
         document.getElementById('registerButton').addEventListener('click', async function() {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            if (!name || !email || !password || password.length < 6) {
-                document.getElementById('registerError').style.display = 'block';
-                return;
-            }
-            document.getElementById('registerError').style.display = 'none';
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                await sendEmailVerification(user);
-                const userDocRef = doc(db, 'users', user.uid);
-                const currentTime = new Date();
-                const trialEndTime = new Date(currentTime.getTime() + (3 * 24 * 60 * 60 * 1000)); // 3 dias
-                await setDoc(userDocRef, {
-                    name: name,
-                    email: email,
-                    trialEndTime: trialEndTime
-                });
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('registerPopup').style.display = 'flex';
-                startRegisterTimer(trialEndTime);
-            } catch (error) {
-                document.getElementById('registerError').textContent = error.message;
-                document.getElementById('registerError').style.display = 'block';
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+            if (name && email && password.length >= 6) {
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    await sendEmailVerification(auth.currentUser);
+                    document.getElementById('registerPopup').style.display = 'flex';
+                    startRegisterTimer();
+                } catch (error) {
+                    errorDiv.textContent = 'Ocorreu um erro durante o cadastro. Por favor, tente novamente.';
+                    errorDiv.style.display = 'block';
+                }
+            } else {
+                errorDiv.textContent = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
+                errorDiv.style.display = 'block';
             }
         });
+
         document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
-            if (!email) {
-                document.getElementById('resetError').style.display = 'block';
-                return;
+            const errorDiv = document.getElementById('resetError');
+            if (email) {
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    document.getElementById('resetPasswordForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'flex';
+                } catch (error) {
+                    errorDiv.textContent = 'Ocorreu um erro ao enviar o email de redefinição.';
+                    errorDiv.style.display = 'block';
+                }
+            } else {
+                errorDiv.textContent = 'Por favor, preencha o campo de email corretamente.';
+                errorDiv.style.display = 'block';
             }
-            document.getElementById('resetError').style.display = 'none';
-            try {
-                await sendPasswordResetEmail(auth, email);
-                alert('Email de redefinição enviado. Verifique sua caixa de entrada.');
-                document.getElementById('resetPasswordForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'flex';
-            } catch (error) {
-                document.getElementById('resetError').textContent = error.message;
-                document.getElementById('resetError').style.display = 'block';
-            }
-        });
-        document.getElementById('closeRegisterPopup').addEventListener('click', function() {
-            document.getElementById('registerPopup').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'flex';
         });
 
         document.getElementById('redirectNowButton').addEventListener('click', function() {
             window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-            window.location.href = 'https://botmillion.github.io/telm/';
+        });
+
+        document.getElementById('closeRegisterPopup').addEventListener('click', function() {
+            document.getElementById('registerPopup').style.display = 'none';
         });
 
         function startRedirectTimer() {
-            let countdown = 5;
+            let timeLeft = 5;
             const timerElement = document.getElementById('redirectTimer');
             const interval = setInterval(() => {
-                timerElement.textContent = countdown;
-                countdown--;
-                if (countdown < 0) {
+                if (timeLeft <= 0) {
                     clearInterval(interval);
                     window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-                    window.location.href = 'https://botmillion.github.io/telm/';
+                } else {
+                    timerElement.textContent = timeLeft;
+                    timeLeft -= 1;
                 }
             }, 1000);
         }
-        function startRegisterTimer(trialEndTime) {
-            let countdown = Math.floor((trialEndTime.getTime() - new Date().getTime()) / 1000);
+
+        function startRegisterTimer() {
+            let timeLeft = 259200; // 3 dias em segundos
             const timerElement = document.getElementById('registerTimer');
             const interval = setInterval(() => {
-                const days = Math.floor(countdown / (3600 * 24));
-                const hours = Math.floor((countdown % (3600 * 24)) / 3600);
-                const minutes = Math.floor((countdown % 3600) / 60);
-                const seconds = countdown % 60;
-                timerElement.textContent = `Tempo restante: ${days} dias, ${hours} horas, ${minutes} minutos, ${seconds} segundos`;
-                countdown--;
-                if (countdown < 0) {
+                if (timeLeft <= 0) {
                     clearInterval(interval);
-                    document.getElementById('registerPopup').style.display = 'none';
-                    alert('Seu período de teste terminou. Por favor, faça o pagamento para continuar.');
+                } else {
+                    const days = Math.floor(timeLeft / 86400);
+                    const hours = Math.floor((timeLeft % 86400) / 3600);
+                    const minutes = Math.floor((timeLeft % 3600) / 60);
+                    const seconds = timeLeft % 60;
+                    timerElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    timeLeft -= 1;
                 }
             }, 1000);
         }
+
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('loginPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.classList.toggle('zmdi-eye-off');
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('registerPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.classList.toggle('zmdi-eye-off');
+        });
     </script>
+    <script src="app.js"></script>
 </body>
 </html>
