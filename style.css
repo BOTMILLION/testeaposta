@@ -63,6 +63,8 @@ body {
     animation: rotate 5s linear infinite;
 }
 
+
+
 /* Adiciona o efeito de brilho à logo */
 .logo::before {
     content: '';
@@ -276,56 +278,4 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     padding: 20px;
     z-index: 1000; /* Garante que o popup fique acima de outros elementos */
-}
-
-/* Estilo para o ícone de ajuda flutuante */
-.help-icon {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #c8102e; /* Cor do botão de ajuda */
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    padding: 10px;
-    z-index: 1000;
-}
-
-.help-icon img {
-    width: 30px;
-    height: 30px;
-}
-
-/* Estilo do popup de ajuda */
-.help-popup {
-    display: none; /* Começa oculto */
-    position: fixed;
-    bottom: 80px; /* Um pouco acima do ícone de ajuda */
-    right: 20px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    width: 250px;
-    z-index: 1001; /* Acima do ícone de ajuda */
-}
-
-.help-popup h2 {
-    font-size: 18px;
-    margin: 0 0 10px;
-}
-
-.help-popup p {
-    font-size: 14px;
-    margin: 0;
-}
-
-.help-popup .close-popup {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 18px;
-    color: #c8102e; /* Cor do ícone de fechar */
 }
