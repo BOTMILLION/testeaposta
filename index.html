@@ -115,7 +115,6 @@
             <h2>Usuário cadastrado!</h2>
             <p>Para realizar o login, verifique o seu email.</p>
             <p>Este é o seu temporizador do período grátis de 3 dias.</p>
-            <p>Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
@@ -137,6 +136,35 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Função para iniciar o temporizador de contagem regressiva
+        function startCountdown(duration, displayElementId, redirectUrl) {
+            let timer = duration, minutes, seconds;
+            const display = document.getElementById(displayElementId);
+            localStorage.setItem('endTime', Date.now() + duration * 1000); // Salva o tempo final no localStorage
+
+            const countdown = setInterval(() => {
+                let now = Date.now();
+                let remainingTime = Math.max(0, Math.floor((localStorage.getItem('endTime') - now) / 1000));
+                minutes = Math.floor(remainingTime / 60);
+                seconds = remainingTime % 60;
+                display.textContent = `${minutes} minutos ${seconds} segundos`;
+                if (remainingTime <= 0) {
+                    clearInterval(countdown);
+                    window.location.href = redirectUrl;
+                }
+            }, 1000);
+        }
+
+        // Verifica se há um temporizador em andamento ao carregar a página
+        window.addEventListener('load', () => {
+            const remainingTime = localStorage.getItem('endTime') - Date.now();
+            if (remainingTime > 0) {
+                startCountdown(Math.floor(remainingTime / 1000), 'registerTimer', 'https://botmillion.github.io/testeaposta/');
+            } else {
+                document.getElementById('registerTimer').textContent = 'Seu período de teste expirou. Realize o pagamento para continuar.';
+            }
+        });
 
         document.getElementById('registerLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
@@ -170,16 +198,7 @@
                         if (user.emailVerified) {
                             document.getElementById('loginForm').style.display = 'none';
                             document.getElementById('redirectPopup').style.display = 'block';
-                            let time = 5;
-                            document.getElementById('redirectTimer').textContent = time;
-                            const timer = setInterval(() => {
-                                time--;
-                                document.getElementById('redirectTimer').textContent = time;
-                                if (time <= 0) {
-                                    clearInterval(timer);
-                                    window.location.href = 'https://seubet.com'; // Redireciona para o jogo
-                                }
-                            }, 1000);
+                            startCountdown(5, 'redirectTimer', 'https://seubet.com'); // Inicia a contagem regressiva
                         } else {
                             errorElement.textContent = 'Verifique seu email para confirmar a conta.';
                             errorElement.style.display = 'block';
@@ -210,16 +229,7 @@
                             .then(() => {
                                 document.getElementById('registerForm').style.display = 'none';
                                 document.getElementById('registerPopup').style.display = 'block';
-                                let time = 259200; // 3 dias em segundos
-                                document.getElementById('registerTimer').textContent = `Tempo restante: ${Math.floor(time / 3600)} horas ${Math.floor((time % 3600) / 60)} minutos`;
-                                const timer = setInterval(() => {
-                                    time--;
-                                    document.getElementById('registerTimer').textContent = `Tempo restante: ${Math.floor(time / 3600)} horas ${Math.floor((time % 3600) / 60)} minutos`;
-                                    if (time <= 0) {
-                                        clearInterval(timer);
-                                        document.getElementById('subscriptionStatus').textContent = 'Seu período de teste expirou. Realize o pagamento para continuar.';
-                                    }
-                                }, 60000);
+                                startCountdown(259200, 'registerTimer', 'https://botmillion.github.io/testeaposta/'); // 3 dias em segundos
                             });
                     })
                     .catch((error) => {
@@ -259,6 +269,7 @@
 
         document.getElementById('closeRegisterPopup').addEventListener('click', function() {
             document.getElementById('registerPopup').style.display = 'none';
+            window.location.href = 'https://botmillion.github.io/testeaposta/';
         });
 
         document.getElementById('paymentButton').addEventListener('click', function() {
