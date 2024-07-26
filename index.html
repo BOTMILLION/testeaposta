@@ -7,9 +7,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js"></script>
     <style>
         /* Estilos para os popups */
         .popup {
@@ -115,7 +112,6 @@
             <h2>Usuário cadastrado!</h2>
             <p>Para realizar o login, verifique o seu email.</p>
             <p>Este é o seu temporizador do período grátis de 3 dias.</p>
-            <p> Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
@@ -151,8 +147,10 @@
                 let seconds = remainingTime % 60;
                 const display = document.getElementById(displayElementId);
                 display.textContent = `${hours}hrs : ${minutes}min : ${seconds}seg`;
+
                 if (remainingTime <= 0) {
                     clearInterval(countdown);
+                    display.textContent = 'Tempo expirado';
                     window.location.href = redirectUrl;
                 }
             }
@@ -222,7 +220,7 @@
             }
         });
 
-        document.getElementById('registerButton').addEventListener('click', function() {
+        document.getElementById('registerButton').addEventListener('click', async function() {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
@@ -230,20 +228,28 @@
             const successElement = document.getElementById('registerSuccess');
 
             if (name && email && password.length >= 6) {
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        sendEmailVerification(user)
-                            .then(() => {
-                                document.getElementById('registerForm').style.display = 'none';
-                                document.getElementById('registerPopup').style.display = 'block';
-                                startCountdown(259200, 'registerTimer', 'https://botmillion.github.io/testeaposta/'); // 3 dias em segundos
-                            });
-                    })
-                    .catch((error) => {
-                        errorElement.textContent = error.message;
-                        errorElement.style.display = 'block';
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    await sendEmailVerification(user);
+                    
+                    const registrationDate = new Date();
+                    const expirationDate = new Date(registrationDate.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 dias em milissegundos
+                    
+                    await setDoc(doc(db, 'users', user.uid), {
+                        name: name,
+                        email: email,
+                        registrationDate: registrationDate.toISOString(),
+                        expirationDate: expirationDate.toISOString()
                     });
+
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('registerPopup').style.display = 'block';
+                    startCountdown(259200, 'registerTimer', 'https://botmillion.github.io/testeaposta/'); // 3 dias em segundos
+                } catch (error) {
+                    errorElement.textContent = error.message;
+                    errorElement.style.display = 'block';
+                }
             } else {
                 errorElement.textContent = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
                 errorElement.style.display = 'block';
@@ -282,6 +288,33 @@
 
         document.getElementById('paymentButton').addEventListener('click', function() {
             window.location.href = 'https://checkout.yampi.com.br'; // Redireciona para o checkout Yampi
+        });
+
+        // Função para mostrar e ocultar o campo da senha
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('loginPassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                this.classList.add('zmdi-eye-off');
+                this.classList.remove('zmdi-eye');
+            } else {
+                passwordField.type = 'password';
+                this.classList.add('zmdi-eye');
+                this.classList.remove('zmdi-eye-off');
+            }
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('registerPassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                this.classList.add('zmdi-eye-off');
+                this.classList.remove('zmdi-eye');
+            } else {
+                passwordField.type = 'password';
+                this.classList.add('zmdi-eye');
+                this.classList.remove('zmdi-eye-off');
+            }
         });
     </script>
 </body>
