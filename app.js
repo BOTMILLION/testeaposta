@@ -11,6 +11,8 @@ import {
     Timestamp 
 } from './firebase'; // Ajuste o caminho conforme necessário
 
+import { formatDistanceToNow, addDays } from 'date-fns'; // Importando date-fns
+
 document.addEventListener('DOMContentLoaded', () => {
     // Referências aos elementos do DOM
     const loginForm = document.getElementById('loginForm');
@@ -111,10 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let countdown = Math.ceil((endDate - new Date()) / 1000);
         const countdownInterval = setInterval(() => {
             countdown -= 1;
-            const hours = Math.floor(countdown / 3600);
-            const minutes = Math.floor((countdown % 3600) / 60);
-            const seconds = countdown % 60;
-            redirectTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
+            const distance = formatDistanceToNow(new Date(endDate), { addSuffix: true });
+            redirectTimer.textContent = distance;
 
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 const trialStartDate = new Date();
-                const trialEndDate = new Date(trialStartDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+                const trialEndDate = addDays(trialStartDate, 3);
 
                 await setDoc(doc(db, 'users', user.uid), {
                     name: name,
@@ -195,26 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             registrationMessage.style.display = 'none';
         });
 
-        let countdown = Math.ceil((trialEndDate - new Date()) / 1000);
-        const countdownInterval = setInterval(() => {
-            countdown -= 1;
-            const hours = Math.floor(countdown / 3600);
-            const minutes = Math.floor((countdown % 3600) / 60);
-            const seconds = countdown % 60;
-            registrationMessage.innerHTML = `
-                <h2>Usuário cadastrado!</h2>
-                <p>Para realizar o login, verifique o seu e-mail.</p>
-                <p>Este é o seu temporizador do período grátis de 3 dias.</p>
-                <p>Ao esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
-                <p>Seu período de teste termina em: ${trialEndDate.toLocaleDateString()} às ${trialEndDate.toLocaleTimeString()}</p>
-                <p>Tempo restante: ${hours}h ${minutes}m ${seconds}s</p>
-                <button id="closePopupButton">FECHAR</button>
-            `;
-
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-            }
-        }, 1000);
+        iniciarRedirecionamento(trialEndDate);
     };
 
     // Manipular o clique no botão de redefinir senha
