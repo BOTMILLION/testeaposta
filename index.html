@@ -9,10 +9,15 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
         import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
-        import { addDays } from 'https://unpkg.com/date-fns@2.21.1/esm/index.js';
+        import { addDays } from 'https://cdn.jsdelivr.net/npm/date-fns@2.29.3/esm/index.js';
 
         const firebaseConfig = {
-            // Configurações do Firebase
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -174,50 +179,118 @@
             }, 1000);
         }
     </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #loginForm, #registerForm, #resetPasswordForm {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            margin-top: 0;
+        }
+        input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .link {
+            display: block;
+            margin-top: 10px;
+            color: #007BFF;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+            display: none;
+            margin-bottom: 10px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .popup h2 {
+            margin-top: 0;
+        }
+    </style>
 </head>
 <body>
     <div id="loginForm">
         <h2>Login</h2>
-        <input type="email" id="loginEmail" placeholder="Email">
-        <input type="password" id="loginPassword" placeholder="Senha">
-        <button id="loginButton">Entrar</button>
-        <p id="loginError" style="display: none; color: red;">Erro no login. Verifique suas credenciais.</p>
-        <p>Não tem uma conta? <span id="registerLink" style="color: blue; cursor: pointer;">Cadastre-se</span></p>
-        <p>Esqueceu a senha? <span id="resetPasswordLink" style="color: blue; cursor: pointer;">Redefinir senha</span></p>
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Senha" required>
+        <button id="loginButton">Login</button>
+        <div id="loginError" class="error">Erro no login, tente novamente.</div>
+        <span id="registerLink" class="link">Não tem uma conta? Cadastre-se</span>
+        <span id="resetPasswordLink" class="link">Esqueceu a senha?</span>
     </div>
 
-    <div id="registerForm" style="display: none;">
+    <div id="registerForm" style="display:none;">
         <h2>Cadastro</h2>
-        <input type="text" id="registerName" placeholder="Nome">
-        <input type="email" id="registerEmail" placeholder="Email">
-        <input type="password" id="registerPassword" placeholder="Senha">
+        <input type="text" id="registerName" placeholder="Nome" required>
+        <input type="email" id="registerEmail" placeholder="Email" required>
+        <input type="password" id="registerPassword" placeholder="Senha" required>
         <button id="registerButton">Cadastrar</button>
-        <p id="registerError" style="display: none; color: red;">Erro no cadastro. Tente novamente.</p>
-        <p>Já tem uma conta? <span id="loginLink" style="color: blue; cursor: pointer;">Entrar</span></p>
+        <div id="registerError" class="error">Erro no cadastro, tente novamente.</div>
+        <div id="registerSuccess" class="success">Cadastro realizado com sucesso! Verifique seu email.</div>
+        <span id="loginLink" class="link">Já tem uma conta? Faça login</span>
     </div>
 
-    <div id="resetPasswordForm" style="display: none;">
-        <h2>Redefinir senha</h2>
-        <input type="email" id="resetEmail" placeholder="Email">
+    <div id="resetPasswordForm" style="display:none;">
+        <h2>Redefinir Senha</h2>
+        <input type="email" id="resetEmail" placeholder="Email" required>
         <button id="resetPasswordButton">Enviar email de redefinição</button>
-        <p id="resetError" style="display: none; color: red;">Erro ao enviar email de redefinição. Tente novamente.</p>
-        <p><span id="backToLoginLink" style="color: blue; cursor: pointer;">Voltar ao login</span></p>
+        <div id="resetError" class="error">Erro ao enviar email de redefinição, tente novamente.</div>
+        <span id="backToLoginLink" class="link">Voltar para login</span>
     </div>
 
-    <div id="registerPopup" style="display: none;">
-        <p>Cadastro realizado com sucesso!</p>
-        <p id="registerTimer"></p>
+    <div id="redirectPopup" class="popup">
+        <h2>Redirecionamento</h2>
+        <p>Você será redirecionado para o jogo em <span id="redirectTimer">5</span> segundos.</p>
+        <button id="redirectNowButton">Redirecionar agora</button>
+    </div>
+
+    <div id="registerPopup" class="popup">
+        <h2>Período de Teste</h2>
+        <p id="registerTimer">Seu período grátis termina em:</p>
         <button id="closeRegisterPopup">Fechar</button>
     </div>
 
-    <div id="subscriptionPopup" style="display: none;">
-        <p>Seu período de teste expirou. Faça o pagamento para continuar.</p>
+    <div id="subscriptionPopup" class="popup">
+        <h2>Assinatura</h2>
+        <p>Seu período de teste terminou. Por favor, faça o pagamento para continuar usando o serviço.</p>
         <button id="payNowButton">Pagar agora</button>
-    </div>
-
-    <div id="redirectPopup" style="display: none;">
-        <p>Login realizado com sucesso! Você será redirecionado em <span id="redirectTimer">5</span> segundos.</p>
-        <button id="redirectNowButton">Redirecionar agora</button>
     </div>
 </body>
 </html>
