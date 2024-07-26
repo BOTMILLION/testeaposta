@@ -10,6 +10,34 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js"></script>
+    <style>
+        /* Estilos para os popups */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .popup .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .popup .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="wrap-login">
@@ -83,21 +111,20 @@
             <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
         <!-- Popup de Cadastro -->
-        <div class="popup" id="registerPopup" style="display: none;">
-<div class="popup" id="redirectPopup">
+        <div class="popup" id="registerPopup">
             <h2>Usuário cadastrado!</h2>
             <p>Para realizar o login, verifique o seu email.</p>
-            <p>Este é o seu temporizador do período gratis de 3 dias.</p>
-            <p> Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
+            <p>Este é o seu temporizador do período grátis de 3 dias.</p>
+            <p>Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
-     
     </div>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+        
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
             authDomain: "projeto-notificacao-968d4.firebaseapp.com",
@@ -113,154 +140,129 @@
 
         document.getElementById('registerLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'flex';
+            document.getElementById('registerForm').style.display = 'block';
         });
+
         document.getElementById('loginLink').addEventListener('click', function() {
             document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'flex';
+            document.getElementById('loginForm').style.display = 'block';
         });
+
         document.getElementById('resetPasswordLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('resetPasswordForm').style.display = 'flex';
+            document.getElementById('resetPasswordForm').style.display = 'block';
         });
+
         document.getElementById('backToLoginLink').addEventListener('click', function() {
             document.getElementById('resetPasswordForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'flex';
+            document.getElementById('loginForm').style.display = 'block';
         });
-        document.getElementById('loginButton').addEventListener('click', async function() {
+
+        document.getElementById('loginButton').addEventListener('click', function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
+            const errorElement = document.getElementById('loginError');
 
             if (email && password) {
-                try {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    document.getElementById('redirectPopup').style.display = 'flex';
-                    startRedirectTimer();
-                } catch (error) {
-                    errorDiv.textContent = 'Erro ao fazer login. Verifique suas credenciais.';
-                    errorDiv.style.display = 'block';
-                }
+                signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        if (user.emailVerified) {
+                            document.getElementById('loginForm').style.display = 'none';
+                            document.getElementById('redirectPopup').style.display = 'block';
+                            let time = 5;
+                            document.getElementById('redirectTimer').textContent = time;
+                            const timer = setInterval(() => {
+                                time--;
+                                document.getElementById('redirectTimer').textContent = time;
+                                if (time <= 0) {
+                                    clearInterval(timer);
+                                    window.location.href = 'https://seubet.com'; // Redireciona para o jogo
+                                }
+                            }, 1000);
+                        } else {
+                            errorElement.textContent = 'Verifique seu email para confirmar a conta.';
+                            errorElement.style.display = 'block';
+                        }
+                    })
+                    .catch((error) => {
+                        errorElement.textContent = error.message;
+                        errorElement.style.display = 'block';
+                    });
             } else {
-                errorDiv.textContent = 'Por favor, preencha todos os campos.';
-                errorDiv.style.display = 'block';
+                errorElement.textContent = 'Por favor, preencha todos os campos corretamente.';
+                errorElement.style.display = 'block';
             }
         });
-        document.getElementById('registerButton').addEventListener('click', async function() {
+
+        document.getElementById('registerButton').addEventListener('click', function() {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            const errorDiv = document.getElementById('registerError');
-            const successDiv = document.getElementById('registerSuccess');
-            const trialStatusDiv = document.getElementById('trialStatus');
-            const registerPopup = document.getElementById('registerPopup');
-            const registerTimerDiv = document.getElementById('registerTimer');
-            const trialPeriod = 3 * 24 * 60 * 60 * 1000; // 3 dias em milissegundos
-            const now = new Date().getTime();
-            const expirationTime = now + trialPeriod;
+            const errorElement = document.getElementById('registerError');
+            const successElement = document.getElementById('registerSuccess');
 
             if (name && email && password.length >= 6) {
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await sendEmailVerification(userCredential.user);
-                    await setDoc(doc(db, "users", userCredential.user.uid), {
-                        name: name,
-                        email: email,
-                        registrationDate: new Date(),
-                        trialExpiration: expirationTime
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        sendEmailVerification(user)
+                            .then(() => {
+                                document.getElementById('registerForm').style.display = 'none';
+                                document.getElementById('registerPopup').style.display = 'block';
+                                let time = 259200; // 3 dias em segundos
+                                document.getElementById('registerTimer').textContent = `Tempo restante: ${Math.floor(time / 3600)} horas ${Math.floor((time % 3600) / 60)} minutos`;
+                                const timer = setInterval(() => {
+                                    time--;
+                                    document.getElementById('registerTimer').textContent = `Tempo restante: ${Math.floor(time / 3600)} horas ${Math.floor((time % 3600) / 60)} minutos`;
+                                    if (time <= 0) {
+                                        clearInterval(timer);
+                                        document.getElementById('subscriptionStatus').textContent = 'Seu período de teste expirou. Realize o pagamento para continuar.';
+                                    }
+                                }, 60000);
+                            });
+                    })
+                    .catch((error) => {
+                        errorElement.textContent = error.message;
+                        errorElement.style.display = 'block';
                     });
-                    successDiv.style.display = 'block';
-                    errorDiv.style.display = 'none';
-                    registerPopup.style.display = 'flex';
-                    updateTrialTimer();
-                } catch (error) {
-                    errorDiv.textContent = 'Erro ao criar conta. Tente novamente.';
-                    errorDiv.style.display = 'block';
-                    successDiv.style.display = 'none';
-                }
             } else {
-                errorDiv.textContent = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
-                errorDiv.style.display = 'block';
-                successDiv.style.display = 'none';
+                errorElement.textContent = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
+                errorElement.style.display = 'block';
             }
         });
-        document.getElementById('resetPasswordButton').addEventListener('click', async function() {
+
+        document.getElementById('resetPasswordButton').addEventListener('click', function() {
             const email = document.getElementById('resetEmail').value;
-            const errorDiv = document.getElementById('resetError');
+            const errorElement = document.getElementById('resetError');
 
             if (email) {
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert('Email de redefinição de senha enviado.');
-                } catch (error) {
-                    errorDiv.textContent = 'Erro ao enviar email de redefinição. Verifique o email.';
-                    errorDiv.style.display = 'block';
-                }
+                sendPasswordResetEmail(auth, email)
+                    .then(() => {
+                        document.getElementById('resetPasswordForm').style.display = 'none';
+                        document.getElementById('loginForm').style.display = 'block';
+                        alert('E-mail de redefinição enviado.');
+                    })
+                    .catch((error) => {
+                        errorElement.textContent = error.message;
+                        errorElement.style.display = 'block';
+                    });
             } else {
-                errorDiv.textContent = 'Por favor, preencha o campo de email corretamente.';
-                errorDiv.style.display = 'block';
+                errorElement.textContent = 'Por favor, preencha o campo de email corretamente.';
+                errorElement.style.display = 'block';
             }
+        });
+
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = 'https://seubet.com'; // Redireciona para o jogo
         });
 
         document.getElementById('closeRegisterPopup').addEventListener('click', function() {
             document.getElementById('registerPopup').style.display = 'none';
         });
 
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = 'https://seubet.com'; // Substitua com o URL do jogo
-        });
-
         document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://checkout.yampi.com.br'; // Substitua com o URL do Yampi checkout
-        });
-
-        function startRedirectTimer() {
-            let time = 5;
-            const timerElement = document.getElementById('redirectTimer');
-            const interval = setInterval(function() {
-                if (time <= 0) {
-                    clearInterval(interval);
-                    window.location.href = 'https://seubet.com'; // Substitua com o URL do jogo
-                } else {
-                    timerElement.textContent = time;
-                    time--;
-                }
-            }, 1000);
-        }
-
-        function updateTrialTimer() {
-            const trialCountdownDiv = document.getElementById('registerTimer');
-            const now = new Date().getTime();
-            const trialEndDate = new Date(now + (3 * 24 * 60 * 60 * 1000)).toLocaleString();
-            trialCountdownDiv.textContent = `Seu período de teste termina em: ${trialEndDate}`;
-        }
-
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('loginPassword');
-            const icon = document.getElementById('togglePassword');
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.remove('zmdi-eye');
-                icon.classList.add('zmdi-eye-off');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('zmdi-eye-off');
-                icon.classList.add('zmdi-eye');
-            }
-        });
-
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('registerPassword');
-            const icon = document.getElementById('toggleRegisterPassword');
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.remove('zmdi-eye');
-                icon.classList.add('zmdi-eye-off');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('zmdi-eye-off');
-                icon.classList.add('zmdi-eye');
-            }
+            window.location.href = 'https://checkout.yampi.com.br'; // Redireciona para o checkout Yampi
         });
     </script>
 </body>
