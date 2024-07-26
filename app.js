@@ -1,3 +1,16 @@
+import { 
+    auth, 
+    db, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    sendEmailVerification, 
+    sendPasswordResetEmail, 
+    doc, 
+    setDoc, 
+    getDoc, 
+    Timestamp 
+} from './firebase'; // Ajuste o caminho conforme necessário
+
 document.addEventListener('DOMContentLoaded', () => {
     // Referências aos elementos do DOM
     const loginForm = document.getElementById('loginForm');
@@ -58,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (userSnapshot.exists()) {
                         const userData = userSnapshot.data();
                         if (verificarStatusDeTesteOuPagamento(userData)) {
-                            iniciarRedirecionamento(userData.trialEndDate || userData.subscriptionEndDate);
+                            iniciarRedirecionamento(userData.subscriptionEndDate || userData.trialEndDate);
                         } else {
                             mostrarPopupPagamento();
                         }
@@ -79,13 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         const trialEndDate = new Date(userData.trialEndDate);
         const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : null;
-        const expirationDate = userData.expirationDate ? new Date(userData.expirationDate) : null;
 
         const isTrialValid = now <= trialEndDate;
         const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
-        const isPaymentValid = expirationDate && now <= expirationDate;
 
-        if (isTrialValid || isSubscriptionValid || isPaymentValid) {
+        if (isTrialValid || isSubscriptionValid) {
             return true;
         } else {
             return false;
@@ -149,8 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 await setDoc(doc(db, 'users', user.uid), {
                     name: name,
                     email: email,
-                    trialStartDate: trialStartDate.toISOString(),
-                    trialEndDate: trialEndDate.toISOString(),
+                    trialStartDate: Timestamp.fromDate(trialStartDate),
+                    trialEndDate: Timestamp.fromDate(trialEndDate),
                     subscriptionEndDate: null,
                     expirationDate: null,
                     paymentStatus: 'unpaid' // Define status de pagamento como não pago
@@ -206,27 +217,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     };
 
-    // Manipular o clique no botão de redefinição de senha
+    // Manipular o clique no botão de redefinir senha
     resetPasswordButton.addEventListener('click', async () => {
         const email = resetEmail.value;
 
         if (email === '') {
-            resetError.style.display = 'block';
-            resetError.textContent = 'Por favor, insira seu e-mail.';
+            resetError.textContent = 'Por favor, insira um e-mail.';
         } else {
             try {
                 await sendPasswordResetEmail(auth, email);
-                resetError.style.display = 'none';
-                alert('Um link de redefinição de senha foi enviado para seu e-mail.');
+                resetError.textContent = '';
+                alert('Um e-mail de redefinição de senha foi enviado.');
                 resetPasswordPopup.style.display = 'none';
             } catch (error) {
-                resetError.style.display = 'block';
                 resetError.textContent = error.message;
             }
         }
     });
 
-    // Fechar o popup de redefinição de senha
+    // Fechar popup de redefinição de senha
     closeResetPopup.addEventListener('click', () => {
         resetPasswordPopup.style.display = 'none';
     });
