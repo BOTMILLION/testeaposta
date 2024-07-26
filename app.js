@@ -79,14 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isTrialValid) {
             trialStatus.style.display = 'block';
-            trialStatus.textContent = `Seu período de teste vai até: ${trialEndDate.toLocaleDateString()}`;
+            trialStatus.textContent = `Seu período de teste vai até: ${trialEndDate.toLocaleDateString()} ${trialEndDate.toLocaleTimeString()}`;
         } else {
             trialStatus.style.display = 'none';
         }
 
         if (isSubscriptionValid) {
             subscriptionStatus.style.display = 'block';
-            subscriptionStatus.textContent = `Sua assinatura é válida até: ${subscriptionEndDate.toLocaleDateString()}`;
+            subscriptionStatus.textContent = `Sua assinatura é válida até: ${subscriptionEndDate.toLocaleDateString()} ${subscriptionEndDate.toLocaleTimeString()}`;
         } else {
             subscriptionStatus.style.display = 'none';
         }
@@ -173,16 +173,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const mostrarMensagemCadastro = (trialStartDate, trialEndDate) => {
         registrationMessage.style.display = 'block';
         registrationMessage.innerHTML = `
-            Cadastro realizado!<br>
-            Para começar, verifique seu e-mail para concluir o processo de login. Você tem um período de teste gratuito de 3 dias, e o temporizador abaixo mostra o tempo restante. Após o período de teste, realize o pagamento de R$20 para continuar acessando nossos serviços.<br><br>
-            <button id="startButton">Iniciar</button>
+            <h2>Usuário cadastrado!</h2>
+            <p>Para realizar o login, verifique o seu e-mail.</p>
+            <p>Este é o seu temporizador do período grátis de 3 dias.</p>
+            <p>Ao esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
+            <p>Seu período de teste termina em: ${trialEndDate.toLocaleDateString()} às ${trialEndDate.toLocaleTimeString()}</p>
+            <button id="closePopupButton">FECHAR</button>
         `;
 
-        document.getElementById('startButton').addEventListener('click', () => {
-            window.location.href = 'https://botmillion.github.io/telm/';
+        document.getElementById('closePopupButton').addEventListener('click', () => {
+            registrationMessage.style.display = 'none';
         });
 
-        let countdown = Math.ceil((trialEndDate - trialStartDate) / 1000);
+        let countdown = Math.ceil((trialEndDate - new Date()) / 1000);
         const countdownInterval = setInterval(() => {
             countdown -= 1;
             const hours = Math.floor(countdown / 3600);
@@ -213,8 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (email) {
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('E-mail de recuperação enviado.');
-                resetPasswordPopup.style.display = 'none';
+                resetError.textContent = 'Confira seu e-mail para instruções de recuperação de senha.';
             } catch (error) {
                 resetError.textContent = error.message;
             }
