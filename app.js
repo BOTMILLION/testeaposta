@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Processar dados de login
     const processarLogin = (userData) => {
-        const trialStartDate = new Date(userData.trialStartDate);
         const trialEndDate = new Date(userData.trialEndDate);
         const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : null;
         const now = new Date();
@@ -154,7 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     email: email,
                     trialStartDate: trialStartDate.toISOString(),
                     trialEndDate: trialEndDate.toISOString(),
-                    subscriptionEndDate: null
+                    subscriptionEndDate: null,
+                    paymentStatus: 'unpaid' // Define status de pagamento como não pago
                 });
 
                 // Enviar e-mail de verificação
@@ -191,7 +191,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const hours = Math.floor(countdown / 3600);
             const minutes = Math.floor((countdown % 3600) / 60);
             const seconds = countdown % 60;
-            registrationMessage.innerHTML += `<br>${hours}h ${minutes}m ${seconds}s restantes no seu período de teste.`;
+            registrationMessage.innerHTML = `
+                <h2>Usuário cadastrado!</h2>
+                <p>Para realizar o login, verifique o seu e-mail.</p>
+                <p>Este é o seu temporizador do período grátis de 3 dias.</p>
+                <p>Ao esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
+                <p>Seu período de teste termina em: ${trialEndDate.toLocaleDateString()} às ${trialEndDate.toLocaleTimeString()}</p>
+                <br>${hours}h ${minutes}m ${seconds}s restantes no seu período de teste.
+                <br> <button id="closePopupButton">FECHAR</button>
+            `;
 
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
@@ -200,34 +208,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     };
 
-    // Manipular o clique no botão de recuperação de senha
-    resetPasswordButton.addEventListener('click', () => {
-        resetPasswordPopup.style.display = 'block';
-    });
-
-    closeResetPopup.addEventListener('click', () => {
-        resetPasswordPopup.style.display = 'none';
-    });
-
-    // Manipular recuperação de senha
-    document.getElementById('resetPasswordSubmit').addEventListener('click', async () => {
+    // Manipular o clique no botão de redefinição de senha
+    resetPasswordButton.addEventListener('click', async () => {
         const email = resetEmail.value;
 
-        if (email) {
+        if (email === '') {
+            resetError.style.display = 'block';
+            resetError.textContent = 'Por favor, insira seu e-mail.';
+        } else {
             try {
                 await sendPasswordResetEmail(auth, email);
-                resetError.textContent = 'Confira seu e-mail para instruções de recuperação de senha.';
+                resetError.style.display = 'none';
+                alert('Um link de redefinição de senha foi enviado para seu e-mail.');
+                resetPasswordPopup.style.display = 'none';
             } catch (error) {
+                resetError.style.display = 'block';
                 resetError.textContent = error.message;
             }
-        } else {
-            resetError.textContent = 'Por favor, insira seu e-mail.';
         }
     });
 
-    // Fechar o popup de pagamento
-    closePopupButton.addEventListener('click', () => {
-        redirectPopup.style.display = 'none';
-        window.location.href = 'https://botmillion.github.io/telm/';
+    // Fechar o popup de redefinição de senha
+    closeResetPopup.addEventListener('click', () => {
+        resetPasswordPopup.style.display = 'none';
     });
 });
