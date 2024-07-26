@@ -1,3 +1,4 @@
+/* Estilos gerais */
 body {
     font-family: 'Poppins', sans-serif;
     display: flex;
@@ -11,28 +12,28 @@ body {
 
 .wrap-login {
     width: 390px;
-    height: 70vh; /* Ajustado para preencher 70% da tela verticalmente */
+    height: 70vh;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
     text-align: center;
-    display: flex; /* Certifica-se de que a tela de login esteja visível */
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 70px; /* Aumentado para garantir visibilidade em dispositivos móveis */
+    margin-bottom: 70px;
 }
 
 /* Estilo ajustado para dispositivos móveis */
 @media (max-width: 600px) {
     .wrap-login {
-        margin-bottom: 100px; /* Aumentado para garantir visibilidade em dispositivos móveis */
-        padding: 20px 10px; /* Ajustado o padding para dispositivos móveis */
+        margin-bottom: 100px;
+        padding: 20px 10px;
     }
     .welcome-text {
-        font-size: 20px; /* Reduzido o tamanho da fonte para dispositivos móveis */
+        font-size: 20px;
     }
 }
 
@@ -40,14 +41,19 @@ body {
     width: 150px;
     margin-bottom: 20px;
     position: relative;
-    animation: rotateWithPause 5.5s linear infinite; /* Duração total do ciclo é 5.5 segundos (0.5s rotação + 5s pausa) */
+    animation: rotateWithPause 5.5s linear infinite;
 }
 
 /* Animação de rotação rápida */
 @keyframes rotateWithPause {
     0% { transform: rotate(0deg); }
     20% { transform: rotate(360deg); }
-    100% { transform: rotate(360deg); } /* A logo para após o giro */
+    100% { transform: rotate(360deg); }
+}
+
+/* Aplica a animação à logo */
+.logo {
+    animation: rotate 5s linear infinite;
 }
 
 /* Adiciona o efeito de brilho à logo */
@@ -69,7 +75,7 @@ body {
     font-size: 30px;
     font-family: 'Poppins', sans-serif;
     font-weight: bold;
-    color: #c8102e; /* Vermelho mais forte */
+    color: #c8102e;
     width: 280px;
     height: 62px;
     line-height: 62px;
@@ -94,7 +100,7 @@ body {
 
 .line input {
     border: none;
-    border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
+    border-bottom: 1px solid #c8102e;
     width: 100%;
     padding: 10px 0;
     font-size: 16px;
@@ -118,7 +124,7 @@ body {
     top: -20px;
     left: 0;
     font-size: 12px;
-    color: #c8102e; /* Vermelho mais forte */
+    color: #c8102e;
 }
 
 .line i {
@@ -128,7 +134,6 @@ body {
     cursor: pointer;
 }
 
-/* Estilos para os ícones de olho */
 .zmdi-eye, .zmdi-eye-off {
     cursor: pointer;
     font-size: 20px;
@@ -140,7 +145,7 @@ body {
 
 .custom-button {
     width: 100%;
-    background: #c8102e; /* Vermelho mais forte */
+    background: #c8102e;
     color: white;
     border: none;
     padding: 15px;
@@ -171,25 +176,25 @@ body {
 }
 
 .info-text a {
-    color: #c8102e; /* Vermelho mais forte */
+    color: #c8102e;
     text-decoration: none;
 }
 
 .popup {
-    display: none; /* Começa oculto */
-    position: fixed; /* Mudado para fixed para permanecer na tela */
+    display: none;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 80%;
-    max-width: 400px; /* Define uma largura máxima para o popup */
+    max-width: 400px;
     background: white;
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     text-align: center;
     z-index: 1000;
-    overflow: auto; /* Adiciona rolagem se o conteúdo for maior que o popup */
+    overflow: auto;
 }
 
 .popup.hidden {
@@ -204,11 +209,11 @@ body {
 .popup p {
     font-size: 16px;
     margin-bottom: 20px;
-    text-align: center; /* Centraliza a mensagem no popup */
+    text-align: center;
 }
 
 .popup .button {
-    background: #c8102e; /* Vermelho mais forte */
+    background: #c8102e;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -217,15 +222,14 @@ body {
     cursor: pointer;
 }
 
-/* Novo estilo para o formulário de redefinição de senha */
 #resetPasswordForm {
-    display: none; /* Começa oculto */
+    display: none;
     width: 100%;
 }
 
 #resetPasswordForm .form-title {
     font-size: 24px;
-    color: #c8102e; /* Vermelho mais forte */
+    color: #c8102e;
     margin-bottom: 20px;
 }
 
@@ -234,11 +238,11 @@ body {
 }
 
 #resetPasswordForm .line input {
-    border-bottom: 1px solid #c8102e; /* Vermelho mais forte */
+    border-bottom: 1px solid #c8102e;
 }
 
 #resetPasswordForm .custom-button {
-    background: #c8102e; /* Vermelho mais forte */
+    background: #c8102e;
 }
 
 #resetPasswordForm .info-text {
@@ -247,7 +251,7 @@ body {
 }
 
 #resetPasswordForm .info-text a {
-    color: #c8102e; /* Vermelho mais forte */
+    color: #c8102e;
     text-decoration: none;
 }
 
@@ -258,9 +262,8 @@ body {
     font-size: 14px;
 }
 
-/* Novos estilos para popups */
 #redirectPopup, #resetPasswordPopup {
-    display: none; /* Inicialmente oculto */
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -272,5 +275,24 @@ body {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     padding: 20px;
-    z-index: 1000; /* Garante que o popup fique acima de outros elementos */
+    z-index: 1000;
+}
+
+/* Adiciona estilo de carregamento */
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 6px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 6px solid #c8102e;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
