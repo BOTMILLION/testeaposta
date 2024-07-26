@@ -1,219 +1,352 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Bem-vindo ao Site</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
-        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
-        import { addDays, format } from 'https://cdn.jsdelivr.net/npm/date-fns@2.29.3/esm/index.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
-            authDomain: "projeto-notificacao-968d4.firebaseapp.com",
-            projectId: "projeto-notificacao-968d4",
-            storageBucket: "projeto-notificacao-968d4.appspot.com",
-            messagingSenderId: "236002612799",
-            appId: "1:236002612799:web:54719603091421b94aca8a"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth();
-        const db = getFirestore();
-
-        function displayTimeRemaining() {
-            const timerElement = document.getElementById('timer');
-            const user = auth.currentUser;
-
-            if (user) {
-                const userDocRef = doc(db, 'users', user.uid);
-                getDoc(userDocRef).then(docSnap => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        const expirationTime = data.expirationTime.toDate();
-                        const now = new Date();
-                        const timeRemaining = expirationTime - now;
-
-                        if (timeRemaining <= 0) {
-                            // Time expired
-                            alert('O tempo de uso gratuito expirou.');
-                            window.location.href = "redirecionar.html"; // Redirecionar ou exibir popup de pagamento
-                        } else {
-                            // Display timer
-                            timerElement.innerText = `Tempo restante: ${format(expirationTime, 'HH:mm:ss')}`;
-                        }
-                    }
-                });
-            }
-        }
-
-        function registerUser(email, password) {
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    const expirationTime = addDays(new Date(), 1); // Define o tempo de expiração para 24 horas
-
-                    setDoc(doc(db, 'users', user.uid), {
-                        expirationTime: expirationTime
-                    }).then(() => {
-                        alert('Cadastro realizado com sucesso!');
-                        displayTimeRemaining();
-                    });
-                })
-                .catch((error) => {
-                    alert(`Erro: ${error.message}`);
-                });
-        }
-
-        function loginUser(email, password) {
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    displayTimeRemaining();
-                })
-                .catch((error) => {
-                    alert(`Erro: ${error.message}`);
-                });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('loginForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const email = e.target.email.value;
-                const password = e.target.password.value;
-                loginUser(email, password);
-            });
-
-            document.getElementById('registerForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const email = e.target.email.value;
-                const password = e.target.password.value;
-                registerUser(email, password);
-            });
-
-            document.getElementById('closeRegisterPopup').addEventListener('click', () => {
-                document.getElementById('registerPopup').style.display = 'none';
-                document.getElementById('loginContainer').style.display = 'block';
-            });
-        });
-    </script>
-</head>
-<body>
-    <div id="loginContainer" class="container">
-        <h1>Login</h1>
-        <form id="loginForm">
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" required>
-            <label for="password">Senha:</label>
-            <input type="password" id="password" name="password" required>
-            <button type="submit">Entrar</button>
-            <button type="button" id="showRegisterPopup">Cadastrar-se</button>
-        </form>
-    </div>
-
-    <div id="registerPopup" class="popup">
-        <div class="popup-content">
-            <span id="closeRegisterPopup" class="close">&times;</span>
-            <h2>Cadastro</h2>
-            <form id="registerForm">
-                <label for="registerEmail">E-mail:</label>
-                <input type="email" id="registerEmail" name="email" required>
-                <label for="registerPassword">Senha:</label>
-                <input type="password" id="registerPassword" name="password" required>
-                <button type="submit">Cadastrar</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="timer" class="timer">Tempo restante: --:--:--</div>
-
     <style>
-        /* Estilos Globais */
+        /* Estilos para o body e container principal */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+            background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
+            background-size: cover;
             margin: 0;
             padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
 
-        .container {
-            max-width: 400px;
-            margin: 50px auto;
+        .wrap-login {
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
-            background: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            max-width: 400px;
+            width: 100%;
         }
 
-        form {
-            display: flex;
-            flex-direction: column;
+        .logo {
+            max-width: 100%;
+            height: auto;
         }
 
-        label {
-            margin: 10px 0 5px;
+        .welcome-text {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #333;
         }
 
-        input {
+        .form-login {
+            margin-top: 20px;
+        }
+
+        .line {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .line input {
+            width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
 
-        button {
-            padding: 10px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
+        .line label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .line input:focus + label,
+        .line input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #007bff;
+        }
+
+        .line i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
             cursor: pointer;
-            margin: 5px 0;
         }
 
-        button:hover {
-            background-color: #218838;
+        .custom-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .custom-button:hover {
+            background-color: #0056b3;
+        }
+
+        .pulse-button {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .info-text {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .info-text a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .info-text a:hover {
+            text-decoration: underline;
         }
 
         .popup {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .popup-content {
-            background: #fff;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
             padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
             border-radius: 8px;
-            position: relative;
-            width: 90%;
-            max-width: 400px;
+            text-align: center;
         }
 
-        .close {
-            position: absolute;
+        .popup h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+
+        .popup p {
+            margin: 10px 0;
+        }
+
+        .popup .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .popup .button:hover {
+            background-color: #0056b3;
+        }
+
+        #messages {
+            position: fixed;
             top: 10px;
             right: 10px;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .timer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
+            max-width: 300px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
         }
     </style>
+</head>
+<body>
+    <div class="wrap-login">
+        <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo" class="logo">
+        <div class="welcome-text">Bem Vindo</div>
+        <div class="form-login" id="loginForm">
+            <div class="line">
+                <input type="email" id="loginEmail" placeholder=" " required>
+                <label for="loginEmail">Seu Email</label>
+            </div>
+            <div class="line">
+                <input type="password" id="loginPassword" placeholder=" " required>
+                <label for="loginPassword">Sua Senha</label>
+                <i class="zmdi zmdi-eye" id="togglePassword"></i>
+            </div>
+            <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <button class="custom-button" id="loginButton">LOGIN</button>
+            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
+            <div class="info-text">
+                Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
+            </div>
+            <div class="info-text">
+                Esqueceu a senha? <a href="#" id="resetPasswordLink">Redefinir Senha</a>
+            </div>
+        </div>
+        <div class="form-login" id="registerForm" style="display: none;">
+            <div class="line">
+                <input type="text" id="registerName" placeholder=" " required>
+                <label for="registerName">Seu Nome</label>
+            </div>
+            <div class="line">
+                <input type="email" id="registerEmail" placeholder=" " required>
+                <label for="registerEmail">Seu Email</label>
+            </div>
+            <div class="line">
+                <input type="password" id="registerPassword" placeholder=" " required>
+                <label for="registerPassword">Sua Senha</label>
+                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
+            </div>
+            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
+            <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado. Verifique o seu email.</div>
+            <div id="trialStatus" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div>
+            <div id="subscriptionStatus" style="color: green; display: none; font-size: 16px; font-weight: bold;"></div>
+            <div id="registerTimer" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div>
+            <button class="custom-button" id="registerButton">CADASTRAR</button>
+            <div class="info-text">
+                Já tem uma conta? <a href="#" id="loginLink">Login</a>
+            </div>
+        </div>
+        <div class="form-login" id="resetPasswordForm" style="display: none;">
+            <div class="line">
+                <input type="email" id="resetEmail" placeholder=" " required>
+                <label for="resetEmail">Seu Email</label>
+            </div>
+            <div id="resetError" style="color: red; display: none;">Por favor, preencha o campo de email corretamente.</div>
+            <button class="custom-button" id="resetPasswordButton">ENVIAR EMAIL DE REDIFINIÇÃO</button>
+            <div class="info-text">
+                <a href="#" id="backToLoginFromReset">Voltar ao Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup de redirecionamento -->
+    <div id="redirectPopup" class="popup">
+        <h2>Você será redirecionado para o jogo</h2>
+        <p>Após o login, você será redirecionado para o jogo em 5 segundos.</p>
+        <button class="button" onclick="closePopup('redirectPopup')">OK</button>
+    </div>
+
+    <!-- Popup de pagamento -->
+    <div id="paymentPopup" class="popup">
+        <h2>Realizar Pagamento</h2>
+        <p>Para continuar usando os serviços após o período de teste, é necessário realizar o pagamento.</p>
+        <button class="button" onclick="window.location.href='https://checkout.yampi.com.br';">PAGAR AGORA</button>
+        <button class="button" onclick="closePopup('paymentPopup')">FECHAR</button>
+    </div>
+
+    <div id="messages"></div>
+
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('loginPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('registerPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+        });
+
+        document.getElementById('loginButton').addEventListener('click', function () {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            if (email && password) {
+                document.getElementById('redirectPopup').style.display = 'block';
+                setTimeout(function() {
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                }, 5000);
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        });
+
+        document.getElementById('registerButton').addEventListener('click', function () {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            if (email && password.length >= 6) {
+                document.getElementById('registerError').style.display = 'none';
+                document.getElementById('registerSuccess').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('trialStatus').style.display = 'block';
+                document.getElementById('subscriptionStatus').style.display = 'block';
+                document.getElementById('registerTimer').style.display = 'block';
+                // Simular a atualização do status de assinatura e o temporizador
+                document.getElementById('trialStatus').textContent = 'Seu período de teste começou!';
+                document.getElementById('subscriptionStatus').textContent = 'A assinatura está ativa!';
+                document.getElementById('registerTimer').textContent = 'Tempo restante para o teste: 30 minutos';
+            } else {
+                document.getElementById('registerError').style.display = 'block';
+            }
+        });
+
+        document.getElementById('resetPasswordButton').addEventListener('click', function () {
+            const email = document.getElementById('resetEmail').value;
+            if (email) {
+                document.getElementById('resetError').style.display = 'none';
+                alert('Instruções para redefinir a senha foram enviadas para o seu email.');
+            } else {
+                document.getElementById('resetError').style.display = 'block';
+            }
+        });
+
+        document.getElementById('loginLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+
+        document.getElementById('registerLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+
+        document.getElementById('resetPasswordLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'block';
+        });
+
+        document.getElementById('backToLoginFromReset').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('resetPasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+
+        function closePopup(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function showMessage(message) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.textContent = message;
+        }
+    </script>
 </body>
 </html>
