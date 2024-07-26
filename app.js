@@ -57,7 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (userSnapshot.exists()) {
                         const userData = userSnapshot.data();
-                        verificarStatusDeTesteOuPagamento(userData);
+                        if (verificarStatusDeTesteOuPagamento(userData)) {
+                            iniciarRedirecionamento(userData.trialEndDate || userData.subscriptionEndDate);
+                        } else {
+                            mostrarPopupPagamento();
+                        }
                     } else {
                         console.error('Dados do usuário não encontrados.');
                     }
@@ -72,48 +76,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Verificar status de teste ou pagamento
     const verificarStatusDeTesteOuPagamento = (userData) => {
+        const now = new Date();
         const trialEndDate = new Date(userData.trialEndDate);
         const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : null;
         const expirationDate = userData.expirationDate ? new Date(userData.expirationDate) : null;
-        const now = new Date();
 
         const isTrialValid = now <= trialEndDate;
         const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
         const isPaymentValid = expirationDate && now <= expirationDate;
 
         if (isTrialValid || isSubscriptionValid || isPaymentValid) {
-            if (isTrialValid) {
-                trialStatus.style.display = 'block';
-                trialStatus.textContent = `Seu período de teste vai até: ${trialEndDate.toLocaleDateString()} ${trialEndDate.toLocaleTimeString()}`;
-            } else {
-                trialStatus.style.display = 'none';
-            }
-
-            if (isSubscriptionValid) {
-                subscriptionStatus.style.display = 'block';
-                subscriptionStatus.textContent = `Sua assinatura é válida até: ${subscriptionEndDate.toLocaleDateString()} ${subscriptionEndDate.toLocaleTimeString()}`;
-            } else {
-                subscriptionStatus.style.display = 'none';
-            }
-
-            if (isTrialValid || isSubscriptionValid) {
-                iniciarRedirecionamento(isTrialValid ? trialEndDate : subscriptionEndDate);
-            } else {
-                trialStatus.style.display = 'none';
-                subscriptionStatus.style.display = 'none';
-                mostrarPopupPagamento();
-            }
+            return true;
         } else {
-            mostrarPopupPagamento();
+            return false;
         }
-    };
-
-    // Mostrar popup de pagamento
-    const mostrarPopupPagamento = () => {
-        paymentPopup.style.display = 'block';
-        paymentNowButton.addEventListener('click', () => {
-            window.location.href = 'https://yampi.com.br/';
-        });
     };
 
     // Iniciar redirecionamento após login
@@ -137,6 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         redirectNowButton.addEventListener('click', () => {
             window.location.href = 'https://botmillion.github.io/telm/';
+        });
+    };
+
+    // Mostrar popup de pagamento
+    const mostrarPopupPagamento = () => {
+        paymentPopup.style.display = 'block';
+        paymentNowButton.addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br/';
         });
     };
 
