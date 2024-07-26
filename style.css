@@ -50,11 +50,6 @@ body {
     100% { transform: rotate(360deg); } /* A logo para após o giro */
 }
 
-/* Aplica a animação à logo */
-.logo {
-    animation: rotate 5s linear infinite;
-}
-
 /* Adiciona o efeito de brilho à logo */
 .logo::before {
     content: '';
