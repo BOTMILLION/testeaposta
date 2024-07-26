@@ -51,10 +51,7 @@
     <div class="wrap-login">
         <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo" class="logo">
         <div class="welcome-text">Bem Vindo</div>
-        
-        <!-- Adicionando o elemento shine -->
         <div class="shine"></div>
-        <!-- Formulário de Login -->
         <div class="form-login" id="loginForm">
             <div class="line">
                 <input type="email" id="loginEmail" placeholder=" " required>
@@ -63,7 +60,7 @@
             <div class="line">
                 <input type="password" id="loginPassword" placeholder=" " required>
                 <label for="loginPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="togglePassword"></i> <!-- Ícone do olho -->
+                <i class="zmdi zmdi-eye" id="togglePassword"></i>
             </div>
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
@@ -75,7 +72,6 @@
                 Esqueceu a senha? <a href="#" id="resetPasswordLink">Redefinir Senha</a>
             </div>
         </div>
-        <!-- Formulário de Cadastro -->
         <div class="form-login" id="registerForm" style="display: none;">
             <div class="line">
                 <input type="text" id="registerName" placeholder=" " required>
@@ -88,19 +84,18 @@
             <div class="line">
                 <input type="password" id="registerPassword" placeholder=" " required>
                 <label for="registerPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i> <!-- Ícone do olho -->
+                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
             </div>
             <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
             <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado. Verifique o seu email.</div>
-            <div id="trialStatus" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Status do Período de Teste -->
-            <div id="subscriptionStatus" style="color: green; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Status da Assinatura -->
-            <div id="registerTimer" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Temporizador do período de teste -->
+            <div id="trialStatus" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div>
+            <div id="subscriptionStatus" style="color: green; display: none; font-size: 16px; font-weight: bold;"></div>
+            <div id="registerTimer" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
             </div>
         </div>
-        <!-- Formulário de Redefinição de Senha -->
         <div class="form-login" id="resetPasswordForm" style="display: none;">
             <div class="line">
                 <input type="email" id="resetEmail" placeholder=" " required>
@@ -112,13 +107,11 @@
                 <a href="#" id="backToLoginLink">Voltar para o Login</a>
             </div>
         </div>
-        <!-- Popup de Redirecionamento -->
         <div class="popup" id="redirectPopup">
             <h2>Login Bem-sucedido!</h2>
             <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
             <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
-        <!-- Popup de Cadastro -->
         <div class="popup" id="registerPopup">
             <h2>Usuário cadastrado!</h2>
             <p>Para realizar o login, verifique o seu email.</p>
@@ -127,14 +120,20 @@
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
-        <!-- Container de Mensagens -->
+        <div class="popup" id="subscriptionPopup">
+            <h2>Seu tempo expirou!</h2>
+            <p>O seu tempo para utilizar os nossos serviços terminou. Para continuar utilizando, realize o pagamento.</p>
+            <button class="button" id="payNowButton">REALIZAR PAGAMENTO</button>
+        </div>
         <div id="messages"></div>
     </div>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
-        
+        import { getTime, addDays } from 'date-fns';
+        import { ptBR } from 'date-fns/locale';
+
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
             authDomain: "projeto-notificacao-968d4.firebaseapp.com",
@@ -142,17 +141,66 @@
             storageBucket: "projeto-notificacao-968d4.appspot.com",
             messagingSenderId: "236002612799",
             appId: "1:236002612799:web:54719603091421b94aca8a",
-            measurementId: "G-KY69HG6ZNZ"
+            measurementId: "G-FP84YBD94F"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Função para iniciar o temporizador de contagem regressiva
+        function getBrazilianDate() {
+            return new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+        }
+
+        function updateTrialAndSubscriptionDates(userId) {
+            const trialEnd = addDays(new Date(), 3);
+            return updateDoc(doc(db, 'users', userId), {
+                trialEnd: trialEnd,
+                subscriptionEnd: null,
+                isPaid: false
+            });
+        }
+
+        async function checkUserStatus() {
+            const user = auth.currentUser;
+            if (user) {
+                const userDoc = doc(db, 'users', user.uid);
+                const userSnapshot = await getDoc(userDoc);
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    const now = new Date();
+                    const trialEnd = userData.trialEnd ? userData.trialEnd.toDate() : null;
+                    const subscriptionEnd = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
+
+                    if (now > trialEnd && now <= subscriptionEnd) {
+                        document.getElementById('trialStatus').style.display = 'none';
+                        document.getElementById('subscriptionStatus').style.display = 'block';
+                        document.getElementById('registerTimer').style.display = 'none';
+                        document.getElementById('registerPopup').style.display = 'none';
+                    } else if (now <= trialEnd) {
+                        document.getElementById('trialStatus').style.display = 'block';
+                        document.getElementById('subscriptionStatus').style.display = 'none';
+                        document.getElementById('registerTimer').style.display = 'block';
+                        document.getElementById('registerPopup').style.display = 'none';
+                        startCountdown((trialEnd - now) / 1000, 'registerTimer', 'https://botmillion.github.io/testeaposta/');
+                    } else {
+                        document.getElementById('trialStatus').style.display = 'none';
+                        document.getElementById('subscriptionStatus').style.display = 'none';
+                        document.getElementById('registerTimer').style.display = 'none';
+                        document.getElementById('registerPopup').style.display = 'none';
+                        document.getElementById('subscriptionPopup').style.display = 'block';
+                        document.getElementById('payNowButton').addEventListener('click', () => {
+                            window.location.href = 'https://yampi.com.br/checkout'; // Substitua pela URL do checkout
+                        });
+                    }
+                }
+            }
+        }
+
         function startCountdown(duration, displayElementId, redirectUrl) {
             const endTime = Date.now() + duration * 1000;
-
             localStorage.setItem('endTime', endTime);
+
             function updateTimer() {
                 const now = Date.now();
                 let remainingTime = Math.floor((endTime - now) / 1000);
@@ -177,21 +225,10 @@
             const timerInterval = setInterval(updateTimer, 1000);
         }
 
-        window.addEventListener('load', () => {
-            const endTime = localStorage.getItem('endTime');
-            console.log('endTime:', endTime); // Adicione isso para depuração
-            if (endTime) {
-                const remainingTime = endTime - Date.now();
-                console.log('remainingTime:', remainingTime); // Adicione isso para depuração
-                if (remainingTime > 0) {
-                    startCountdown(Math.floor(remainingTime / 1000), 'registerTimer', 'https://botmillion.github.io/testeaposta/');
-                } else {
-                    document.getElementById('registerTimer').textContent = 'Seu período de teste expirou. Realize o pagamento para continuar.';
-                }
-            }
+        window.addEventListener('load', async () => {
+            await checkUserStatus();
         });
 
-        // Eventos de clique e manipulação de formulários
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -250,7 +287,7 @@
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     await sendEmailVerification(userCredential.user);
                     document.getElementById('registerPopup').style.display = 'block';
-                    // Inicie o temporizador do período grátis aqui
+                    await updateTrialAndSubscriptionDates(userCredential.user.uid);
                     const duration = 3 * 24 * 3600; // 3 dias em segundos
                     startCountdown(duration, 'registerTimer', 'https://botmillion.github.io/testeaposta/');
                 } catch (error) {
@@ -282,7 +319,10 @@
             document.getElementById('registerPopup').style.display = 'none';
         });
 
-        // Manipulação do WebSocket
+        document.getElementById('payNowButton').addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br/checkout'; // Substitua pela URL do checkout
+        });
+
         const socket = new WebSocket('ws://localhost:3000'); // Substitua pela URL do seu WebSocket
         socket.onopen = () => {
             console.log('Conectado ao WebSocket');
@@ -296,7 +336,6 @@
             console.log('Desconectado do WebSocket');
         };
 
-        // Manipulação do botão de senha
         document.getElementById('togglePassword').addEventListener('click', () => {
             const passwordField = document.getElementById('loginPassword');
             const type = passwordField.type === 'password' ? 'text' : 'password';
