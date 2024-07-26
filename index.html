@@ -98,9 +98,8 @@
     </div>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
-
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
             authDomain: "projeto-notificacao-968d4.firebaseapp.com",
@@ -110,7 +109,6 @@
             appId: "1:236002612799:web:54719603091421b94aca8a",
             measurementId: "G-KY69HG6ZNZ"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -119,22 +117,18 @@
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'flex';
         });
-
         document.getElementById('loginLink').addEventListener('click', function() {
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'flex';
         });
-
         document.getElementById('resetPasswordLink').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('resetPasswordForm').style.display = 'flex';
         });
-
         document.getElementById('backToLoginLink').addEventListener('click', function() {
             document.getElementById('resetPasswordForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'flex';
         });
-
         document.getElementById('loginButton').addEventListener('click', async function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -146,48 +140,52 @@
                     document.getElementById('redirectPopup').style.display = 'flex';
                     startRedirectTimer();
                 } catch (error) {
-                    errorDiv.innerText = 'Credenciais inválidas.';
+                    errorDiv.textContent = 'Erro ao fazer login. Verifique suas credenciais.';
                     errorDiv.style.display = 'block';
                 }
             } else {
-                errorDiv.innerText = 'Por favor, preencha todos os campos.';
+                errorDiv.textContent = 'Por favor, preencha todos os campos.';
                 errorDiv.style.display = 'block';
             }
         });
-
         document.getElementById('registerButton').addEventListener('click', async function() {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             const errorDiv = document.getElementById('registerError');
             const successDiv = document.getElementById('registerSuccess');
+            const trialStatusDiv = document.getElementById('trialStatus');
+            const registerPopup = document.getElementById('registerPopup');
+            const registerTimerDiv = document.getElementById('registerTimer');
+            const trialPeriod = 3 * 24 * 60 * 60 * 1000; // 3 dias em milissegundos
+            const now = new Date().getTime();
+            const expirationTime = now + trialPeriod;
 
             if (name && email && password.length >= 6) {
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-
-                    await sendEmailVerification(user);
-
-                    await setDoc(doc(db, 'users', user.uid), {
+                    await sendEmailVerification(userCredential.user);
+                    await setDoc(doc(db, "users", userCredential.user.uid), {
                         name: name,
                         email: email,
-                        createdAt: new Date()
+                        registrationDate: new Date(),
+                        trialExpiration: expirationTime
                     });
-
-                    document.getElementById('registerForm').style.display = 'none';
-                    document.getElementById('registerPopup').style.display = 'flex';
-                    startRegisterTimer();
+                    successDiv.style.display = 'block';
+                    errorDiv.style.display = 'none';
+                    registerPopup.style.display = 'flex';
+                    updateTrialTimer();
                 } catch (error) {
-                    errorDiv.innerText = 'Erro ao cadastrar. Verifique as informações e tente novamente.';
+                    errorDiv.textContent = 'Erro ao criar conta. Tente novamente.';
                     errorDiv.style.display = 'block';
+                    successDiv.style.display = 'none';
                 }
             } else {
-                errorDiv.innerText = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
+                errorDiv.textContent = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
                 errorDiv.style.display = 'block';
+                successDiv.style.display = 'none';
             }
         });
-
         document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
             const errorDiv = document.getElementById('resetError');
@@ -195,76 +193,76 @@
             if (email) {
                 try {
                     await sendPasswordResetEmail(auth, email);
-                    document.getElementById('resetPasswordForm').style.display = 'none';
-                    document.getElementById('loginForm').style.display = 'flex';
-                    alert('Email de redefinição enviado. Verifique sua caixa de entrada.');
+                    alert('Email de redefinição de senha enviado.');
                 } catch (error) {
-                    errorDiv.innerText = 'Erro ao enviar o email de redefinição. Verifique o email e tente novamente.';
+                    errorDiv.textContent = 'Erro ao enviar email de redefinição. Verifique o email.';
                     errorDiv.style.display = 'block';
                 }
             } else {
-                errorDiv.innerText = 'Por favor, preencha o campo de email corretamente.';
+                errorDiv.textContent = 'Por favor, preencha o campo de email corretamente.';
                 errorDiv.style.display = 'block';
             }
-        });
-
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Redireciona para o jogo
         });
 
         document.getElementById('closeRegisterPopup').addEventListener('click', function() {
             document.getElementById('registerPopup').style.display = 'none';
         });
 
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = 'https://seubet.com'; // Substitua com o URL do jogo
+        });
+
+        document.getElementById('paymentButton').addEventListener('click', function() {
+            window.location.href = 'https://checkout.yampi.com.br'; // Substitua com o URL do Yampi checkout
+        });
+
         function startRedirectTimer() {
-            let timeLeft = 5;
+            let time = 5;
             const timerElement = document.getElementById('redirectTimer');
-            const interval = setInterval(() => {
-                if (timeLeft <= 0) {
+            const interval = setInterval(function() {
+                if (time <= 0) {
                     clearInterval(interval);
-                    document.getElementById('redirectNowButton').click();
+                    window.location.href = 'https://seubet.com'; // Substitua com o URL do jogo
                 } else {
-                    timerElement.textContent = timeLeft;
+                    timerElement.textContent = time;
+                    time--;
                 }
-                timeLeft -= 1;
             }, 1000);
         }
 
-        function startRegisterTimer() {
-            const threeDaysInMilliseconds = 3 * 24 * 60 * 60 * 1000; // 3 dias
-            let endTime = new Date().getTime() + threeDaysInMilliseconds;
-            const timerElement = document.getElementById('registerTimer');
-
-            const updateTimer = () => {
-                const now = new Date().getTime();
-                const timeLeft = endTime - now;
-                
-                if (timeLeft <= 0) {
-                    timerElement.textContent = 'O período de teste terminou. Realize o pagamento para continuar.';
-                    clearInterval(timerInterval);
-                } else {
-                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                    timerElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-                }
-            };
-
-            const timerInterval = setInterval(updateTimer, 1000);
-            updateTimer();
+        function updateTrialTimer() {
+            const trialCountdownDiv = document.getElementById('registerTimer');
+            const now = new Date().getTime();
+            const trialEndDate = new Date(now + (3 * 24 * 60 * 60 * 1000)).toLocaleString();
+            trialCountdownDiv.textContent = `Seu período de teste termina em: ${trialEndDate}`;
         }
 
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
+            const icon = document.getElementById('togglePassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('zmdi-eye');
+                icon.classList.add('zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('zmdi-eye-off');
+                icon.classList.add('zmdi-eye');
+            }
         });
 
         document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
             const passwordField = document.getElementById('registerPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
+            const icon = document.getElementById('toggleRegisterPassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('zmdi-eye');
+                icon.classList.add('zmdi-eye-off');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('zmdi-eye-off');
+                icon.classList.add('zmdi-eye');
+            }
         });
     </script>
 </body>
