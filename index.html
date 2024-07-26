@@ -23,9 +23,9 @@
 
         .wrap-login {
             background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
             text-align: center;
             max-width: 400px;
             width: 100%;
@@ -37,32 +37,39 @@
         }
 
         .welcome-text {
-            font-size: 24px;
+            font-size: 28px;
             margin: 20px 0;
             color: #333;
         }
 
-        .form-login {
+        .form-login, .form-register, .form-reset {
             margin-top: 20px;
         }
 
         .line {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .line input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             box-sizing: border-box;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .line input:focus {
+            border-color: #007bff;
+            outline: none;
         }
 
         .line label {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 14px;
+            left: 15px;
             color: #666;
             transition: all 0.3s ease;
         }
@@ -70,14 +77,14 @@
         .line input:focus + label,
         .line input:not(:placeholder-shown) + label {
             top: -10px;
-            left: 10px;
+            left: 15px;
             font-size: 12px;
             color: #007bff;
         }
 
         .line i {
             position: absolute;
-            right: 10px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
@@ -86,12 +93,13 @@
         .custom-button {
             background-color: #007bff;
             color: white;
-            padding: 10px 20px;
+            padding: 15px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             margin: 10px 0;
+            transition: background-color 0.3s ease;
         }
 
         .custom-button:hover {
@@ -118,8 +126,8 @@
         }
 
         .info-text {
-            font-size: 14px;
-            margin-top: 10px;
+            font-size: 16px;
+            margin-top: 15px;
         }
 
         .info-text a {
@@ -138,30 +146,37 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
             z-index: 1000;
-            border-radius: 8px;
+            border-radius: 10px;
             text-align: center;
+            width: 80%;
+            max-width: 400px;
         }
 
         .popup h2 {
-            margin: 0 0 10px;
-            font-size: 18px;
+            margin: 0 0 15px;
+            font-size: 20px;
+            color: #333;
         }
 
         .popup p {
             margin: 10px 0;
+            font-size: 16px;
+            color: #555;
         }
 
         .popup .button {
             margin-top: 20px;
-            padding: 10px 20px;
+            padding: 12px 25px;
             border: none;
             background-color: #007bff;
             color: white;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
 
         .popup .button:hover {
@@ -170,14 +185,15 @@
 
         #messages {
             position: fixed;
-            top: 10px;
-            right: 10px;
+            top: 20px;
+            right: 20px;
             max-width: 300px;
             background-color: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 8px;
             z-index: 1000;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -205,7 +221,7 @@
                 Esqueceu a senha? <a href="#" id="resetPasswordLink">Redefinir Senha</a>
             </div>
         </div>
-        <div class="form-login" id="registerForm" style="display: none;">
+        <div class="form-register" id="registerForm" style="display: none;">
             <div class="line">
                 <input type="text" id="registerName" placeholder=" " required>
                 <label for="registerName">Seu Nome</label>
@@ -229,13 +245,13 @@
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
             </div>
         </div>
-        <div class="form-login" id="resetPasswordForm" style="display: none;">
+        <div class="form-reset" id="resetPasswordForm" style="display: none;">
             <div class="line">
                 <input type="email" id="resetEmail" placeholder=" " required>
                 <label for="resetEmail">Seu Email</label>
             </div>
-            <div id="resetError" style="color: red; display: none;">Por favor, preencha o campo de email corretamente.</div>
-            <button class="custom-button" id="resetPasswordButton">ENVIAR EMAIL DE REDIFINIÇÃO</button>
+            <div id="resetError" style="color: red; display: none;">Por favor, informe o seu email.</div>
+            <button class="custom-button" id="resetPasswordButton">REDIFINIR SENHA</button>
             <div class="info-text">
                 <a href="#" id="backToLoginFromReset">Voltar ao Login</a>
             </div>
