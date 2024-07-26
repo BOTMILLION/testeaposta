@@ -84,17 +84,15 @@
         </div>
         <!-- Popup de Cadastro -->
         <div class="popup" id="registerPopup" style="display: none;">
+<div class="popup" id="redirectPopup">
             <h2>Usuário cadastrado!</h2>
-            <p id="registerPopupMessage" style="text-align: center; font-size: 16px;">
-                Para realizar o login, verifique o seu email. 
-                <br> 
-                Este é o seu temporizador de 3 dias. 
-                <br> 
-                Após o período, realize o pagamento para continuar utilizando nossos serviços.
-            </p>
+            <p>Para realizar o login, verifique o seu email.</p>
+            <p>Este é o seu temporizador do período gratis de 3 dias.</p>
+            <p> Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
-            <button class="button" id="closeRegisterPopup">Fechar</button>
+            <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
+     
     </div>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
