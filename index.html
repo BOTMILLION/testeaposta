@@ -139,30 +139,37 @@
 
         // Função para iniciar o temporizador de contagem regressiva
         function startCountdown(duration, displayElementId, redirectUrl) {
-            let timer = duration, minutes, seconds;
-            const display = document.getElementById(displayElementId);
-            localStorage.setItem('endTime', Date.now() + duration * 1000); // Salva o tempo final no localStorage
+            const endTime = Date.now() + duration * 1000;
+            localStorage.setItem('endTime', endTime); // Salva o tempo final no localStorage
 
-            const countdown = setInterval(() => {
+            function updateTimer() {
                 let now = Date.now();
-                let remainingTime = Math.max(0, Math.floor((localStorage.getItem('endTime') - now) / 1000));
-                minutes = Math.floor(remainingTime / 60);
-                seconds = remainingTime % 60;
-                display.textContent = `${minutes} minutos ${seconds} segundos`;
+                let remainingTime = Math.max(0, Math.floor((endTime - now) / 1000));
+                let hours = Math.floor(remainingTime / 3600);
+                let minutes = Math.floor((remainingTime % 3600) / 60);
+                let seconds = remainingTime % 60;
+                const display = document.getElementById(displayElementId);
+                display.textContent = `${hours}hrs : ${minutes}min : ${seconds}seg`;
                 if (remainingTime <= 0) {
                     clearInterval(countdown);
                     window.location.href = redirectUrl;
                 }
-            }, 1000);
+            }
+
+            updateTimer(); // Atualiza o temporizador imediatamente
+            const countdown = setInterval(updateTimer, 1000);
         }
 
         // Verifica se há um temporizador em andamento ao carregar a página
         window.addEventListener('load', () => {
-            const remainingTime = localStorage.getItem('endTime') - Date.now();
-            if (remainingTime > 0) {
-                startCountdown(Math.floor(remainingTime / 1000), 'registerTimer', 'https://botmillion.github.io/testeaposta/');
-            } else {
-                document.getElementById('registerTimer').textContent = 'Seu período de teste expirou. Realize o pagamento para continuar.';
+            const endTime = localStorage.getItem('endTime');
+            if (endTime) {
+                const remainingTime = endTime - Date.now();
+                if (remainingTime > 0) {
+                    startCountdown(Math.floor(remainingTime / 1000), 'registerTimer', 'https://botmillion.github.io/testeaposta/');
+                } else {
+                    document.getElementById('registerTimer').textContent = 'Seu período de teste expirou. Realize o pagamento para continuar.';
+                }
             }
         });
 
