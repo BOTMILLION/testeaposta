@@ -140,7 +140,7 @@
                     document.getElementById('redirectPopup').style.display = 'flex';
                     startRedirectTimer();
                 } catch (error) {
-                    errorDiv.textContent = 'Erro ao fazer login. Verifique suas credenciais.';
+                    errorDiv.textContent = 'Credenciais inválidas.';
                     errorDiv.style.display = 'block';
                 }
             } else {
@@ -148,44 +148,37 @@
                 errorDiv.style.display = 'block';
             }
         });
+
         document.getElementById('registerButton').addEventListener('click', async function() {
-            const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName').value;
             const errorDiv = document.getElementById('registerError');
             const successDiv = document.getElementById('registerSuccess');
-            const trialStatusDiv = document.getElementById('trialStatus');
-            const registerPopup = document.getElementById('registerPopup');
-            const registerTimerDiv = document.getElementById('registerTimer');
-            const trialPeriod = 3 * 24 * 60 * 60 * 1000; // 3 dias em milissegundos
-            const now = new Date().getTime();
-            const expirationTime = now + trialPeriod;
 
-            if (name && email && password.length >= 6) {
+            if (email && password.length >= 6 && name) {
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await sendEmailVerification(userCredential.user);
-                    await setDoc(doc(db, "users", userCredential.user.uid), {
+                    const user = userCredential.user;
+                    await sendEmailVerification(user);
+                    await setDoc(doc(db, 'users', user.uid), {
                         name: name,
                         email: email,
-                        registrationDate: new Date(),
-                        trialExpiration: expirationTime
+                        createdAt: new Date(),
                     });
-                    successDiv.style.display = 'block';
-                    errorDiv.style.display = 'none';
-                    registerPopup.style.display = 'flex';
-                    updateTrialTimer();
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('registerPopup').style.display = 'flex';
+                    startRegisterTimer(user.uid);
                 } catch (error) {
-                    errorDiv.textContent = 'Erro ao criar conta. Tente novamente.';
+                    errorDiv.textContent = 'Erro ao cadastrar. Tente novamente.';
                     errorDiv.style.display = 'block';
-                    successDiv.style.display = 'none';
                 }
             } else {
                 errorDiv.textContent = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
                 errorDiv.style.display = 'block';
-                successDiv.style.display = 'none';
             }
         });
+
         document.getElementById('resetPasswordButton').addEventListener('click', async function() {
             const email = document.getElementById('resetEmail').value;
             const errorDiv = document.getElementById('resetError');
@@ -193,77 +186,264 @@
             if (email) {
                 try {
                     await sendPasswordResetEmail(auth, email);
-                    alert('Email de redefinição de senha enviado.');
+                    alert('Email de redefinição enviado.');
+                    document.getElementById('resetPasswordForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'flex';
                 } catch (error) {
-                    errorDiv.textContent = 'Erro ao enviar email de redefinição. Verifique o email.';
+                    errorDiv.textContent = 'Erro ao enviar email de redefinição.';
                     errorDiv.style.display = 'block';
                 }
             } else {
-                errorDiv.textContent = 'Por favor, preencha o campo de email corretamente.';
+                errorDiv.textContent = 'Por favor, preencha o campo de email.';
                 errorDiv.style.display = 'block';
             }
         });
 
-        document.getElementById('closeRegisterPopup').addEventListener('click', function() {
-            document.getElementById('registerPopup').style.display = 'none';
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('loginPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.classList.toggle('zmdi-eye-off');
         });
 
-        document.getElementById('redirectNowButton').addEventListener('click', function() {
-            window.location.href = 'https://seubet.com'; // Substitua com o URL do jogo
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('registerPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.classList.toggle('zmdi-eye-off');
         });
 
         document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://checkout.yampi.com.br'; // Substitua com o URL do Yampi checkout
+            window.location.href = 'https://checkout.yampi.com.br/';
+        });
+
+        document.getElementById('redirectNowButton').addEventListener('click', function() {
+            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+        });
+
+        document.getElementById('closeRegisterPopup').addEventListener('click', function() {
+            document.getElementById('registerPopup').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'flex';
         });
 
         function startRedirectTimer() {
-            let time = 5;
+            let timeLeft = 5;
             const timerElement = document.getElementById('redirectTimer');
             const interval = setInterval(function() {
-                if (time <= 0) {
+                if (timeLeft <= 0) {
                     clearInterval(interval);
-                    window.location.href = 'https://seubet.com'; // Substitua com o URL do jogo
+                    timerElement.textContent = '0';
+                    document.getElementById('redirectNowButton').click();
                 } else {
-                    timerElement.textContent = time;
-                    time--;
+                    timerElement.textContent = timeLeft;
+                    timeLeft -= 1;
                 }
             }, 1000);
         }
 
-        function updateTrialTimer() {
-            const trialCountdownDiv = document.getElementById('registerTimer');
-            const now = new Date().getTime();
-            const trialEndDate = new Date(now + (3 * 24 * 60 * 60 * 1000)).toLocaleString();
-            trialCountdownDiv.textContent = `Seu período de teste termina em: ${trialEndDate}`;
+        function startRegisterTimer(userId) {
+            const trialDays = 3; // Número de dias do período de teste
+            const trialEndDate = new Date();
+            trialEndDate.setDate(trialEndDate.getDate() + trialDays);
+            const trialStatusDiv = document.getElementById('trialStatus');
+            const registerTimer = document.getElementById('registerTimer');
+
+            async function updateTrialStatus() {
+                const userDoc = doc(db, 'users', userId);
+                const docSnap = await getDoc(userDoc);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const createdAt = data.createdAt.toDate();
+                    const daysPassed = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+                    if (daysPassed < trialDays) {
+                        trialStatusDiv.textContent = `Seu período de teste vai até ${trialEndDate.toLocaleDateString()}.`;
+                        registerTimer.textContent = `${trialDays - daysPassed} dias restantes`;
+                    } else {
+                        trialStatusDiv.textContent = 'Seu período de teste expirou. Realize o pagamento para continuar utilizando nossos serviços.';
+                        registerTimer.textContent = 'Período de teste expirado';
+                    }
+                }
+            }
+
+            updateTrialStatus();
+
+            setInterval(updateTrialStatus, 60000); // Atualiza a cada minuto
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
 
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('loginPassword');
-            const icon = document.getElementById('togglePassword');
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.remove('zmdi-eye');
-                icon.classList.add('zmdi-eye-off');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('zmdi-eye-off');
-                icon.classList.add('zmdi-eye');
-            }
-        });
+        .wrap-login {
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            text-align: center;
+        }
 
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
-            const passwordField = document.getElementById('registerPassword');
-            const icon = document.getElementById('toggleRegisterPassword');
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.remove('zmdi-eye');
-                icon.classList.add('zmdi-eye-off');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('zmdi-eye-off');
-                icon.classList.add('zmdi-eye');
+        .logo {
+            max-width: 150px;
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+
+        .form-login {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .line {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px;
+            pointer-events: none;
+            transition: 0.2s;
+        }
+
+        input:focus + label, input:not(:placeholder-shown) + label {
+            top: -20px;
+            left: 0;
+            font-size: 12px;
+            color: #007bff;
+        }
+
+        .zmdi-eye {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        .custom-button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .custom-button:hover {
+            background: #0056b3;
+        }
+
+        .pulse-button {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
             }
-        });
-    </script>
+            50% {
+                transform: scale(1.05);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .info-text {
+            font-size: 14px;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .popup .button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .popup .button:hover {
+            background: #0056b3;
+        }
+
+        .shine {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            display: none;
+        }
+
+        .success {
+            color: green;
+            font-size: 12px;
+            display: none;
+        }
+    </style>
 </body>
 </html>
