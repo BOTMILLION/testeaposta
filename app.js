@@ -223,8 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Fechar pop-up de redirecionamento
+    // Fechar o popup de pagamento
     closePopupButton.addEventListener('click', () => {
         redirectPopup.style.display = 'none';
+        window.location.href = 'https://botmillion.github.io/telm/';
     });
 });
