@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Referência aos elementos do DOM
+    // Referências aos elementos do DOM
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
     const loginLink = document.getElementById('loginLink');
@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginButton.addEventListener('click', async () => {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
+
         if (password.length < 6) {
             mostrarErro('loginError', 'A senha deve ter pelo menos 6 caracteres.');
         } else {
@@ -47,11 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Recarregar o status do usuário
                 await user.reload();
-                
+
                 if (user.emailVerified) {
                     const userDoc = doc(db, 'users', user.uid);
                     const userSnapshot = await getDoc(userDoc);
-                    
+
                     if (userSnapshot.exists()) {
                         processarLogin(userSnapshot.data());
                     } else {
@@ -106,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const iniciarRedirecionamento = (endDate) => {
         loginForm.style.display = 'none';
         redirectPopup.style.display = 'block';
+
         let countdown = Math.ceil((endDate - new Date()) / 1000);
         const countdownInterval = setInterval(() => {
             countdown -= 1;
@@ -113,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const minutes = Math.floor((countdown % 3600) / 60);
             const seconds = countdown % 60;
             redirectTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
+
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
                 window.location.href = 'https://botmillion.github.io/telm/';
@@ -136,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = document.getElementById('registerName').value;
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
+
         if (name === '' || email === '' || password === '' || password.length < 6) {
             mostrarErro('registerError', 'Por favor, preencha todos os campos corretamente.');
         } else {
@@ -185,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const minutes = Math.floor((countdown % 3600) / 60);
             const seconds = countdown % 60;
             registrationMessage.innerHTML += `<br>${hours}h ${minutes}m ${seconds}s restantes no seu período de teste.`;
+
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
                 registrationMessage.innerHTML += '<br>Seu período de teste expirou.';
@@ -204,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Manipular recuperação de senha
     document.getElementById('resetPasswordSubmit').addEventListener('click', async () => {
         const email = resetEmail.value;
+
         if (email) {
             try {
                 await sendPasswordResetEmail(auth, email);
@@ -217,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Fechar popups
+    // Fechar pop-up de redirecionamento
     closePopupButton.addEventListener('click', () => {
         redirectPopup.style.display = 'none';
     });
