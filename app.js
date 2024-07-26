@@ -18,7 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetError = document.getElementById('resetError');
     const closeResetPopup = document.getElementById('closeResetPopup');
     const subscriptionStatus = document.getElementById('subscriptionStatus');
-    const closePopupButton = document.getElementById('closePopup');
+    const closePopupButton = document.getElementById('closePopupButton');
+    const paymentPopup = document.getElementById('paymentPopup');
+    const paymentNowButton = document.getElementById('paymentNowButton');
 
     // Mostrar o formulário de cadastro
     registerLink.addEventListener('click', (event) => {
@@ -54,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const userSnapshot = await getDoc(userDoc);
 
                     if (userSnapshot.exists()) {
-                        processarLogin(userSnapshot.data());
+                        const userData = userSnapshot.data();
+                        verificarStatusDeTesteOuPagamento(userData);
                     } else {
                         console.error('Dados do usuário não encontrados.');
                     }
@@ -67,39 +70,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Processar dados de login
-    const processarLogin = (userData) => {
+    // Verificar status de teste ou pagamento
+    const verificarStatusDeTesteOuPagamento = (userData) => {
         const trialEndDate = new Date(userData.trialEndDate);
         const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : null;
+        const expirationDate = userData.expirationDate ? new Date(userData.expirationDate) : null;
         const now = new Date();
 
         const isTrialValid = now <= trialEndDate;
         const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
+        const isPaymentValid = expirationDate && now <= expirationDate;
 
-        if (isTrialValid) {
-            trialStatus.style.display = 'block';
-            trialStatus.textContent = `Seu período de teste vai até: ${trialEndDate.toLocaleDateString()} ${trialEndDate.toLocaleTimeString()}`;
-        } else {
-            trialStatus.style.display = 'none';
-        }
+        if (isTrialValid || isSubscriptionValid || isPaymentValid) {
+            if (isTrialValid) {
+                trialStatus.style.display = 'block';
+                trialStatus.textContent = `Seu período de teste vai até: ${trialEndDate.toLocaleDateString()} ${trialEndDate.toLocaleTimeString()}`;
+            } else {
+                trialStatus.style.display = 'none';
+            }
 
-        if (isSubscriptionValid) {
-            subscriptionStatus.style.display = 'block';
-            subscriptionStatus.textContent = `Sua assinatura é válida até: ${subscriptionEndDate.toLocaleDateString()} ${subscriptionEndDate.toLocaleTimeString()}`;
-        } else {
-            subscriptionStatus.style.display = 'none';
-        }
+            if (isSubscriptionValid) {
+                subscriptionStatus.style.display = 'block';
+                subscriptionStatus.textContent = `Sua assinatura é válida até: ${subscriptionEndDate.toLocaleDateString()} ${subscriptionEndDate.toLocaleTimeString()}`;
+            } else {
+                subscriptionStatus.style.display = 'none';
+            }
 
-        if (isTrialValid || isSubscriptionValid) {
-            iniciarRedirecionamento(isTrialValid ? trialEndDate : subscriptionEndDate);
+            if (isTrialValid || isSubscriptionValid) {
+                iniciarRedirecionamento(isTrialValid ? trialEndDate : subscriptionEndDate);
+            } else {
+                trialStatus.style.display = 'none';
+                subscriptionStatus.style.display = 'none';
+                mostrarPopupPagamento();
+            }
         } else {
-            trialStatus.style.display = 'block';
-            trialStatus.textContent = 'Seu período de teste expirou. Por favor, faça o pagamento para continuar.';
-            paymentButton.style.display = 'block';
-            paymentButton.addEventListener('click', () => {
-                window.location.href = 'https://yampi.com.br/';
-            });
+            mostrarPopupPagamento();
         }
+    };
+
+    // Mostrar popup de pagamento
+    const mostrarPopupPagamento = () => {
+        paymentPopup.style.display = 'block';
+        paymentNowButton.addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br/';
+        });
     };
 
     // Iniciar redirecionamento após login
@@ -154,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     trialStartDate: trialStartDate.toISOString(),
                     trialEndDate: trialEndDate.toISOString(),
                     subscriptionEndDate: null,
+                    expirationDate: null,
                     paymentStatus: 'unpaid' // Define status de pagamento como não pago
                 });
 
@@ -197,13 +212,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Este é o seu temporizador do período grátis de 3 dias.</p>
                 <p>Ao esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
                 <p>Seu período de teste termina em: ${trialEndDate.toLocaleDateString()} às ${trialEndDate.toLocaleTimeString()}</p>
-                <br>${hours}h ${minutes}m ${seconds}s restantes no seu período de teste.
-                <br> <button id="closePopupButton">FECHAR</button>
+                <p>Tempo restante: ${hours}h ${minutes}m ${seconds}s</p>
+                <button id="closePopupButton">FECHAR</button>
             `;
 
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
-                registrationMessage.innerHTML += '<br>Seu período de teste expirou.';
             }
         }, 1000);
     };
