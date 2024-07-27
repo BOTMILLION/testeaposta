@@ -8,13 +8,15 @@ import {
     doc, 
     setDoc, 
     getDoc, 
-    Timestamp 
+    Timestamp, 
+    updateDoc 
 } from './firebase'; // Ajuste o caminho conforme necessário
 
 import { formatDistanceToNow, addDays } from 'date-fns'; // Importando date-fns
 
 const REDIRECT_URL = 'https://botmillion.github.io/telm/';
 const PAYMENT_URL = 'https://yampi.com.br/';
+const HOME_URL = 'https://botmillion.github.io/testeaposta/';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Referências aos elementos do DOM
@@ -99,10 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Verificar status de teste ou pagamento
         const checkTrialOrSubscriptionStatus = (userData) => {
             const now = new Date();
-            const trialEndDate = new Date(userData.trialEndDate);
-            const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate) : null;
+            const trialEndDate = userData.trialEndDate ? new Date(userData.trialEndDate.toDate()) : null;
+            const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate.toDate()) : null;
 
-            const isTrialValid = now <= trialEndDate;
+            const isTrialValid = trialEndDate && now <= trialEndDate;
             const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
 
             return isTrialValid || isSubscriptionValid;
@@ -169,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         trialStartDate: Timestamp.fromDate(trialStartDate),
                         trialEndDate: Timestamp.fromDate(trialEndDate),
                         subscriptionEndDate: null,
-                        expirationDate: null,
                         paymentStatus: 'unpaid' // Define status de pagamento como não pago
                     });
 
@@ -198,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             document.getElementById('closePopupButton').addEventListener('click', () => {
-                registrationMessage.style.display = 'none';
+                window.location.href = HOME_URL;
             });
 
             startRedirect(trialEndDate);
@@ -216,8 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     await sendPasswordResetEmail(auth, email);
                     resetError.textContent = '';
-                    alert('Um e-mail de redefinição de senha foi enviado.');
                     resetPasswordPopup.style.display = 'none';
+                    alert('Enviamos um e-mail para redefinir a senha.');
                 } catch (error) {
                     resetError.textContent = error.message;
                 }
@@ -229,17 +230,17 @@ document.addEventListener('DOMContentLoaded', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
-        // Adicionar funcionalidade de logout
+        // Fechar popup de pagamento
+        closePopupButton.addEventListener('click', () => {
+            paymentPopup.style.display = 'none';
+        });
+
+        // Logout
         if (logoutButton) {
             logoutButton.addEventListener('click', async () => {
                 await auth.signOut();
                 window.location.href = '/';
             });
         }
-
-        // Fechar popup de pagamento
-        closePopupButton.addEventListener('click', () => {
-            paymentPopup.style.display = 'none';
-        });
     }
 });
