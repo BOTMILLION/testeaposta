@@ -103,50 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const now = new Date();
             const trialEndDate = userData.trialEndDate ? new Date(userData.trialEndDate.toDate()) : null;
             const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate.toDate()) : null;
-
-            const isTrialValid = trialEndDate && now <= trialEndDate;
-            const isSubscriptionValid = subscriptionEndDate && now <= subscriptionEndDate;
-
-            return isTrialValid || isSubscriptionValid;
-        };
-
-        // Iniciar redirecionamento após login
-        const startRedirect = (endDate) => {
-            loginForm.style.display = 'none';
-            redirectPopup.style.display = 'block';
-
-            const updateTimer = () => {
-                const distance = formatDistanceToNow(new Date(endDate), { addSuffix: true });
-                redirectTimer.textContent = distance;
-            };
-
-            const countdownInterval = setInterval(() => {
-                updateTimer();
-                if (new Date() >= endDate) {
-                    clearInterval(countdownInterval);
-                    window.location.href = REDIRECT_URL;
-                }
-            }, 1000);
-
-            redirectNowButton.addEventListener('click', () => {
-                window.location.href = REDIRECT_URL;
-            });
-        };
-
-        // Mostrar popup de pagamento
-        const showPaymentPopup = () => {
-            paymentPopup.style.display = 'block';
-            paymentNowButton.addEventListener('click', () => {
-                window.location.href = PAYMENT_URL;
-            });
-        };
-
-        // Mostrar erro
-        const handleError = (elementId, message) => {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.style.display = 'block';
-                element.textContent = message;
+            
+            if (subscriptionEndDate && now <= subscriptionEndDate) {
+                return true;
+            } else if (trialEndDate && now <= trialEndDate) {
+                return true;
+            } else {
+                return false;
             }
         };
 
@@ -162,13 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-                    const trialStartDate = new Date();
-                    const trialEndDate = addDays(trialStartDate, 3);
+                    const registrationDate = new Date();
+                    const trialEndDate = addDays(registrationDate, 3);
 
                     await setDoc(doc(db, 'users', user.uid), {
                         name: name,
                         email: email,
-                        trialStartDate: Timestamp.fromDate(trialStartDate),
+                        registrationDate: Timestamp.fromDate(registrationDate),
                         trialEndDate: Timestamp.fromDate(trialEndDate),
                         subscriptionEndDate: null,
                         paymentStatus: 'unpaid' // Define status de pagamento como não pago
@@ -179,103 +142,129 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     document.getElementById('registerError').style.display = 'none';
                     registerForm.style.display = 'none';
-                    showRegistrationMessage(trialStartDate, trialEndDate);
+                    showRegistrationMessage(registrationDate, trialEndDate);
                 } catch (error) {
                     handleError('registerError', error.message);
                 }
             }
         });
 
-        // Mostrar mensagem de cadastro
-        const showRegistrationMessage = (trialStartDate, trialEndDate) => {
+        // Mostrar a mensagem de registro
+        const showRegistrationMessage = (registrationDate, trialEndDate) => {
+            const startDate = new Date(registrationDate);
+            const endDate = new Date(trialEndDate);
+
             registrationMessage.style.display = 'block';
             registrationMessage.innerHTML = `
                 <h2>Usuário cadastrado!</h2>
                 <p>Para realizar o login, verifique o seu e-mail.</p>
                 <p>Este é o seu temporizador do período grátis de 3 dias.</p>
                 <p>Ao esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
-                <p>Seu período de teste termina em: ${trialEndDate.toLocaleDateString()} às ${trialEndDate.toLocaleTimeString()}</p>
+                <p>Seu período de teste começa em: ${startDate.toLocaleDateString()} às ${startDate.toLocaleTimeString()}</p>
+                <p>Seu período de teste termina em: ${endDate.toLocaleDateString()} às ${endDate.toLocaleTimeString()}</p>
                 <button id="closePopupButton">FECHAR</button>
             `;
 
             document.getElementById('closePopupButton').addEventListener('click', () => {
-                window.location.href = HOME_URL;
+                window.location.href = HOME_URL; // Redirecionar para o início
             });
 
-            startRedirect(trialEndDate);
+            startRedirect(endDate);
         };
 
-        // Manipular o clique no botão de redefinir senha
-        const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        // Redirecionar após o término do período gratuito
+        const startRedirect = (endDate) => {
+            const now = new Date();
+            const timeLeft = endDate - now;
 
+            if (timeLeft <= 0) {
+                window.location.href = REDIRECT_URL;
+                return;
+            }
+
+            const interval = setInterval(() => {
+                const now = new Date();
+                const timeLeft = endDate - now;
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    window.location.href = REDIRECT_URL;
+                } else {
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    
+                    redirectTimer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }, 1000);
+        };
+
+        // Mostrar o pop-up de pagamento
+        const showPaymentPopup = () => {
+            paymentPopup.style.display = 'block';
+            paymentNowButton.addEventListener('click', () => {
+                window.location.href = PAYMENT_URL;
+            });
+        };
+
+        // Manipular o clique no botão de reset de senha
         resetPasswordButton.addEventListener('click', async () => {
             const email = resetEmail.value;
 
-            if (!isValidEmail(email)) {
-                resetError.textContent = 'Por favor, insira um e-mail válido.';
+            if (email === '') {
+                handleError('resetError', 'Por favor, insira seu e-mail.');
             } else {
                 try {
                     await sendPasswordResetEmail(auth, email);
-                    resetError.textContent = '';
+                    resetError.style.display = 'none';
                     resetPasswordPopup.style.display = 'none';
-                    alert('Enviamos um e-mail para redefinir a senha.');
+                    alert('E-mail de recuperação enviado.');
                 } catch (error) {
-                    resetError.textContent = error.message;
+                    handleError('resetError', error.message);
                 }
             }
         });
 
-        // Fechar popup de redefinição de senha
+        // Fechar o pop-up de reset de senha
         closeResetPopup.addEventListener('click', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
-        // Manipular o clique no botão de logout
-        logoutButton.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = HOME_URL;
-            }).catch((error) => {
-                console.error('Erro ao fazer logout:', error.message);
-            });
-        });
-
-        // Manipular a visualização do status de assinatura
-        subscriptionStatus.addEventListener('click', async () => {
-            try {
-                const user = auth.currentUser;
-                if (user) {
-                    const userDoc = doc(db, 'users', user.uid);
-                    const userSnapshot = await getDoc(userDoc);
-                    
-                    if (userSnapshot.exists()) {
-                        const userData = userSnapshot.data();
-                        const now = new Date();
-                        const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate.toDate()) : null;
-
-                        if (subscriptionEndDate && now <= subscriptionEndDate) {
-                            subscriptionStatus.textContent = 'Assinatura ativa até ' + subscriptionEndDate.toLocaleDateString();
-                        } else {
-                            subscriptionStatus.textContent = 'Assinatura expirada ou não ativa';
-                        }
-                    } else {
-                        console.error('Dados do usuário não encontrados.');
-                    }
-                } else {
-                    console.error('Nenhum usuário logado.');
-                }
-            } catch (error) {
-                console.error('Erro ao buscar status de assinatura:', error.message);
-            }
-        });
-
-        // Exibir popup de pagamento
-        paymentButton.addEventListener('click', () => {
-            paymentPopup.style.display = 'block';
-        });
-
-        // Fechar popup de pagamento
+        // Fechar o pop-up de pagamento
         closePopupButton.addEventListener('click', () => {
             paymentPopup.style.display = 'none';
+        });
+
+        // Adicionar mais tempo à assinatura manualmente
+        const addSubscriptionTime = async (userId, additionalDays) => {
+            const userDoc = doc(db, 'users', userId);
+            const userSnapshot = await getDoc(userDoc);
+
+            if (userSnapshot.exists()) {
+                const userData = userSnapshot.data();
+                const currentEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate.toDate()) : new Date();
+                const newEndDate = addDays(currentEndDate, additionalDays);
+
+                await updateDoc(userDoc, {
+                    subscriptionEndDate: Timestamp.fromDate(newEndDate),
+                    paymentStatus: 'paid' // Atualizar status de pagamento
+                });
+
+                console.log('Tempo de assinatura adicionado com sucesso.');
+            } else {
+                console.error('Usuário não encontrado.');
+            }
+        };
+
+        // Manipular o clique no botão de logout
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = HOME_URL;
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error.message);
+            }
         });
     }
 });
