@@ -230,17 +230,52 @@ document.addEventListener('DOMContentLoaded', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
+        // Manipular o clique no botão de logout
+        logoutButton.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = HOME_URL;
+            }).catch((error) => {
+                console.error('Erro ao fazer logout:', error.message);
+            });
+        });
+
+        // Manipular a visualização do status de assinatura
+        subscriptionStatus.addEventListener('click', async () => {
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    const userDoc = doc(db, 'users', user.uid);
+                    const userSnapshot = await getDoc(userDoc);
+                    
+                    if (userSnapshot.exists()) {
+                        const userData = userSnapshot.data();
+                        const now = new Date();
+                        const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate.toDate()) : null;
+
+                        if (subscriptionEndDate && now <= subscriptionEndDate) {
+                            subscriptionStatus.textContent = 'Assinatura ativa até ' + subscriptionEndDate.toLocaleDateString();
+                        } else {
+                            subscriptionStatus.textContent = 'Assinatura expirada ou não ativa';
+                        }
+                    } else {
+                        console.error('Dados do usuário não encontrados.');
+                    }
+                } else {
+                    console.error('Nenhum usuário logado.');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar status de assinatura:', error.message);
+            }
+        });
+
+        // Exibir popup de pagamento
+        paymentButton.addEventListener('click', () => {
+            paymentPopup.style.display = 'block';
+        });
+
         // Fechar popup de pagamento
         closePopupButton.addEventListener('click', () => {
             paymentPopup.style.display = 'none';
         });
-
-        // Logout
-        if (logoutButton) {
-            logoutButton.addEventListener('click', async () => {
-                await auth.signOut();
-                window.location.href = '/';
-            });
-        }
     }
 });
