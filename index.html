@@ -116,7 +116,6 @@
             <h2>Usuário cadastrado!</h2>
             <p>Para realizar o login, verifique o seu email.</p>
             <p>Este é o seu temporizador do período grátis de 3 dias.</p>
-            <p>Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
@@ -131,8 +130,8 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
-        import { addDays } from 'date-fns';
         import { addDays } from 'https://cdn.jsdelivr.net/npm/date-fns@2.29.3/esm/addDays/index.js'; // CDN para date-fns
+        import { addDays } from 'https://cdn.jsdelivr.net/npm/date-fns@2.29.3/esm/index.js'; // CDN atualizado para date-fns
 
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
@@ -157,18 +156,11 @@
         async function checkUserStatus() {
             const user = auth.currentUser;
             if (user) {
-                const userDoc = doc(db, 'users', user.uid);
-                const userSnapshot = await getDoc(userDoc);
-                if (userSnapshot.exists()) {
-                    const userData = userSnapshot.data();
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
                     const now = new Date();
-                    const trialEnd = userData.trialEnd ? userData.trialEnd.toDate() : null;
-                    const subscriptionEnd = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
                     const trialEnd = userData.trialEnd.toDate();
-
                     if (now > trialEnd && !userData.isPaid) {
                         document.getElementById('subscriptionPopup').style.display = 'block';
                     } else if (now > trialEnd) {
@@ -176,7 +168,6 @@
                         document.getElementById('registerTimer').innerText = `Seu período de teste termina em: ${trialEnd.toLocaleDateString()}`;
                     }
                 } else {
-                    // Usuário não encontrado no Firestore
                     console.log('Usuário não encontrado.');
                 }
             } else {
@@ -186,9 +177,7 @@
         async function handleLogin(email, password) {
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // Verificar status do usuário após o login
                 await checkUserStatus();
-                // Exibir popup de redirecionamento
                 document.getElementById('redirectPopup').style.display = 'block';
                 startRedirectTimer();
             } catch (error) {
