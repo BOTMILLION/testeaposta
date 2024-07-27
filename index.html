@@ -161,21 +161,46 @@
                 const displayElement = document.getElementById(displayElementId);
                 displayElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
                 if (remainingTime <= 0) {
-                    clearInterval(timerInterval);
-                    if (redirectUrl) window.location.href = redirectUrl;
+                    window.location.href = redirectUrl;
                 }
             }
-            updateTimer(); // Update immediately
-            const timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+        
+        // Função para exibir mensagens do Telegram
+        const ws = new WebSocket('ws://localhost:3000'); // Conecte-se ao WebSocket
+        ws.onmessage = function(event) {
+            const messageElement = document.getElementById('messages');
+            messageElement.textContent = event.data;
+        };
+
+        // Função para verificar se o e-mail está verificado
+        async function checkEmailVerification() {
+            const user = auth.currentUser;
+            if (user && !user.emailVerified) {
+                alert('Por favor, verifique seu e-mail.');
+                await auth.signOut();
+                return false;
+            }
+            return true;
         }
 
+        // Função para tratamento de login
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const errorElement = document.getElementById('loginError');
             errorElement.style.display = 'none';
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                if (!user.emailVerified) {
+                    errorElement.textContent = 'Por favor, verifique seu e-mail.';
+                    errorElement.style.display = 'block';
+                    await auth.signOut();
+                    return;
+                }
                 // Exibir popup de redirecionamento
                 document.getElementById('redirectPopup').style.display = 'block';
                 startCountdown(5, 'redirectTimer', 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL');
@@ -185,34 +210,7 @@
             }
         });
 
-        document.getElementById('registerLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-        });
-
-        document.getElementById('loginLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        });
-
-        document.getElementById('resetPasswordLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('resetPasswordForm').style.display = 'block';
-        });
-
-        document.getElementById('backToLoginLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('resetPasswordForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        });
-
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br';
-        });
-
+        // Função para tratamento de cadastro
         document.getElementById('registerButton').addEventListener('click', async () => {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
@@ -247,10 +245,17 @@
             }
         });
 
+        // Função para tratamento de redefinição de senha
         document.getElementById('resetPasswordButton').addEventListener('click', async () => {
             const email = document.getElementById('resetEmail').value;
             const errorElement = document.getElementById('resetError');
             errorElement.style.display = 'none';
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                errorElement.textContent = 'Por favor, insira um e-mail válido.';
+                errorElement.style.display = 'block';
+                return;
+            }
             try {
                 await sendPasswordResetEmail(auth, email);
                 alert('Email de redefinição enviado.');
@@ -262,40 +267,50 @@
             }
         });
 
+        // Alternar visibilidade da senha
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('loginPassword');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        });
+        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('registerPassword');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        });
+
+        // Alterar visibilidade dos formulários
+        document.getElementById('registerLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+        document.getElementById('resetPasswordLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'block';
+        });
+        document.getElementById('backToLoginLink').addEventListener('click', () => {
+            document.getElementById('resetPasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+
+        // Fechar o popup de cadastro
         document.getElementById('closeRegisterPopup').addEventListener('click', () => {
             document.getElementById('registerPopup').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         });
 
+        // Ação do botão de pagamento
+        document.getElementById('paymentButton').addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br';
+        });
+
+        // Fechar o popup de redirecionamento agora
         document.getElementById('redirectNowButton').addEventListener('click', () => {
             window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
         });
 
-        // Função para conectar ao WebSocket
-        function connectWebSocket() {
-            const socket = new WebSocket('ws://localhost:3000');
-
-            socket.onopen = () => {
-                console.log('WebSocket conectado.');
-            };
-
-            socket.onmessage = (event) => {
-                const messagesElement = document.getElementById('messages');
-                messagesElement.textContent = event.data;
-            };
-
-            socket.onclose = (event) => {
-                console.log('WebSocket desconectado.', event.reason);
-                // Tentativa de reconexão
-                setTimeout(connectWebSocket, 5000);
-            };
-
-            socket.onerror = (error) => {
-                console.error('WebSocket erro:', error.message);
-            };
-        }
-
-        connectWebSocket();
     </script>
 </body>
 </html>
