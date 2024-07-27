@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (userSnapshot.exists()) {
                             const userData = userSnapshot.data();
                             if (checkTrialOrSubscriptionStatus(userData)) {
-                                startRedirect(userData.subscriptionEndDate || userData.trialEndDate);
+                                startRedirect(userData.subscriptionEnd || userData.trialEnd);
                             } else {
                                 showPaymentPopup();
                             }
@@ -97,21 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-
-        // Verificar status de teste ou pagamento
-        const checkTrialOrSubscriptionStatus = (userData) => {
-            const now = new Date();
-            const trialEndDate = userData.trialEndDate ? new Date(userData.trialEndDate.toDate()) : null;
-            const subscriptionEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate.toDate()) : null;
-            
-            if (subscriptionEndDate && now <= subscriptionEndDate) {
-                return true;
-            } else if (trialEndDate && now <= trialEndDate) {
-                return true;
-            } else {
-                return false;
-            }
-        };
 
         // Manipular o clique no botão de cadastro
         registerButton.addEventListener('click', async () => {
@@ -131,10 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     await setDoc(doc(db, 'users', user.uid), {
                         name: name,
                         email: email,
-                        registrationDate: Timestamp.fromDate(registrationDate),
-                        trialEndDate: Timestamp.fromDate(trialEndDate),
-                        subscriptionEndDate: null,
-                        paymentStatus: 'unpaid' // Define status de pagamento como não pago
+                        isPaid: false,
+                        subscriptionEnd: null,
+                        trialEnd: Timestamp.fromDate(trialEndDate),
+                        trialStart: Timestamp.fromDate(registrationDate)
                     });
 
                     // Enviar e-mail de verificação
@@ -243,12 +228,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (userSnapshot.exists()) {
                 const userData = userSnapshot.data();
-                const currentEndDate = userData.subscriptionEndDate ? new Date(userData.subscriptionEndDate.toDate()) : new Date();
+                const currentEndDate = userData.subscriptionEnd ? new Date(userData.subscriptionEnd.toDate()) : new Date();
                 const newEndDate = addDays(currentEndDate, additionalDays);
 
                 await updateDoc(userDoc, {
-                    subscriptionEndDate: Timestamp.fromDate(newEndDate),
-                    paymentStatus: 'paid' // Atualizar status de pagamento
+                    subscriptionEnd: Timestamp.fromDate(newEndDate),
+                    isPaid: true // Atualizar status de pagamento
                 });
 
                 console.log('Tempo de assinatura adicionado com sucesso.');
