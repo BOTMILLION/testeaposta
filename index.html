@@ -8,137 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilos para o body e container principal */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: url('https://i.imgur.com/3oDyemd.png') no-repeat center center fixed;
-            background-size: cover;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        .wrap-login {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .logo {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .welcome-text {
-            font-size: 28px;
-            margin: 20px 0;
-            color: #333;
-        }
-
-        .form-login, .form-register, .form-reset {
-            margin-top: 20px;
-        }
-
-        .line {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .line input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .line input:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-
-        .line label {
-            position: absolute;
-            top: 14px;
-            left: 15px;
-            color: #666;
-            transition: all 0.3s ease;
-        }
-
-        .line input:focus + label,
-        .line input:not(:placeholder-shown) + label {
-            top: -10px;
-            left: 15px;
-            font-size: 12px;
-            color: #007bff;
-        }
-
-        .line i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-        }
-
-        .custom-button {
-            background-color: #007bff;
-            color: white;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            margin: 10px 0;
-            transition: background-color 0.3s ease;
-        }
-
-        .custom-button:hover {
-            background-color: #0056b3;
-        }
-
-        .pulse-button {
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.05);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .info-text {
-            font-size: 16px;
-            margin-top: 15px;
-        }
-
-        .info-text a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .info-text a:hover {
-            text-decoration: underline;
-        }
-
+        /* Estilos para os popups */
         .popup {
             display: none;
             position: fixed;
@@ -146,54 +16,34 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: white;
-            padding: 25px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
-            border-radius: 10px;
+            border-radius: 8px;
             text-align: center;
-            width: 80%;
-            max-width: 400px;
         }
-
-        .popup h2 {
-            margin: 0 0 15px;
-            font-size: 20px;
-            color: #333;
-        }
-
-        .popup p {
-            margin: 10px 0;
-            font-size: 16px;
-            color: #555;
-        }
-
         .popup .button {
             margin-top: 20px;
-            padding: 12px 25px;
+            padding: 10px 20px;
             border: none;
             background-color: #007bff;
             color: white;
             cursor: pointer;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
+            border-radius: 5px;
         }
-
         .popup .button:hover {
             background-color: #0056b3;
         }
-
         #messages {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             max-width: 300px;
             background-color: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 5px;
             z-index: 1000;
-            font-size: 14px;
         }
     </style>
 </head>
@@ -201,6 +51,7 @@
     <div class="wrap-login">
         <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo" class="logo">
         <div class="welcome-text">Bem Vindo</div>
+        <div class="shine"></div>
         <div class="form-login" id="loginForm">
             <div class="line">
                 <input type="email" id="loginEmail" placeholder=" " required>
@@ -221,7 +72,7 @@
                 Esqueceu a senha? <a href="#" id="resetPasswordLink">Redefinir Senha</a>
             </div>
         </div>
-        <div class="form-register" id="registerForm" style="display: none;">
+        <div class="form-login" id="registerForm" style="display: none;">
             <div class="line">
                 <input type="text" id="registerName" placeholder=" " required>
                 <label for="registerName">Seu Nome</label>
@@ -245,123 +96,346 @@
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
             </div>
         </div>
-        <div class="form-reset" id="resetPasswordForm" style="display: none;">
+        <div class="form-login" id="resetPasswordForm" style="display: none;">
             <div class="line">
                 <input type="email" id="resetEmail" placeholder=" " required>
                 <label for="resetEmail">Seu Email</label>
             </div>
-            <div id="resetError" style="color: red; display: none;">Por favor, informe o seu email.</div>
-            <button class="custom-button" id="resetPasswordButton">REDIFINIR SENHA</button>
+            <div id="resetError" style="color: red; display: none;">Por favor, preencha o campo de email corretamente.</div>
+            <button class="custom-button" id="resetPasswordButton">ENVIAR EMAIL DE REDIFINIÇÃO</button>
             <div class="info-text">
-                <a href="#" id="backToLoginFromReset">Voltar ao Login</a>
+                <a href="#" id="backToLoginLink">Voltar para o Login</a>
             </div>
         </div>
+        <div class="popup" id="redirectPopup">
+            <h2>Login Bem-sucedido!</h2>
+            <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
+            <button class="button" id="redirectNowButton">Ir Agora</button>
+        </div>
+        <div class="popup" id="registerPopup">
+            <h2>Usuário cadastrado!</h2>
+            <p>Para realizar o login, verifique o seu email.</p>
+            <p>Este é o seu temporizador do período grátis de 3 dias.</p>
+            <p> Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
+            <p>Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
+            <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
+            <button class="button" id="closeRegisterPopup">FECHAR</button>
+        </div>
+        <div class="popup" id="subscriptionPopup">
+            <h2>Seu tempo expirou!</h2>
+            <p>O seu tempo para utilizar os nossos serviços terminou. Para continuar utilizando, realize o pagamento.</p>
+            <button class="button" id="payNowButton">REALIZAR PAGAMENTO</button>
+        </div>
+        <div id="messages"></div>
     </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+        import { getTime, addDays } from 'date-fns';
+        import { ptBR } from 'date-fns/locale';
+        import { addDays } from 'date-fns';
 
-    <!-- Popup de redirecionamento -->
-    <div id="redirectPopup" class="popup">
-        <h2>Você será redirecionado para o jogo</h2>
-        <p>Após o login, você será redirecionado para o jogo em 5 segundos.</p>
-        <button class="button" onclick="closePopup('redirectPopup')">OK</button>
-    </div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
+            authDomain: "projeto-notificacao-968d4.firebaseapp.com",
+            projectId: "projeto-notificacao-968d4",
+            storageBucket: "projeto-notificacao-968d4.appspot.com",
+            messagingSenderId: "236002612799",
+            appId: "1:236002612799:web:54719603091421b94aca8a",
+            measurementId: "G-FP84YBD94F"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    <!-- Popup de pagamento -->
-    <div id="paymentPopup" class="popup">
-        <h2>Realizar Pagamento</h2>
-        <p>Para continuar usando os serviços após o período de teste, é necessário realizar o pagamento.</p>
-        <button class="button" onclick="window.location.href='https://checkout.yampi.com.br';">PAGAR AGORA</button>
-        <button class="button" onclick="closePopup('paymentPopup')">FECHAR</button>
-    </div>
+        function getBrazilianDate() {
+            return new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+        }
 
-    <div id="messages"></div>
+        function updateTrialAndSubscriptionDates(userId) {
+            const trialEnd = addDays(new Date(), 3);
+            return updateDoc(doc(db, 'users', userId), {
+                trialEnd: trialEnd,
+                subscriptionEnd: null,
+                isPaid: false
+            });
+        }
+        async function checkUserStatus() {
+            const user = auth.currentUser;
+            if (user) {
+                const userDoc = doc(db, 'users', user.uid);
+                const userSnapshot = await getDoc(userDoc);
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    const now = new Date();
+                    const trialEnd = userData.trialEnd ? userData.trialEnd.toDate() : null;
+                    const subscriptionEnd = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
 
-    <script src="app.js"></script>
-    <script>
-        document.getElementById('togglePassword').addEventListener('click', function () {
-            const passwordInput = document.getElementById('loginPassword');
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
+                    if (now > trialEnd && now <= subscriptionEnd) {
+                        document.getElementById('trialStatus').style.display = 'none';
+                        document.getElementById('subscriptionStatus').style.display = 'block';
+                        document.getElementById('registerTimer').style.display = 'none';
+                        document.getElementById('registerPopup').style.display = 'none';
+                    } else if (now <= trialEnd) {
+                        document.getElementById('trialStatus').style.display = 'block';
+                        document.getElementById('subscriptionStatus').style.display = 'none';
+                        document.getElementById('registerTimer').style.display = 'block';
+                        document.getElementById('registerPopup').style.display = 'none';
+                        startCountdown((trialEnd - now) / 1000, 'registerTimer', 'https://botmillion.github.io/testeaposta/');
+                    } else {
+                        document.getElementById('trialStatus').style.display = 'none';
+                        document.getElementById('subscriptionStatus').style.display = 'none';
+                        document.getElementById('registerTimer').style.display = 'none';
+                        document.getElementById('registerPopup').style.display = 'none';
+                    if (now > trialEnd && !userData.isPaid) {
+                        document.getElementById('subscriptionPopup').style.display = 'block';
+                        document.getElementById('payNowButton').addEventListener('click', () => {
+                            window.location.href = 'https://yampi.com.br/checkout'; // Substitua pela URL do checkout
+                        });
+                    } else if (now > trialEnd) {
+                        document.getElementById('registerPopup').style.display = 'block';
+                        document.getElementById('registerTimer').innerText = `Seu período de teste termina em: ${trialEnd.toLocaleDateString()}`;
+                    }
+                } else {
+                    // Usuário não encontrado no Firestore
+                    console.log('Usuário não encontrado.');
+                }
+            } else {
+                console.log('Nenhum usuário está autenticado.');
+            }
+        }
+
+        function startCountdown(duration, displayElementId, redirectUrl) {
+            const endTime = Date.now() + duration * 1000;
+            localStorage.setItem('endTime', endTime);
+
+            function updateTimer() {
+                const now = Date.now();
+                let remainingTime = Math.floor((endTime - now) / 1000);
+                if (remainingTime < 0) {
+                    remainingTime = 0;
+                }
+                let hours = Math.floor(remainingTime / 3600);
+                let minutes = Math.floor((remainingTime % 3600) / 60);
+                let seconds = remainingTime % 60;
+
+                document.getElementById(displayElementId).textContent = 
+                    `${hours}h ${minutes}m ${seconds}s`;
+
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById(displayElementId).textContent = 'Tempo Expirado';
+                    window.location.href = redirectUrl;
+                }
+        async function handleLogin(email, password) {
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // Verificar status do usuário após o login
+                await checkUserStatus();
+                // Exibir popup de redirecionamento
+                document.getElementById('redirectPopup').style.display = 'block';
+                startRedirectTimer();
+            } catch (error) {
+                document.getElementById('loginError').style.display = 'block';
+                console.error('Erro no login:', error);
+            }
+        }
+
+            updateTimer();
+            const timerInterval = setInterval(updateTimer, 1000);
+        async function handleRegistration(name, email, password) {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                await sendEmailVerification(user);
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: name,
+                    email: email,
+                    trialEnd: addDays(new Date(), 3),
+                    subscriptionEnd: null,
+                    isPaid: false
+                });
+                document.getElementById('registerSuccess').style.display = 'block';
+                document.getElementById('registerPopup').style.display = 'block';
+                startRegisterTimer();
+            } catch (error) {
+                document.getElementById('registerError').style.display = 'block';
+                console.error('Erro no cadastro:', error);
+            }
+        }
+
+        window.addEventListener('load', async () => {
+            await checkUserStatus();
         });
+        async function handlePasswordReset(email) {
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Email de redefinição de senha enviado.');
+            } catch (error) {
+                document.getElementById('resetError').style.display = 'block';
+                console.error('Erro ao enviar email de redefinição:', error);
+            }
+        }
 
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function () {
-            const passwordInput = document.getElementById('registerPassword');
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-        });
-
-        document.getElementById('loginButton').addEventListener('click', function () {
+        document.getElementById('loginButton').addEventListener('click', async () => {
+        document.getElementById('loginButton').addEventListener('click', () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             if (email && password) {
-                document.getElementById('redirectPopup').style.display = 'block';
-                setTimeout(function() {
-                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-                }, 5000);
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    document.getElementById('redirectPopup').style.display = 'block';
+                    let seconds = 5;
+                    document.getElementById('redirectTimer').textContent = seconds;
+                    const interval = setInterval(() => {
+                        seconds--;
+                        document.getElementById('redirectTimer').textContent = seconds;
+                        if (seconds <= 0) {
+                            clearInterval(interval);
+                            window.location.href = 'https://botmillion.github.io/testeaposta/';
+                        }
+                    }, 1000);
+                } catch (error) {
+                    console.error('Erro de login:', error);
+                    document.getElementById('loginError').style.display = 'block';
+                }
             } else {
                 document.getElementById('loginError').style.display = 'block';
             }
+            handleLogin(email, password);
         });
 
-        document.getElementById('registerButton').addEventListener('click', function () {
+        document.getElementById('registerButton').addEventListener('click', () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            handleRegistration(name, email, password);
+        });
+
+        document.getElementById('paymentButton').addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br/checkout'; // Substitua pela URL do checkout
+        document.getElementById('resetPasswordButton').addEventListener('click', () => {
+            const email = document.getElementById('resetEmail').value;
+            handlePasswordReset(email);
+        });
+
+        document.getElementById('registerLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+        document.getElementById('resetPasswordLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'block';
+        });
+        document.getElementById('backToLoginLink').addEventListener('click', () => {
+            document.getElementById('resetPasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+
+        document.getElementById('registerButton').addEventListener('click', async () => {
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             if (email && password.length >= 6) {
-                document.getElementById('registerError').style.display = 'none';
-                document.getElementById('registerSuccess').style.display = 'block';
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('trialStatus').style.display = 'block';
-                document.getElementById('subscriptionStatus').style.display = 'block';
-                document.getElementById('registerTimer').style.display = 'block';
-                // Simular a atualização do status de assinatura e o temporizador
-                document.getElementById('trialStatus').textContent = 'Seu período de teste começou!';
-                document.getElementById('subscriptionStatus').textContent = 'A assinatura está ativa!';
-                document.getElementById('registerTimer').textContent = 'Tempo restante para o teste: 30 minutos';
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await sendEmailVerification(userCredential.user);
+                    document.getElementById('registerPopup').style.display = 'block';
+                    await updateTrialAndSubscriptionDates(userCredential.user.uid);
+                    const duration = 3 * 24 * 3600; // 3 dias em segundos
+                    startCountdown(duration, 'registerTimer', 'https://botmillion.github.io/testeaposta/');
+                } catch (error) {
+                    console.error('Erro de cadastro:', error);
+                    document.getElementById('registerError').style.display = 'block';
+                }
             } else {
                 document.getElementById('registerError').style.display = 'block';
             }
         });
 
-        document.getElementById('resetPasswordButton').addEventListener('click', function () {
+        document.getElementById('resetPasswordButton').addEventListener('click', async () => {
             const email = document.getElementById('resetEmail').value;
             if (email) {
-                document.getElementById('resetError').style.display = 'none';
-                alert('Instruções para redefinir a senha foram enviadas para o seu email.');
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    document.getElementById('resetPasswordForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+                } catch (error) {
+                    console.error('Erro ao enviar email de redefinição:', error);
+                    document.getElementById('resetError').style.display = 'block';
+                }
             } else {
                 document.getElementById('resetError').style.display = 'block';
             }
+        document.getElementById('redirectNowButton').addEventListener('click', () => {
+            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
         });
 
-        document.getElementById('loginLink').addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('closeRegisterPopup').addEventListener('click', () => {
+            document.getElementById('registerPopup').style.display = 'none';
         });
 
-        document.getElementById('registerLink').addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('payNowButton').addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br/checkout'; // Substitua pela URL do checkout
+            window.location.href = 'https://checkout.yampi.com.br/';
         });
 
-        document.getElementById('resetPasswordLink').addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('resetPasswordForm').style.display = 'block';
-        });
+        const socket = new WebSocket('ws://localhost:3000'); // Substitua pela URL do seu WebSocket
+        socket.onopen = () => {
+            console.log('Conectado ao WebSocket');
+        };
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            const messagesContainer = document.getElementById('messages');
+            messagesContainer.textContent = message.text; // Exibe a mensagem recebida
+        };
+        socket.onclose = () => {
+            console.log('Desconectado do WebSocket');
+        };
 
-        document.getElementById('backToLoginFromReset').addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById('resetPasswordForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('loginPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
         });
-
-        function closePopup(id) {
-            document.getElementById(id).style.display = 'none';
+        function startRedirectTimer() {
+            let timer = 5;
+            const timerElement = document.getElementById('redirectTimer');
+            const interval = setInterval(() => {
+                timerElement.textContent = timer;
+                if (timer <= 0) {
+                    clearInterval(interval);
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                }
+                timer--;
+            }, 1000);
         }
 
-        function showMessage(message) {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.textContent = message;
+        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('registerPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        });
+        function startRegisterTimer() {
+            let timer = 3 * 24 * 60 * 60; // 3 dias em segundos
+            const timerElement = document.getElementById('registerTimer');
+            const interval = setInterval(() => {
+                const days = Math.floor(timer / (24 * 60 * 60));
+                const hours = Math.floor((timer % (24 * 60 * 60)) / (60 * 60));
+                const minutes = Math.floor((timer % (60 * 60)) / 60);
+                const seconds = timer % 60;
+                timerElement.textContent = `Seu período grátis termina em ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                if (timer <= 0) {
+                    clearInterval(interval);
+                    document.getElementById('subscriptionPopup').style.display = 'block';
+                }
+                timer--;
+            }, 1000);
         }
     </script>
 </body>
