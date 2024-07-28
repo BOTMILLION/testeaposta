@@ -44,7 +44,7 @@
             border-radius: 5px;
             z-index: 1000;
         }
-        #trialStatus, #subscriptionStatus, #trialCountdown {
+        #trialCountdown {
             color: blue;
             font-size: 16px;
             font-weight: bold;
@@ -96,7 +96,6 @@
             </div>
             <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
             <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado. Verifique o seu email.</div>
-            <div id="trialCountdown"></div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
@@ -119,15 +118,6 @@
             <h2>Login Bem-sucedido!</h2>
             <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
             <button class="button" id="redirectNowButton">Ir Agora</button>
-        </div>
-        
-        <div class="popup" id="registerPopup">
-            <h2>Usuário cadastrado!</h2>
-            <p>Para realizar o login, verifique o seu email.</p>
-            <p>Este é o seu temporizador do período grátis de 3 dias.</p>
-            <p> Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
-            <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
-            <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
         
         <div class="popup" id="paymentPopup">
@@ -174,16 +164,17 @@
                 const now = new Date();
                 const timeRemaining = trialEndDate - now;
                 
-                if (timeRemaining <= 0) {
-                    const paymentDate = userData.paymentDate ? new Date(userData.paymentDate.toDate()) : null;
-                    if (!paymentDate || paymentDate < now) {
-                        document.getElementById('paymentPopup').style.display = 'block';
-                        return false;
-                    }
+                const hasValidPaymentDate = userData.paymentDate ? new Date(userData.paymentDate.toDate()) > now : false;
+                
+                if (timeRemaining <= 0 && !hasValidPaymentDate) {
+                    return false;
                 }
-                return true;
+                
+                if (timeRemaining > 0 || hasValidPaymentDate) {
+                    return true;
+                }
             }
-            return true;
+            return false;
         }
         
         document.getElementById('loginButton').addEventListener('click', async () => {
