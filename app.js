@@ -44,7 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logoutButton');
 
     // Verificar a existência dos elementos antes de adicionar eventos
-    if (loginForm && registerForm && loginLink && registerLink && loginButton && registerButton && paymentButton && redirectPopup && redirectTimer && redirectNowButton && trialStatus && registrationMessage && resetPasswordButton && resetPasswordPopup && resetEmail && resetError && closeResetPopup && subscriptionStatus && closePopupButton && paymentPopup && paymentNowButton) {
+    if (
+        loginForm && registerForm && loginLink && registerLink && loginButton && registerButton && 
+        paymentButton && redirectPopup && redirectTimer && redirectNowButton && trialStatus && 
+        registrationMessage && resetPasswordButton && resetPasswordPopup && resetEmail && 
+        resetError && closeResetPopup && subscriptionStatus && closePopupButton && 
+        paymentPopup && paymentNowButton && logoutButton
+    ) {
         
         // Mostrar o formulário de cadastro
         registerLink.addEventListener('click', (event) => {
@@ -216,40 +222,39 @@ document.addEventListener('DOMContentLoaded', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
-        // Fechar o pop-up de pagamento
-        closePopupButton.addEventListener('click', () => {
-            paymentPopup.style.display = 'none';
+        // Adicionar logout
+        logoutButton.addEventListener('click', async () => {
+            await auth.signOut();
+            window.location.href = HOME_URL; // Redirecionar após logout
         });
 
-        // Adicionar mais tempo à assinatura manualmente
-        const addSubscriptionTime = async (userId, additionalDays) => {
-            const userDoc = doc(db, 'users', userId);
-            const userSnapshot = await getDoc(userDoc);
+        // Mostrar status da assinatura
+        const checkTrialOrSubscriptionStatus = (userData) => {
+            const now = new Date();
+            const trialEndDate = userData.trialEnd ? userData.trialEnd.toDate() : null;
+            const subscriptionEndDate = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
 
-            if (userSnapshot.exists()) {
-                const userData = userSnapshot.data();
-                const currentEndDate = userData.subscriptionEnd ? new Date(userData.subscriptionEnd.toDate()) : new Date();
-                const newEndDate = addDays(currentEndDate, additionalDays);
-
-                await updateDoc(userDoc, {
-                    subscriptionEnd: Timestamp.fromDate(newEndDate),
-                    isPaid: true // Atualizar status de pagamento
-                });
-
-                console.log('Tempo de assinatura adicionado com sucesso.');
+            if (subscriptionEndDate && subscriptionEndDate > now) {
+                subscriptionStatus.textContent = `Assinatura ativa até ${subscriptionEndDate.toLocaleDateString()}.`;
+                return true;
+            } else if (trialEndDate && trialEndDate > now) {
+                subscriptionStatus.textContent = `Período de teste ativo até ${trialEndDate.toLocaleDateString()}.`;
+                return true;
             } else {
-                console.error('Usuário não encontrado.');
+                subscriptionStatus.textContent = 'Seu período de teste ou assinatura expirou.';
+                return false;
             }
         };
 
-        // Manipular o clique no botão de logout
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await auth.signOut();
-                window.location.href = HOME_URL;
-            } catch (error) {
-                console.error('Erro ao fazer logout:', error.message);
+        // Manipulação de erros
+        const handleError = (elementId, message) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.style.display = 'block';
+                element.textContent = message;
             }
-        });
+        };
+    } else {
+        console.error('Alguns elementos DOM estão faltando.');
     }
 });
