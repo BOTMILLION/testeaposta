@@ -136,13 +136,13 @@
         import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
         
         const firebaseConfig = {
-            apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
-            authDomain: "projeto-notificacao-968d4.firebaseapp.com",
-            projectId: "projeto-notificacao-968d4",
-            storageBucket: "projeto-notificacao-968d4.appspot.com",
-            messagingSenderId: "236002612799",
-            appId: "1:236002612799:web:54719603091421b94aca8a",
-            measurementId: "G-KY69HG6ZNZ"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -162,155 +162,99 @@
                 displayElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
                 if (remainingTime <= 0) {
                     window.location.href = redirectUrl;
+                } else {
+                    requestAnimationFrame(updateTimer);
                 }
             }
             updateTimer();
-            setInterval(updateTimer, 1000);
-        }
-        
-        // Função para exibir mensagens do Telegram
-        const ws = new WebSocket('ws://localhost:3000'); // Conecte-se ao WebSocket
-        ws.onmessage = function(event) {
-            const messageElement = document.getElementById('messages');
-            messageElement.textContent = event.data;
-        };
-
-        // Função para verificar se o e-mail está verificado
-        async function checkEmailVerification() {
-            const user = auth.currentUser;
-            if (user && !user.emailVerified) {
-                alert('Por favor, verifique seu e-mail.');
-                await auth.signOut();
-                return false;
-            }
-            return true;
         }
 
-        // Função para tratamento de login
+        // Manipulação de eventos de login
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const errorElement = document.getElementById('loginError');
-            errorElement.style.display = 'none';
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                if (!user.emailVerified) {
-                    errorElement.textContent = 'Por favor, verifique seu e-mail.';
-                    errorElement.style.display = 'block';
-                    await auth.signOut();
-                    return;
-                }
-                // Exibir popup de redirecionamento
-                document.getElementById('redirectPopup').style.display = 'block';
+                const endTime = Date.now() + 5 * 1000; // 5 segundos para redirecionamento
+                localStorage.setItem('endTime', endTime); // Salva o tempo final no localStorage
                 startCountdown(5, 'redirectTimer', 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL');
+                document.getElementById('redirectPopup').style.display = 'block';
             } catch (error) {
-                errorElement.textContent = 'Email ou senha incorretos.';
-                errorElement.style.display = 'block';
+                document.getElementById('loginError').style.display = 'block';
             }
         });
 
-        // Função para tratamento de cadastro
+        // Manipulação de eventos de cadastro
         document.getElementById('registerButton').addEventListener('click', async () => {
-            const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            const errorElement = document.getElementById('registerError');
-            const successElement = document.getElementById('registerSuccess');
-            const trialStatusElement = document.getElementById('trialStatus');
-            const countdownElement = document.getElementById('trialCountdown');
-            errorElement.style.display = 'none';
-            successElement.style.display = 'none';
-            trialStatusElement.style.display = 'none';
-            countdownElement.style.display = 'none';
-            if (password.length < 6) {
-                errorElement.textContent = 'A senha deve ter pelo menos 6 caracteres.';
-                errorElement.style.display = 'block';
-                return;
-            }
             try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                await sendEmailVerification(auth.currentUser);
-                await setDoc(doc(db, 'users', email), {
-                    name: name,
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                await sendEmailVerification(user);
+                await setDoc(doc(db, 'users', user.uid), {
                     email: email,
-                    trialEnd: Date.now() + 3 * 24 * 60 * 60 * 1000 // 3 dias
+                    trialEnd: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
                 });
-                successElement.style.display = 'block';
-                startCountdown(3 * 24 * 60 * 60, 'registerTimer'); // 3 dias
                 document.getElementById('registerPopup').style.display = 'block';
+                startCountdown(3 * 24 * 60 * 60, 'registerTimer', 'https://yampi.com.br/checkout');
+                document.getElementById('registerForm').reset();
             } catch (error) {
-                errorElement.textContent = 'Erro ao cadastrar. Tente novamente.';
-                errorElement.style.display = 'block';
+                document.getElementById('registerError').style.display = 'block';
             }
         });
 
-        // Função para tratamento de redefinição de senha
+        // Manipulação de eventos de redefinição de senha
         document.getElementById('resetPasswordButton').addEventListener('click', async () => {
             const email = document.getElementById('resetEmail').value;
-            const errorElement = document.getElementById('resetError');
-            errorElement.style.display = 'none';
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                errorElement.textContent = 'Por favor, insira um e-mail válido.';
-                errorElement.style.display = 'block';
-                return;
-            }
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('Email de redefinição enviado.');
+                alert('Email de redefinição enviado. Verifique sua caixa de entrada.');
                 document.getElementById('resetPasswordForm').style.display = 'none';
                 document.getElementById('loginForm').style.display = 'block';
             } catch (error) {
-                errorElement.textContent = 'Erro ao enviar email de redefinição. Tente novamente.';
-                errorElement.style.display = 'block';
+                document.getElementById('resetError').style.display = 'block';
             }
         });
 
-        // Alternar visibilidade da senha
-        document.getElementById('togglePassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('loginPassword');
-            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-        });
-        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('registerPassword');
-            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-        });
-
-        // Alterar visibilidade dos formulários
+        // Alternar entre formulários de login, cadastro e redefinição de senha
         document.getElementById('registerLink').addEventListener('click', () => {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
         });
+
         document.getElementById('loginLink').addEventListener('click', () => {
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         });
+
         document.getElementById('resetPasswordLink').addEventListener('click', () => {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('resetPasswordForm').style.display = 'block';
         });
+
         document.getElementById('backToLoginLink').addEventListener('click', () => {
             document.getElementById('resetPasswordForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         });
 
-        // Fechar o popup de cadastro
         document.getElementById('closeRegisterPopup').addEventListener('click', () => {
             document.getElementById('registerPopup').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
         });
 
-        // Ação do botão de pagamento
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://yampi.com.br';
-        });
-
-        // Fechar o popup de redirecionamento agora
         document.getElementById('redirectNowButton').addEventListener('click', () => {
             window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
         });
 
+        // Atualizar o temporizador no popup de cadastro
+        const registerTimerElement = document.getElementById('registerTimer');
+        if (registerTimerElement) {
+            const endTime = localStorage.getItem('endTime');
+            if (endTime) {
+                startCountdown(Math.floor((endTime - Date.now()) / 1000), 'registerTimer', 'https://yampi.com.br/checkout');
+            }
+        }
     </script>
 </body>
 </html>
