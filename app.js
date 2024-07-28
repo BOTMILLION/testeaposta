@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 registerForm.style.display = 'none';
                 showRegistrationMessage(registrationDate, trialEndDate);
             } catch (error) {
+                console.error('Erro ao criar usuário:', error);
                 handleError('registerError', error.message);
             }
         });
@@ -149,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const endDate = new Date(trialEndDate);
 
             registrationMessage.style.display = 'block';
-            registrationMessage.innerHTML = 
+            registrationMessage.innerHTML = `
                 <h2>Usuário cadastrado!</h2>
                 <p>Para realizar o login, verifique o seu e-mail.</p>
                 <p>Este é o seu temporizador do período grátis de 3 dias.</p>
@@ -157,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Seu período de teste começa em: ${startDate.toLocaleDateString()} às ${startDate.toLocaleTimeString()}</p>
                 <p>Seu período de teste termina em: ${endDate.toLocaleDateString()} às ${endDate.toLocaleTimeString()}</p>
                 <button id="closePopupButton">FECHAR</button>
-            ;
+            `;
 
             document.getElementById('closePopupButton').addEventListener('click', () => {
                 window.location.href = HOME_URL; // Redirecionar para o início
@@ -189,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
                     
-                    redirectTimer.textContent = ${days}d ${hours}h ${minutes}m ${seconds}s;
+                    redirectTimer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
                 }
             }, 1000);
         };
@@ -220,12 +221,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Fechar o pop-up de recuperação de senha
+        // Manipular o fechamento do pop-up de recuperação de senha
         closeResetPopup.addEventListener('click', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
-        // Função para tratar erros
+        // Manipular o clique no botão de logout
+        logoutButton.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = HOME_URL;
+            }).catch((error) => {
+                console.error('Erro ao sair:', error);
+            });
+        });
+
+        // Função para lidar com erros
         const handleError = (elementId, message) => {
             const errorElement = document.getElementById(elementId);
             if (errorElement) {
@@ -234,15 +244,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // Manipular o logout
-        logoutButton.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = HOME_URL;
-            }).catch((error) => {
-                console.error('Erro ao sair:', error);
-            });
-        });
+        // Verificar o status da assinatura do usuário
+        const checkTrialOrSubscriptionStatus = (userData) => {
+            const now = new Date();
+            const trialEnd = userData.trialEnd.toDate();
+            const subscriptionEnd = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
+
+            if (subscriptionEnd && now > subscriptionEnd) {
+                return false; // Assinatura expirada
+            } else if (now > trialEnd) {
+                return false; // Período de teste expirado
+            }
+
+            return true; // Período de teste ou assinatura válida
+        };
     } else {
-        console.error('Um ou mais elementos não foram encontrados no DOM.');
+        console.error('Alguns elementos necessários não estão presentes no DOM.');
     }
 });
