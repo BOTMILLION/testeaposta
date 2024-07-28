@@ -226,39 +226,46 @@ document.addEventListener('DOMContentLoaded', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
-        // Manipular o clique no botão de logout
-        logoutButton.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = HOME_URL;
-            }).catch((error) => {
-                console.error('Erro ao sair:', error);
-            });
+        // Manipular o fechamento do pop-up de pagamento
+        closePopupButton.addEventListener('click', () => {
+            paymentPopup.style.display = 'none';
         });
 
-        // Função para lidar com erros
-        const handleError = (elementId, message) => {
-            const errorElement = document.getElementById(elementId);
-            if (errorElement) {
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-            }
-        };
-
-        // Verificar o status da assinatura do usuário
+        // Verificar status de assinatura do usuário
         const checkTrialOrSubscriptionStatus = (userData) => {
             const now = new Date();
-            const trialEnd = userData.trialEnd.toDate();
-            const subscriptionEnd = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
+            const trialEndDate = userData.trialEnd.toDate();
+            const subscriptionEndDate = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
 
-            if (subscriptionEnd && now > subscriptionEnd) {
-                return false; // Assinatura expirada
-            } else if (now > trialEnd) {
-                return false; // Período de teste expirado
+            if (!userData.isPaid) {
+                if (now < trialEndDate) {
+                    trialStatus.textContent = `Seu período de teste gratuito termina em: ${formatDistanceToNow(trialEndDate, { addSuffix: true })}`;
+                    return true;
+                } else if (subscriptionEndDate && now < subscriptionEndDate) {
+                    subscriptionStatus.textContent = `Sua assinatura ativa termina em: ${formatDistanceToNow(subscriptionEndDate, { addSuffix: true })}`;
+                    return true;
+                }
             }
-
-            return true; // Período de teste ou assinatura válida
+            return false;
         };
-    } else {
-        console.error('Alguns elementos necessários não estão presentes no DOM.');
+
+        // Manipular o clique no botão de logout
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = HOME_URL;
+            } catch (error) {
+                console.error('Erro ao sair:', error.message);
+            }
+        });
     }
+
+    // Função para tratar erros
+    const handleError = (errorElementId, message) => {
+        const errorElement = document.getElementById(errorElementId);
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+    };
 });
