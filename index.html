@@ -177,12 +177,8 @@
                     trialStatus.textContent = 'Seu período de teste expirou.';
                     subscriptionStatus.textContent = 'Por favor, realize o pagamento para continuar usando os serviços.';
                 } else {
-                    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-                    trialStatus.textContent = `Tempo restante do período de teste: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-                    subscriptionStatus.textContent = `Sua assinatura expira em: ${trialEndDate.toLocaleString()}`;
+                    trialStatus.textContent = 'Seu período de teste ainda está ativo.';
+                    subscriptionStatus.textContent = 'Por favor, realize o pagamento para continuar usando os serviços.';
                 }
             }
         }
@@ -190,36 +186,59 @@
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            
+
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                if (user.emailVerified) {
-                    document.getElementById('loginError').style.display = 'none';
-                    document.getElementById('redirectPopup').style.display = 'block';
-                    
-                    let timer = 5;
-                    const redirectTimer = document.getElementById('redirectTimer');
-                    const countdown = setInterval(() => {
-                        timer--;
-                        redirectTimer.textContent = timer;
-                        if (timer <= 0) {
-                            clearInterval(countdown);
-                            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-                        }
-                    }, 1000);
-                    
-                    document.getElementById('redirectNowButton').addEventListener('click', () => {
-                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-                    });
-                    
-                    // Atualizar o status do período de teste e da assinatura
-                    await updateUserTrialStatus(user.uid);
-                } else {
+                if (!user.emailVerified) {
                     document.getElementById('loginError').style.display = 'none';
                     document.getElementById('emailVerificationError').style.display = 'block';
+                    return;
                 }
+
+                // Atualizar o status do período de teste e da assinatura
+                const userDoc = doc(db, 'users', user.uid);
+                const userSnapshot = await getDoc(userDoc);
+                
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    const trialEndDate = new Date(userData.trialEndDate.toDate());
+                    const now = new Date();
+                    const timeRemaining = trialEndDate - now;
+
+                    if (timeRemaining <= 0) {
+                        document.getElementById('trialStatus').textContent = 'Seu período de teste expirou.';
+                        document.getElementById('subscriptionStatus').textContent = 'Por favor, realize o pagamento para continuar usando os serviços.';
+                        return;
+                    }
+
+                    const paymentDate = userData.paymentDate;
+                    if (!paymentDate) {
+                        document.getElementById('trialStatus').textContent = 'Seu período de teste ainda está ativo.';
+                        document.getElementById('subscriptionStatus').textContent = 'Por favor, realize o pagamento para continuar usando os serviços.';
+                        return;
+                    }
+                }
+
+                document.getElementById('loginError').style.display = 'none';
+                document.getElementById('redirectPopup').style.display = 'block';
+
+                let timer = 5;
+                const redirectTimer = document.getElementById('redirectTimer');
+                const countdown = setInterval(() => {
+                    timer--;
+                    redirectTimer.textContent = timer;
+                    if (timer <= 0) {
+                        clearInterval(countdown);
+                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                    }
+                }, 1000);
+                
+                document.getElementById('redirectNowButton').addEventListener('click', () => {
+                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                });
+                
             } catch (error) {
                 document.getElementById('loginError').style.display = 'block';
                 console.error(error.message);
@@ -294,58 +313,37 @@
             
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('Email de redefinição enviado. Verifique sua caixa de entrada.');
                 document.getElementById('resetPasswordForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
+                alert('Email de redefinição enviado.');
             } catch (error) {
                 document.getElementById('resetError').style.display = 'block';
-                document.getElementById('resetError').textContent = error.message;
+                document.getElementById('resetError').textContent = 'Erro ao enviar email de redefinição.';
                 console.error(error.message);
             }
         });
         
-        window.onload = () => {
-            document.getElementById('loginForm').style.display = 'block';
-        };
-        
-        document.getElementById('togglePassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-        });
-        
-        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('registerPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-        });
-        
-        document.getElementById('registerLink').addEventListener('click', (e) => {
-            e.preventDefault();
+        document.getElementById('registerLink').addEventListener('click', (event) => {
+            event.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
         });
         
-        document.getElementById('loginLink').addEventListener('click', (e) => {
-            e.preventDefault();
+        document.getElementById('loginLink').addEventListener('click', (event) => {
+            event.preventDefault();
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         });
         
-        document.getElementById('resetPasswordLink').addEventListener('click', (e) => {
-            e.preventDefault();
+        document.getElementById('resetPasswordLink').addEventListener('click', (event) => {
+            event.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('resetPasswordForm').style.display = 'block';
         });
         
-        document.getElementById('backToLoginLink').addEventListener('click', (e) => {
-            e.preventDefault();
+        document.getElementById('backToLoginLink').addEventListener('click', (event) => {
+            event.preventDefault();
             document.getElementById('resetPasswordForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
-        });
-        
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://your-payment-link.com';
         });
     </script>
 </body>
