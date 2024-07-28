@@ -81,22 +81,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Recarregar o status do usuário
                     await user.reload();
 
-                    if (user.emailVerified) {
-                        const userDoc = doc(db, 'users', user.uid);
-                        const userSnapshot = await getDoc(userDoc);
+                    if (!user.emailVerified) {
+                        handleError('loginError', 'Por favor, verifique seu e-mail antes de fazer login.');
+                        return; // Impedir redirecionamento se o e-mail não foi verificado
+                    }
 
-                        if (userSnapshot.exists()) {
-                            const userData = userSnapshot.data();
-                            if (checkTrialOrSubscriptionStatus(userData)) {
-                                startRedirect(userData.subscriptionEnd || userData.trialEnd);
-                            } else {
-                                showPaymentPopup();
-                            }
+                    const userDoc = doc(db, 'users', user.uid);
+                    const userSnapshot = await getDoc(userDoc);
+
+                    if (userSnapshot.exists()) {
+                        const userData = userSnapshot.data();
+                        if (checkTrialOrSubscriptionStatus(userData)) {
+                            startRedirect(userData.subscriptionEnd || userData.trialEnd);
                         } else {
-                            console.error('Dados do usuário não encontrados.');
+                            showPaymentPopup();
                         }
                     } else {
-                        handleError('loginError', 'Por favor, verifique seu e-mail antes de fazer login.');
+                        console.error('Dados do usuário não encontrados.');
                     }
                 } catch (error) {
                     handleError('loginError', error.message);
@@ -208,11 +209,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 try {
                     await sendPasswordResetEmail(auth, email);
-                    resetError.style.display = 'none';
-                    resetPasswordPopup.style.display = 'none';
-                    alert('E-mail de recuperação enviado.');
+                    resetError.textContent = 'Um e-mail de recuperação foi enviado.';
                 } catch (error) {
-                    handleError('resetError', error.message);
+                    resetError.textContent = `Erro: ${error.message}`;
                 }
             }
         });
@@ -248,5 +247,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Erro ao fazer logout:', error.message);
             }
         });
+
+        // Função para lidar com erros
+        const handleError = (elementId, message) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+            }
+        };
     }
 });
