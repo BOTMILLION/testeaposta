@@ -15,7 +15,7 @@ import {
 import { formatDistanceToNow, addDays } from 'date-fns'; // Importando date-fns
 
 const REDIRECT_URL = 'https://botmillion.github.io/telm/';
-const PAYMENT_URL = 'https://yampi.com.br/';
+const PAYMENT_URL = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
 const HOME_URL = 'https://botmillion.github.io/testeaposta/';
 
 document.addEventListener('DOMContentLoaded', () => {
