@@ -9,10 +9,10 @@ import {
     setDoc, 
     getDoc, 
     Timestamp, 
-    updateDoc 
+    addDays 
 } from './firebase'; // Ajuste o caminho conforme necessário
 
-import { formatDistanceToNow, addDays } from 'date-fns'; // Importando date-fns
+import { formatDistanceToNow } from 'date-fns'; // Importando date-fns
 
 const REDIRECT_URL = 'https://botmillion.github.io/telm/';
 const PAYMENT_URL = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
@@ -226,45 +226,51 @@ document.addEventListener('DOMContentLoaded', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
+        // Manipular o logout
+        logoutButton.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = HOME_URL;
+            }).catch((error) => {
+                console.error('Erro ao sair:', error);
+            });
+        });
+
+        // Manipular o status da assinatura
+        const checkTrialOrSubscriptionStatus = (userData) => {
+            const now = Timestamp.now().toDate();
+            const trialEnd = userData.trialEnd.toDate();
+            const subscriptionEnd = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
+
+            if (userData.isPaid) {
+                if (subscriptionEnd && now < subscriptionEnd) {
+                    subscriptionStatus.textContent = `Sua assinatura é válida até ${subscriptionEnd.toLocaleDateString()}.`;
+                    return true;
+                } else {
+                    showPaymentPopup();
+                    return false;
+                }
+            } else {
+                if (now < trialEnd) {
+                    trialStatus.textContent = `Seu período de teste termina em ${formatDistanceToNow(trialEnd, { addSuffix: true })}.`;
+                    return true;
+                } else {
+                    showPaymentPopup();
+                    return false;
+                }
+            }
+        };
+
         // Manipular o fechamento do pop-up de pagamento
         closePopupButton.addEventListener('click', () => {
             paymentPopup.style.display = 'none';
         });
-
-        // Verificar status de assinatura do usuário
-        const checkTrialOrSubscriptionStatus = (userData) => {
-            const now = new Date();
-            const trialEndDate = userData.trialEnd.toDate();
-            const subscriptionEndDate = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
-
-            if (!userData.isPaid) {
-                if (now < trialEndDate) {
-                    trialStatus.textContent = `Seu período de teste gratuito termina em: ${formatDistanceToNow(trialEndDate, { addSuffix: true })}`;
-                    return true;
-                } else if (subscriptionEndDate && now < subscriptionEndDate) {
-                    subscriptionStatus.textContent = `Sua assinatura ativa termina em: ${formatDistanceToNow(subscriptionEndDate, { addSuffix: true })}`;
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        // Manipular o clique no botão de logout
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await auth.signOut();
-                window.location.href = HOME_URL;
-            } catch (error) {
-                console.error('Erro ao sair:', error.message);
-            }
-        });
     }
 
-    // Função para tratar erros
-    const handleError = (errorElementId, message) => {
-        const errorElement = document.getElementById(errorElementId);
+    // Função para exibir erros
+    const handleError = (elementId, errorMessage) => {
+        const errorElement = document.getElementById(elementId);
         if (errorElement) {
-            errorElement.textContent = message;
+            errorElement.textContent = errorMessage;
             errorElement.style.display = 'block';
         }
     };
