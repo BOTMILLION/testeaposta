@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilos para os popups */
         .popup {
             display: none;
             position: fixed;
@@ -45,6 +44,11 @@
             border-radius: 5px;
             z-index: 1000;
         }
+        #trialStatus, #subscriptionStatus, #trialCountdown {
+            color: blue;
+            font-size: 16px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -52,9 +56,8 @@
         <img src="https://i.imgur.com/zWOAVrg.png" alt="Logo" class="logo">
         <div class="welcome-text">Bem Vindo</div>
         
-        <!-- Adicionando o elemento shine -->
         <div class="shine"></div>
-        <!-- Formulário de Login -->
+        
         <div class="form-login" id="loginForm">
             <div class="line">
                 <input type="email" id="loginEmail" placeholder=" " required>
@@ -63,7 +66,7 @@
             <div class="line">
                 <input type="password" id="loginPassword" placeholder=" " required>
                 <label for="loginPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="togglePassword"></i> <!-- Ícone do olho -->
+                <i class="zmdi zmdi-eye" id="togglePassword"></i>
             </div>
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
             <div id="emailVerificationError" style="color: red; display: none;">Por favor, verifique seu e-mail antes de fazer login.</div>
@@ -76,7 +79,7 @@
                 Esqueceu a senha? <a href="#" id="resetPasswordLink">Redefinir Senha</a>
             </div>
         </div>
-        <!-- Formulário de Cadastro -->
+        
         <div class="form-login" id="registerForm" style="display: none;">
             <div class="line">
                 <input type="text" id="registerName" placeholder=" " required>
@@ -89,19 +92,19 @@
             <div class="line">
                 <input type="password" id="registerPassword" placeholder=" " required>
                 <label for="registerPassword">Sua Senha</label>
-                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i> <!-- Ícone do olho -->
+                <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
             </div>
             <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
             <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado. Verifique o seu email.</div>
-            <div id="trialStatus" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Status do Período de Teste -->
-            <div id="subscriptionStatus" style="color: green; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Status da Assinatura -->
-            <div id="trialCountdown" style="color: blue; display: none; font-size: 16px; font-weight: bold;"></div> <!-- Temporizador do período de teste -->
+            <div id="trialStatus"></div>
+            <div id="subscriptionStatus"></div>
+            <div id="trialCountdown"></div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
             </div>
         </div>
-        <!-- Formulário de Redefinição de Senha -->
+        
         <div class="form-login" id="resetPasswordForm" style="display: none;">
             <div class="line">
                 <input type="email" id="resetEmail" placeholder=" " required>
@@ -113,13 +116,13 @@
                 <a href="#" id="backToLoginLink">Voltar para o Login</a>
             </div>
         </div>
-        <!-- Popup de Redirecionamento -->
+        
         <div class="popup" id="redirectPopup">
             <h2>Login Bem-sucedido!</h2>
             <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
             <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
-        <!-- Popup de Cadastro -->
+        
         <div class="popup" id="registerPopup">
             <h2>Usuário cadastrado!</h2>
             <p>Para realizar o login, verifique o seu email.</p>
@@ -128,13 +131,14 @@
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
-        <!-- Container de Mensagens -->
+        
         <div id="messages"></div>
     </div>
+    
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
         
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfSbH9IkKCsBH-66Tz0",
@@ -149,16 +153,40 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Função para exibir mensagens no pop-up
         function showMessage(message) {
             const messagesDiv = document.getElementById('messages');
             messagesDiv.textContent = message;
             setTimeout(() => {
                 messagesDiv.textContent = '';
-            }, 10000); // Exibir a mensagem por 10 segundos
+            }, 10000);
         }
         
-        // Função de login
+        async function updateUserTrialStatus(userId) {
+            const userDoc = doc(db, 'users', userId);
+            const userSnapshot = await getDoc(userDoc);
+            if (userSnapshot.exists()) {
+                const userData = userSnapshot.data();
+                const trialEndDate = new Date(userData.trialEndDate.toDate());
+                const now = new Date();
+                const timeRemaining = trialEndDate - now;
+                
+                const trialStatus = document.getElementById('trialStatus');
+                const subscriptionStatus = document.getElementById('subscriptionStatus');
+                
+                if (timeRemaining <= 0) {
+                    trialStatus.textContent = 'Seu período de teste expirou.';
+                    subscriptionStatus.textContent = 'Por favor, realize o pagamento para continuar usando os serviços.';
+                } else {
+                    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                    trialStatus.textContent = `Tempo restante do período de teste: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    subscriptionStatus.textContent = `Sua assinatura expira em: ${trialEndDate.toLocaleString()}`;
+                }
+            }
+        }
+        
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -167,13 +195,10 @@
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                // Verificar se o email está verificado
                 if (user.emailVerified) {
                     document.getElementById('loginError').style.display = 'none';
-                    // Mostrar popup de redirecionamento
                     document.getElementById('redirectPopup').style.display = 'block';
                     
-                    // Contador regressivo no popup
                     let timer = 5;
                     const redirectTimer = document.getElementById('redirectTimer');
                     const countdown = setInterval(() => {
@@ -188,6 +213,9 @@
                     document.getElementById('redirectNowButton').addEventListener('click', () => {
                         window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                     });
+                    
+                    // Atualizar o status do período de teste e da assinatura
+                    await updateUserTrialStatus(user.uid);
                 } else {
                     document.getElementById('loginError').style.display = 'none';
                     document.getElementById('emailVerificationError').style.display = 'block';
@@ -198,7 +226,6 @@
             }
         });
         
-        // Função de cadastro
         document.getElementById('registerButton').addEventListener('click', async () => {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
@@ -214,23 +241,25 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                // Atualizar o Firestore com o nome
+                // Atualizar o Firestore com o nome e outras informações
+                const trialEndDate = new Date();
+                trialEndDate.setDate(trialEndDate.getDate() + 3); // Período de teste de 3 dias
+                
                 await setDoc(doc(db, 'users', user.uid), {
                     name: name,
                     email: email,
-                    createdAt: new Date()
+                    createdAt: new Date(),
+                    trialEndDate: trialEndDate,
+                    paymentDate: null // Inicialmente sem data de pagamento
                 });
                 
                 // Enviar email de verificação
                 await sendEmailVerification(user);
                 
-                // Mostrar popup de sucesso de registro
                 document.getElementById('registerForm').style.display = 'none';
                 document.getElementById('registerPopup').style.display = 'block';
                 
                 // Iniciar o contador do período grátis
-                const trialEndDate = new Date();
-                trialEndDate.setDate(trialEndDate.getDate() + 3); // Período de teste de 3 dias
                 const trialCountdown = document.getElementById('registerTimer');
                 
                 function updateTrialCountdown() {
@@ -260,7 +289,6 @@
             }
         });
         
-        // Função de redefinição de senha
         document.getElementById('resetPasswordButton').addEventListener('click', async () => {
             const email = document.getElementById('resetEmail').value;
             
@@ -276,12 +304,10 @@
             }
         });
         
-        // Exibir formulário de login ao iniciar
         window.onload = () => {
             document.getElementById('loginForm').style.display = 'block';
         };
         
-        // Alternar visibilidade de senha
         document.getElementById('togglePassword').addEventListener('click', () => {
             const passwordField = document.getElementById('loginPassword');
             const type = passwordField.type === 'password' ? 'text' : 'password';
@@ -294,7 +320,6 @@
             passwordField.type = type;
         });
         
-        // Alternar entre formulários
         document.getElementById('registerLink').addEventListener('click', (e) => {
             e.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
@@ -319,7 +344,6 @@
             document.getElementById('loginForm').style.display = 'block';
         });
         
-        // Função para realizar o pagamento
         document.getElementById('paymentButton').addEventListener('click', () => {
             window.location.href = 'https://your-payment-link.com';
         });
