@@ -217,44 +217,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Fechar o pop-up de reset de senha
+        // Fechar o pop-up de recuperação de senha
         closeResetPopup.addEventListener('click', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
-        // Adicionar logout
-        logoutButton.addEventListener('click', async () => {
-            await auth.signOut();
-            window.location.href = HOME_URL; // Redirecionar após logout
-        });
-
-        // Mostrar status da assinatura
+        // Função para verificar status do período gratuito ou assinatura
         const checkTrialOrSubscriptionStatus = (userData) => {
-            const now = new Date();
-            const trialEndDate = userData.trialEnd ? userData.trialEnd.toDate() : null;
-            const subscriptionEndDate = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
+            const now = Timestamp.now();
 
-            if (subscriptionEndDate && subscriptionEndDate > now) {
-                subscriptionStatus.textContent = `Assinatura ativa até ${subscriptionEndDate.toLocaleDateString()}.`;
-                return true;
-            } else if (trialEndDate && trialEndDate > now) {
-                subscriptionStatus.textContent = `Período de teste ativo até ${trialEndDate.toLocaleDateString()}.`;
-                return true;
-            } else {
-                subscriptionStatus.textContent = 'Seu período de teste ou assinatura expirou.';
-                return false;
+            if (userData.isPaid) {
+                return true; // Assinatura ativa
             }
+
+            const trialEndDate = userData.trialEnd.toDate();
+
+            if (now.toDate() > trialEndDate) {
+                return false; // Período de teste expirado
+            }
+
+            return true; // Período de teste ainda válido
         };
 
-        // Manipulação de erros
-        const handleError = (elementId, message) => {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.style.display = 'block';
-                element.textContent = message;
+        // Manipular o clique no botão de logout
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = HOME_URL;
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error.message);
             }
-        };
-    } else {
-        console.error('Alguns elementos DOM estão faltando.');
+        });
     }
 });
