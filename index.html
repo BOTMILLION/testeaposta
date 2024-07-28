@@ -155,158 +155,173 @@
             messagesDiv.textContent = message;
             setTimeout(() => {
                 messagesDiv.textContent = '';
-            }, 5000); // Exibir a mensagem por 5 segundos
+            }, 10000); // Exibir a mensagem por 10 segundos
         }
-
-        // Mostrar mensagens do Telegram
-        const ws = new WebSocket('ws://localhost:3000');
-        ws.onmessage = function(event) {
-            showMessage(event.data);
-        };
-
-        window.onload = function() {
-            document.getElementById('loginButton').addEventListener('click', function() {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                signInWithEmailAndPassword(auth, email, password)
-                    .then(async (userCredential) => {
-                        const user = userCredential.user;
-                        if (user.emailVerified) {
-                            document.getElementById('redirectPopup').style.display = 'block';
-                            let seconds = 5;
-                            const timer = document.getElementById('redirectTimer');
-                            const interval = setInterval(() => {
-                                seconds--;
-                                timer.textContent = seconds;
-                                if (seconds <= 0) {
-                                    clearInterval(interval);
-                                    window.location.href = "https://botmillion.github.io/telm/";
-                                }
-                            }, 1000);
-                        } else {
-                            document.getElementById('emailVerificationError').textContent = 'Por favor, verifique seu e-mail.';
-                            document.getElementById('emailVerificationError').style.display = 'block';
+        
+        // Função de login
+        document.getElementById('loginButton').addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Verificar se o email está verificado
+                if (user.emailVerified) {
+                    document.getElementById('loginError').style.display = 'none';
+                    // Mostrar popup de redirecionamento
+                    document.getElementById('redirectPopup').style.display = 'block';
+                    
+                    // Contador regressivo no popup
+                    let timer = 5;
+                    const redirectTimer = document.getElementById('redirectTimer');
+                    const countdown = setInterval(() => {
+                        timer--;
+                        redirectTimer.textContent = timer;
+                        if (timer <= 0) {
+                            clearInterval(countdown);
+                            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                         }
-                    })
-                    .catch(error => {
-                        console.error('Erro de login:', error);
-                        document.getElementById('loginError').textContent = 'Email ou senha incorretos.';
-                        document.getElementById('loginError').style.display = 'block';
+                    }, 1000);
+                    
+                    document.getElementById('redirectNowButton').addEventListener('click', () => {
+                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                     });
-            });
-
-            document.getElementById('registerButton').addEventListener('click', function() {
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                if (password.length < 6) {
-                    document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
-                    document.getElementById('registerError').style.display = 'block';
-                    return;
+                } else {
+                    document.getElementById('loginError').style.display = 'none';
+                    document.getElementById('emailVerificationError').style.display = 'block';
                 }
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        setDoc(doc(db, "users", user.uid), {
-                            email: user.email,
-                            trialEnd: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000) // Adiciona 3 dias
-                        }).then(() => {
-                            sendEmailVerification(user)
-                                .then(() => {
-                                    document.getElementById('registerPopup').style.display = 'block';
-                                    initializeTrialTimer();
-                                })
-                                .catch(error => {
-                                    console.error('Erro ao enviar email de verificação:', error);
-                                });
-                        }).catch(error => {
-                            console.error('Erro ao adicionar dados ao Firestore:', error);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Erro ao cadastrar:', error);
-                        document.getElementById('registerError').textContent = 'Erro ao cadastrar. Tente novamente.';
-                        document.getElementById('registerError').style.display = 'block';
-                    });
-            });
-
-            document.getElementById('resetPasswordButton').addEventListener('click', function() {
-                const email = document.getElementById('resetEmail').value;
-                sendPasswordResetEmail(auth, email)
-                    .then(() => {
-                        alert('Email de redefinição enviado!');
-                        document.getElementById('resetPasswordForm').style.display = 'none';
-                        document.getElementById('loginForm').style.display = 'block';
-                    })
-                    .catch(error => {
-                        console.error('Erro ao enviar email de redefinição:', error);
-                        document.getElementById('resetError').textContent = 'Erro ao enviar email de redefinição.';
-                        document.getElementById('resetError').style.display = 'block';
-                    });
-            });
-
-            document.getElementById('loginLink').addEventListener('click', function(e) {
-                e.preventDefault();
+            } catch (error) {
+                document.getElementById('loginError').style.display = 'block';
+                console.error(error.message);
+            }
+        });
+        
+        // Função de cadastro
+        document.getElementById('registerButton').addEventListener('click', async () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (password.length < 6) {
+                document.getElementById('registerError').style.display = 'block';
+                document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
+                return;
+            }
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Atualizar o Firestore com o nome
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: name,
+                    email: email,
+                    createdAt: new Date()
+                });
+                
+                // Enviar email de verificação
+                await sendEmailVerification(user);
+                
+                // Mostrar popup de sucesso de registro
                 document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
-            });
-
-            document.getElementById('registerLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('registerForm').style.display = 'block';
-            });
-
-            document.getElementById('resetPasswordLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('resetPasswordForm').style.display = 'block';
-            });
-
-            document.getElementById('backToLoginLink').addEventListener('click', function(e) {
-                e.preventDefault();
+                document.getElementById('registerPopup').style.display = 'block';
+                
+                // Iniciar o contador do período grátis
+                const trialEndDate = new Date();
+                trialEndDate.setDate(trialEndDate.getDate() + 3); // Período de teste de 3 dias
+                const trialCountdown = document.getElementById('registerTimer');
+                
+                function updateTrialCountdown() {
+                    const now = new Date();
+                    const timeRemaining = trialEndDate - now;
+                    if (timeRemaining <= 0) {
+                        trialCountdown.textContent = 'Seu período de teste expirou.';
+                        return;
+                    }
+                    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                    trialCountdown.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s restantes`;
+                }
+                updateTrialCountdown();
+                setInterval(updateTrialCountdown, 1000);
+                
+                document.getElementById('closeRegisterPopup').addEventListener('click', () => {
+                    document.getElementById('registerPopup').style.display = 'none';
+                });
+                
+            } catch (error) {
+                document.getElementById('registerError').style.display = 'block';
+                document.getElementById('registerError').textContent = error.message;
+                console.error(error.message);
+            }
+        });
+        
+        // Função de redefinição de senha
+        document.getElementById('resetPasswordButton').addEventListener('click', async () => {
+            const email = document.getElementById('resetEmail').value;
+            
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Email de redefinição enviado. Verifique sua caixa de entrada.');
                 document.getElementById('resetPasswordForm').style.display = 'none';
                 document.getElementById('loginForm').style.display = 'block';
-            });
-
-            document.getElementById('closeRegisterPopup').addEventListener('click', function() {
-                document.getElementById('registerPopup').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
-            });
-
-            function initializeTrialTimer() {
-                const trialEndDate = new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000); // 3 dias
-                const timerElement = document.getElementById('registerTimer');
-                setInterval(() => {
-                    const now = new Date();
-                    const timeLeft = trialEndDate - now;
-                    if (timeLeft <= 0) {
-                        timerElement.textContent = 'Seu período de teste terminou.';
-                        clearInterval();
-                    } else {
-                        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                        timerElement.textContent = `Tempo restante: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-                    }
-                }, 1000);
+            } catch (error) {
+                document.getElementById('resetError').style.display = 'block';
+                document.getElementById('resetError').textContent = error.message;
+                console.error(error.message);
             }
+        });
+        
+        // Exibir formulário de login ao iniciar
+        window.onload = () => {
+            document.getElementById('loginForm').style.display = 'block';
         };
-
-        document.getElementById('togglePassword').addEventListener('click', function() {
+        
+        // Alternar visibilidade de senha
+        document.getElementById('togglePassword').addEventListener('click', () => {
             const passwordField = document.getElementById('loginPassword');
             const type = passwordField.type === 'password' ? 'text' : 'password';
             passwordField.type = type;
         });
-
-        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+        
+        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
             const passwordField = document.getElementById('registerPassword');
             const type = passwordField.type === 'password' ? 'text' : 'password';
             passwordField.type = type;
         });
-
-        document.getElementById('paymentButton').addEventListener('click', function() {
-            window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
+        
+        // Alternar entre formulários
+        document.getElementById('registerLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+        
+        document.getElementById('loginLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+        
+        document.getElementById('resetPasswordLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'block';
+        });
+        
+        document.getElementById('backToLoginLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('resetPasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+        
+        // Função para realizar o pagamento
+        document.getElementById('paymentButton').addEventListener('click', () => {
+            window.location.href = 'https://your-payment-link.com';
         });
     </script>
 </body>
