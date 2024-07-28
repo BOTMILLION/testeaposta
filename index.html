@@ -66,6 +66,7 @@
                 <i class="zmdi zmdi-eye" id="togglePassword"></i> <!-- Ícone do olho -->
             </div>
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <div id="emailVerificationError" style="color: red; display: none;">Por favor, verifique seu e-mail antes de fazer login.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
             <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
             <div class="info-text">
@@ -132,7 +133,7 @@
     </div>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
         import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
         
         const firebaseConfig = {
@@ -148,58 +149,44 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Função para iniciar o temporizador de contagem regressiva
-        function startCountdown(duration, displayElementId, redirectUrl) {
-            const endTime = Date.now() + duration * 1000;
-            localStorage.setItem('endTime', endTime); // Salva o tempo final no localStorage
-            function updateTimer() {
-                let now = Date.now();
-                let remainingTime = Math.max(0, Math.floor((endTime - now) / 1000));
-                let hours = Math.floor(remainingTime / 3600);
-                let minutes = Math.floor((remainingTime % 3600) / 60);
-                let seconds = remainingTime % 60;
-                const displayElement = document.getElementById(displayElementId);
-                displayElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
-                if (remainingTime <= 0) {
-                    clearInterval(timerInterval);
-                    if (redirectUrl) window.location.href = redirectUrl;
-                }
-            }
-            updateTimer();
-            const timerInterval = setInterval(updateTimer, 1000);
+        // Função para exibir mensagens no pop-up
+        function showMessage(message) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.textContent = message;
+            setTimeout(() => {
+                messagesDiv.textContent = '';
+            }, 5000); // Exibir a mensagem por 5 segundos
         }
-        
-        // Início do temporizador de teste
-        function initializeTrialTimer() {
-            const endTime = localStorage.getItem('endTime');
-            if (endTime) {
-                const remainingTime = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-                if (remainingTime > 0) {
-                    startCountdown(remainingTime, 'registerTimer', null);
-                } else {
-                    document.getElementById('registerTimer').textContent = 'Período de teste expirado.';
-                    document.getElementById('registerTimer').style.color = 'red';
-                }
-            }
-        }
-        
+
+        // Mostrar mensagens do Telegram
+        const ws = new WebSocket('ws://localhost:3000');
+        ws.onmessage = function(event) {
+            showMessage(event.data);
+        };
+
         window.onload = function() {
             document.getElementById('loginButton').addEventListener('click', function() {
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
                 signInWithEmailAndPassword(auth, email, password)
-                    .then(() => {
-                        document.getElementById('redirectPopup').style.display = 'block';
-                        let seconds = 5;
-                        const timer = document.getElementById('redirectTimer');
-                        const interval = setInterval(() => {
-                            seconds--;
-                            timer.textContent = seconds;
-                            if (seconds <= 0) {
-                                clearInterval(interval);
-                                window.location.href = "https://botmillion.github.io/telm/";
-                            }
-                        }, 1000);
+                    .then(async (userCredential) => {
+                        const user = userCredential.user;
+                        if (user.emailVerified) {
+                            document.getElementById('redirectPopup').style.display = 'block';
+                            let seconds = 5;
+                            const timer = document.getElementById('redirectTimer');
+                            const interval = setInterval(() => {
+                                seconds--;
+                                timer.textContent = seconds;
+                                if (seconds <= 0) {
+                                    clearInterval(interval);
+                                    window.location.href = "https://botmillion.github.io/telm/";
+                                }
+                            }, 1000);
+                        } else {
+                            document.getElementById('emailVerificationError').textContent = 'Por favor, verifique seu e-mail.';
+                            document.getElementById('emailVerificationError').style.display = 'block';
+                        }
                     })
                     .catch(error => {
                         console.error('Erro de login:', error);
@@ -208,30 +195,6 @@
                     });
             });
 
-            document.getElementById('paymentButton').addEventListener('click', function() {
-                window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
-            });
-            
-            document.getElementById('registerLink').addEventListener('click', function() {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('registerForm').style.display = 'block';
-            });
-            
-            document.getElementById('loginLink').addEventListener('click', function() {
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
-            });
-            
-            document.getElementById('resetPasswordLink').addEventListener('click', function() {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('resetPasswordForm').style.display = 'block';
-            });
-            
-            document.getElementById('backToLoginLink').addEventListener('click', function() {
-                document.getElementById('resetPasswordForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
-            });
-            
             document.getElementById('registerButton').addEventListener('click', function() {
                 const email = document.getElementById('registerEmail').value;
                 const password = document.getElementById('registerPassword').value;
@@ -242,14 +205,22 @@
                 }
                 createUserWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
-                        sendEmailVerification(userCredential.user)
-                            .then(() => {
-                                document.getElementById('registerPopup').style.display = 'block';
-                                initializeTrialTimer();
-                            })
-                            .catch(error => {
-                                console.error('Erro ao enviar email de verificação:', error);
-                            });
+                        const user = userCredential.user;
+                        setDoc(doc(db, "users", user.uid), {
+                            email: user.email,
+                            trialEnd: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000) // Adiciona 3 dias
+                        }).then(() => {
+                            sendEmailVerification(user)
+                                .then(() => {
+                                    document.getElementById('registerPopup').style.display = 'block';
+                                    initializeTrialTimer();
+                                })
+                                .catch(error => {
+                                    console.error('Erro ao enviar email de verificação:', error);
+                                });
+                        }).catch(error => {
+                            console.error('Erro ao adicionar dados ao Firestore:', error);
+                        });
                     })
                     .catch(error => {
                         console.error('Erro ao cadastrar:', error);
@@ -262,24 +233,81 @@
                 const email = document.getElementById('resetEmail').value;
                 sendPasswordResetEmail(auth, email)
                     .then(() => {
-                        alert('Email de redefinição enviado.');
+                        alert('Email de redefinição enviado!');
                         document.getElementById('resetPasswordForm').style.display = 'none';
                         document.getElementById('loginForm').style.display = 'block';
                     })
                     .catch(error => {
                         console.error('Erro ao enviar email de redefinição:', error);
-                        document.getElementById('resetError').textContent = 'Erro ao enviar email de redefinição. Tente novamente.';
+                        document.getElementById('resetError').textContent = 'Erro ao enviar email de redefinição.';
                         document.getElementById('resetError').style.display = 'block';
                     });
             });
-            
-            document.getElementById('closeRegisterPopup').addEventListener('click', function() {
-                document.getElementById('registerPopup').style.display = 'none';
+
+            document.getElementById('loginLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
             });
 
-            // Configuração inicial do temporizador
-            initializeTrialTimer();
+            document.getElementById('registerLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+            });
+
+            document.getElementById('resetPasswordLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('resetPasswordForm').style.display = 'block';
+            });
+
+            document.getElementById('backToLoginLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('resetPasswordForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
+            });
+
+            document.getElementById('closeRegisterPopup').addEventListener('click', function() {
+                document.getElementById('registerPopup').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
+            });
+
+            function initializeTrialTimer() {
+                const trialEndDate = new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000); // 3 dias
+                const timerElement = document.getElementById('registerTimer');
+                setInterval(() => {
+                    const now = new Date();
+                    const timeLeft = trialEndDate - now;
+                    if (timeLeft <= 0) {
+                        timerElement.textContent = 'Seu período de teste terminou.';
+                        clearInterval();
+                    } else {
+                        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                        timerElement.textContent = `Tempo restante: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    }
+                }, 1000);
+            }
         };
+
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('loginPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('registerPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        });
+
+        document.getElementById('paymentButton').addEventListener('click', function() {
+            window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
+        });
     </script>
 </body>
 </html>
