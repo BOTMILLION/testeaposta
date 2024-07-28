@@ -73,35 +73,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (password.length < 6) {
                 handleError('loginError', 'A senha deve ter pelo menos 6 caracteres.');
-            } else {
-                try {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
+                return;
+            }
 
-                    // Recarregar o status do usuário
-                    await user.reload();
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
 
-                    if (!user.emailVerified) {
-                        handleError('loginError', 'Por favor, verifique seu e-mail antes de fazer login.');
-                        return; // Impedir redirecionamento se o e-mail não foi verificado
-                    }
+                // Recarregar o status do usuário
+                await user.reload();
 
-                    const userDoc = doc(db, 'users', user.uid);
-                    const userSnapshot = await getDoc(userDoc);
-
-                    if (userSnapshot.exists()) {
-                        const userData = userSnapshot.data();
-                        if (checkTrialOrSubscriptionStatus(userData)) {
-                            startRedirect(userData.subscriptionEnd || userData.trialEnd);
-                        } else {
-                            showPaymentPopup();
-                        }
-                    } else {
-                        console.error('Dados do usuário não encontrados.');
-                    }
-                } catch (error) {
-                    handleError('loginError', error.message);
+                if (!user.emailVerified) {
+                    handleError('loginError', 'Por favor, verifique seu e-mail antes de fazer login.');
+                    return; // Impedir redirecionamento se o e-mail não foi verificado
                 }
+
+                const userDoc = doc(db, 'users', user.uid);
+                const userSnapshot = await getDoc(userDoc);
+
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    if (checkTrialOrSubscriptionStatus(userData)) {
+                        startRedirect(userData.subscriptionEnd || userData.trialEnd);
+                    } else {
+                        showPaymentPopup();
+                    }
+                } else {
+                    console.error('Dados do usuário não encontrados.');
+                }
+            } catch (error) {
+                handleError('loginError', error.message);
             }
         });
 
@@ -113,31 +114,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (name === '' || email === '' || password === '' || password.length < 6) {
                 handleError('registerError', 'Por favor, preencha todos os campos corretamente.');
-            } else {
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    const registrationDate = new Date();
-                    const trialEndDate = addDays(registrationDate, 3);
+                return;
+            }
 
-                    await setDoc(doc(db, 'users', user.uid), {
-                        name: name,
-                        email: email,
-                        isPaid: false,
-                        subscriptionEnd: null,
-                        trialEnd: Timestamp.fromDate(trialEndDate),
-                        trialStart: Timestamp.fromDate(registrationDate)
-                    });
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const registrationDate = new Date();
+                const trialEndDate = addDays(registrationDate, 3);
 
-                    // Enviar e-mail de verificação
-                    await sendEmailVerification(user);
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: name,
+                    email: email,
+                    isPaid: false,
+                    subscriptionEnd: null,
+                    trialEnd: Timestamp.fromDate(trialEndDate),
+                    trialStart: Timestamp.fromDate(registrationDate)
+                });
 
-                    document.getElementById('registerError').style.display = 'none';
-                    registerForm.style.display = 'none';
-                    showRegistrationMessage(registrationDate, trialEndDate);
-                } catch (error) {
-                    handleError('registerError', error.message);
-                }
+                // Enviar e-mail de verificação
+                await sendEmailVerification(user);
+
+                document.getElementById('registerError').style.display = 'none';
+                registerForm.style.display = 'none';
+                showRegistrationMessage(registrationDate, trialEndDate);
+            } catch (error) {
+                handleError('registerError', error.message);
             }
         });
 
@@ -205,14 +207,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = resetEmail.value;
 
             if (email === '') {
-                handleError('resetError', 'Por favor, insira seu e-mail.');
-            } else {
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    resetError.textContent = 'Um e-mail de recuperação foi enviado.';
-                } catch (error) {
-                    resetError.textContent = `Erro: ${error.message}`;
-                }
+                handleError('resetError', 'O e-mail é obrigatório.');
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                resetPasswordPopup.style.display = 'none';
+                alert('E-mail de recuperação enviado!');
+            } catch (error) {
+                handleError('resetError', error.message);
             }
         });
 
@@ -221,40 +225,24 @@ document.addEventListener('DOMContentLoaded', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
-        // Função para verificar status do período gratuito ou assinatura
-        const checkTrialOrSubscriptionStatus = (userData) => {
-            const now = Timestamp.now();
-
-            if (userData.isPaid) {
-                return true; // Assinatura ativa
-            }
-
-            const trialEndDate = userData.trialEnd.toDate();
-
-            if (now.toDate() > trialEndDate) {
-                return false; // Período de teste expirado
-            }
-
-            return true; // Período de teste ainda válido
-        };
-
-        // Manipular o clique no botão de logout
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await auth.signOut();
-                window.location.href = HOME_URL;
-            } catch (error) {
-                console.error('Erro ao fazer logout:', error.message);
-            }
-        });
-
-        // Função para lidar com erros
+        // Função para tratar erros
         const handleError = (elementId, message) => {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.textContent = message;
-                element.style.display = 'block';
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
             }
         };
+
+        // Manipular o logout
+        logoutButton.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = HOME_URL;
+            }).catch((error) => {
+                console.error('Erro ao sair:', error);
+            });
+        });
+    } else {
+        console.error('Um ou mais elementos não foram encontrados no DOM.');
     }
 });
