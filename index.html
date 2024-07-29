@@ -188,11 +188,10 @@
                 if (isTrialActive) {
                     document.getElementById('redirectPopup').style.display = 'block';
                     let seconds = 5;
-                    const timerElement = document.getElementById('redirectTimer');
-                    timerElement.textContent = seconds;
+                    document.getElementById('redirectTimer').textContent = seconds;
                     const interval = setInterval(() => {
-                        seconds -= 1;
-                        timerElement.textContent = seconds;
+                        seconds--;
+                        document.getElementById('redirectTimer').textContent = seconds;
                         if (seconds <= 0) {
                             clearInterval(interval);
                             window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
@@ -202,28 +201,35 @@
                     document.getElementById('paymentPopup').style.display = 'block';
                 }
             } catch (error) {
+                console.error('Erro ao fazer login:', error.message);
                 document.getElementById('loginError').style.display = 'block';
-                if (error.code === 'auth/user-not-found') {
+                if (error.message.includes('requires email verification')) {
                     document.getElementById('emailVerificationError').style.display = 'block';
                 }
-                console.error('Erro ao fazer login:', error.message);
             }
         });
         
         document.getElementById('registerButton').addEventListener('click', async () => {
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
+            
+            if (password.length < 6) {
+                document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
+                document.getElementById('registerError').style.display = 'block';
+                return;
+            }
+            
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
                 const user = auth.currentUser;
                 await sendEmailVerification(user);
-                document.getElementById('registerPopup').style.display = 'block';
-                // Exibir temporizador do período grátis
+                document.getElementById('registerSuccess').style.display = 'block';
+                
                 const registerTimer = document.getElementById('registerTimer');
                 const trialEndDate = new Date();
                 trialEndDate.setDate(trialEndDate.getDate() + 3);
                 registerTimer.textContent = `Seu período grátis termina em: ${trialEndDate.toLocaleDateString()}`;
-                // Salvar data de término do período de teste no Firestore
+                
                 await setDoc(doc(db, 'users', user.uid), { trialEndDate });
             } catch (error) {
                 document.getElementById('registerError').style.display = 'block';
@@ -235,62 +241,58 @@
             const email = document.getElementById('resetEmail').value;
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('Um e-mail para redefinição de senha foi enviado.');
-                document.getElementById('resetPasswordForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
+                alert('Email de redefinição de senha enviado.');
             } catch (error) {
                 document.getElementById('resetError').style.display = 'block';
-                console.error('Erro ao enviar e-mail de redefinição de senha:', error.message);
+                console.error('Erro ao enviar email de redefinição de senha:', error.message);
             }
         });
         
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br';
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'none';
         });
         
         document.getElementById('registerLink').addEventListener('click', () => {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
-        });
-        
-        document.getElementById('loginLink').addEventListener('click', () => {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('resetPasswordForm').style.display = 'none';
         });
         
         document.getElementById('resetPasswordLink').addEventListener('click', () => {
             document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
             document.getElementById('resetPasswordForm').style.display = 'block';
         });
         
         document.getElementById('backToLoginLink').addEventListener('click', () => {
-            document.getElementById('resetPasswordForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'none';
         });
         
-        document.getElementById('closeRegisterPopup').addEventListener('click', () => {
-            document.getElementById('registerPopup').style.display = 'none';
+        document.getElementById('redirectNowButton').addEventListener('click', () => {
+            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+        });
+        
+        document.getElementById('paymentButton').addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br/checkout-link'; // Atualize o link do Yampi conforme necessário
         });
         
         document.getElementById('paymentPopupButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br';
+            window.location.href = 'https://yampi.com.br/checkout-link'; // Atualize o link do Yampi conforme necessário
         });
         
-        function connectWebSocket() {
-            const socket = new WebSocket('wss://localhost:3000'); // Endereço do seu servidor WebSocket
-            socket.onmessage = function(event) {
-                showMessage(event.data);
-            };
-            socket.onopen = function() {
-                console.log('Conectado ao WebSocket');
-            };
-            socket.onclose = function() {
-                console.log('WebSocket desconectado. Tentando reconectar...');
-                setTimeout(connectWebSocket, 5000);
-            };
-        }
+        const socket = new WebSocket('ws://localhost:3000');
         
-        connectWebSocket();
+        socket.addEventListener('message', (event) => {
+            showMessage(event.data);
+        });
+        
+        socket.addEventListener('error', (error) => {
+            console.error('WebSocket Error:', error);
+        });
     </script>
 </body>
 </html>
