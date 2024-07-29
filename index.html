@@ -20,6 +20,8 @@
             z-index: 1000;
             border-radius: 8px;
             text-align: center;
+            width: 80%;
+            max-width: 400px;
         }
         .popup .button {
             margin-top: 20px;
@@ -32,6 +34,15 @@
         }
         .popup .button:hover {
             background-color: #0056b3;
+        }
+        .popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: #333;
+            font-size: 20px;
+            line-height: 1;
         }
         #messages {
             position: fixed;
@@ -48,6 +59,48 @@
             color: blue;
             font-size: 16px;
             font-weight: bold;
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .line {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .line input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .line label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            transition: all 0.3s;
+        }
+        .line input:focus + label,
+        .line input:not(:placeholder-shown) + label {
+            top: -20px;
+            left: 10px;
+            font-size: 12px;
+            color: #007bff;
+        }
+        .line i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        .pulse-button {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .pulse-button:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
         }
     </style>
 </head>
@@ -68,8 +121,8 @@
                 <label for="loginPassword">Sua Senha</label>
                 <i class="zmdi zmdi-eye" id="togglePassword"></i>
             </div>
-            <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
-            <div id="emailVerificationError" style="color: red; display: none;">Por favor, verifique seu e-mail antes de fazer login.</div>
+            <div id="loginError" class="error-message" style="display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <div id="emailVerificationError" class="error-message" style="display: none;">Por favor, verifique seu e-mail antes de fazer login.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
             <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
             <div class="info-text">
@@ -94,7 +147,7 @@
                 <label for="registerPassword">Sua Senha</label>
                 <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
             </div>
-            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
+            <div id="registerError" class="error-message" style="display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
             <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado. Verifique o seu email.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
@@ -107,7 +160,7 @@
                 <input type="email" id="resetEmail" placeholder=" " required>
                 <label for="resetEmail">Seu Email</label>
             </div>
-            <div id="resetError" style="color: red; display: none;">Por favor, preencha o campo de email corretamente.</div>
+            <div id="resetError" class="error-message" style="display: none;">Por favor, preencha o campo de email corretamente.</div>
             <button class="custom-button" id="resetPasswordButton">ENVIAR EMAIL DE REDIFINIÇÃO</button>
             <div class="info-text">
                 <a href="#" id="backToLoginLink">Voltar para o Login</a>
@@ -115,12 +168,14 @@
         </div>
         
         <div class="popup" id="redirectPopup">
+            <span class="close-btn" id="closeRedirectPopup">&times;</span>
             <h2>Login Bem-sucedido!</h2>
             <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
             <button class="button" id="redirectNowButton">Ir Agora</button>
         </div>
         
         <div class="popup" id="paymentPopup">
+            <span class="close-btn" id="closePaymentPopup">&times;</span>
             <h2>Período de Teste Expirado!</h2>
             <p>Seu período de teste expirou. Para continuar usando nossos serviços, você precisa realizar o pagamento.</p>
             <button class="button" id="paymentPopupButton">REALIZAR PAGAMENTO</button>
@@ -139,88 +194,88 @@
             authDomain: "projeto-notificacao-968d4.firebaseapp.com",
             projectId: "projeto-notificacao-968d4",
             storageBucket: "projeto-notificacao-968d4.appspot.com",
-            messagingSenderId: "236002612799",
-            appId: "1:236002612799:web:54719603091421b94aca8a",
-            measurementId: "G-KY69HG6ZNZ"
+            messagingSenderId: "1078277828550",
+            appId: "1:1078277828550:web:1234567890abcdef"
         };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        function showMessage(message) {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.textContent = message;
-            setTimeout(() => {
-                messagesDiv.textContent = '';
-            }, 10000);
-        }
-        
         async function updateUserTrialStatus(userId) {
             const userDoc = doc(db, 'users', userId);
             const userSnapshot = await getDoc(userDoc);
+            
             if (userSnapshot.exists()) {
                 const userData = userSnapshot.data();
-                const trialEndDate = new Date(userData.trialEndDate.toDate());
                 const now = new Date();
-                const timeRemaining = trialEndDate - now;
+                const trialEndDate = new Date(userData.trialEndDate.toDate());
                 
-                const hasValidPaymentDate = userData.paymentDate ? new Date(userData.paymentDate.toDate()) > now : false;
-                
-                if (timeRemaining <= 0 && !hasValidPaymentDate) {
-                    return false;
-                }
-                
-                if (timeRemaining > 0 || hasValidPaymentDate) {
+                if (now < trialEndDate) {
                     return true;
                 }
+                
+                return false;
             }
+            
             return false;
+        }
+        
+        function showMessage(message) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<p>${message}</p>`;
         }
         
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            if (!email || !password) {
-                document.getElementById('loginError').style.display = 'block';
-                return;
-            }
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                if (!user.emailVerified) {
-                    document.getElementById('emailVerificationError').style.display = 'block';
-                    return;
-                }
-                const isTrialActive = await updateUserTrialStatus(user.uid);
-                if (!isTrialActive) {
-                    document.getElementById('paymentPopup').style.display = 'block';
-                } else {
-                    document.getElementById('redirectPopup').style.display = 'block';
-                    let countdown = 5;
-                    const redirectTimer = setInterval(() => {
-                        document.getElementById('redirectTimer').textContent = countdown;
-                        if (countdown === 0) {
-                            clearInterval(redirectTimer);
-                            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+            const loginErrorElement = document.getElementById('loginError');
+            const emailVerificationErrorElement = document.getElementById('emailVerificationError');
+            
+            loginErrorElement.style.display = 'none';
+            emailVerificationErrorElement.style.display = 'none';
+            
+            if (email && password) {
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    if (user.emailVerified) {
+                        const userId = user.uid;
+                        const hasValidTrial = await updateUserTrialStatus(userId);
+                        
+                        if (hasValidTrial) {
+                            document.getElementById('redirectPopup').style.display = 'block';
+                            
+                            let countdown = 5;
+                            const timer = document.getElementById('redirectTimer');
+                            timer.textContent = countdown;
+                            
+                            const countdownInterval = setInterval(() => {
+                                countdown--;
+                                timer.textContent = countdown;
+                                
+                                if (countdown <= 0) {
+                                    clearInterval(countdownInterval);
+                                    window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                                }
+                            }, 1000);
+                            
+                            document.getElementById('redirectNowButton').addEventListener('click', () => {
+                                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                            });
+                        } else {
+                            document.getElementById('paymentPopup').style.display = 'block';
                         }
-                        countdown--;
-                    }, 1000);
-                    document.getElementById('redirectNowButton').addEventListener('click', () => {
-                        clearInterval(redirectTimer);
-                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-                    });
+                    } else {
+                        emailVerificationErrorElement.style.display = 'block';
+                    }
+                } catch (error) {
+                    loginErrorElement.style.display = 'block';
                 }
-            } catch (error) {
-                console.error(error);
+            } else {
+                loginErrorElement.style.display = 'block';
             }
-        });
-        
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br/checkout/pxBz1vS0pNYaWmzM';
-        });
-        
-        document.getElementById('paymentPopupButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br/checkout/pxBz1vS0pNYaWmzM';
         });
         
         document.getElementById('registerLink').addEventListener('click', () => {
@@ -231,6 +286,63 @@
         document.getElementById('loginLink').addEventListener('click', () => {
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
+        });
+        
+        document.getElementById('registerButton').addEventListener('click', async () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const registerErrorElement = document.getElementById('registerError');
+            const registerSuccessElement = document.getElementById('registerSuccess');
+            
+            registerErrorElement.style.display = 'none';
+            registerSuccessElement.style.display = 'none';
+            
+            if (name && email && password.length >= 6) {
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    const user = auth.currentUser;
+                    if (user) {
+                        await sendEmailVerification(user);
+                        
+                        const userId = user.uid;
+                        await setDoc(doc(db, 'users', userId), {
+                            name: name,
+                            email: email,
+                            trialEndDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+                            paymentDate: null
+                        });
+                        
+                        document.getElementById('registerForm').style.display = 'none';
+                        document.getElementById('redirectPopup').style.display = 'block';
+                        
+                        let countdown = 5;
+                        const timer = document.getElementById('redirectTimer');
+                        timer.textContent = countdown;
+                        
+                        const countdownInterval = setInterval(() => {
+                            countdown--;
+                            timer.textContent = countdown;
+                            
+                            if (countdown <= 0) {
+                                clearInterval(countdownInterval);
+                                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                            }
+                        }, 1000);
+                        
+                        document.getElementById('redirectNowButton').addEventListener('click', () => {
+                            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                        });
+                        
+                        registerSuccessElement.style.display = 'block';
+                    }
+                } catch (error) {
+                    registerErrorElement.style.display = 'block';
+                }
+            } else {
+                registerErrorElement.style.display = 'block';
+            }
         });
         
         document.getElementById('resetPasswordLink').addEventListener('click', () => {
@@ -244,44 +356,70 @@
         });
         
         document.getElementById('resetPasswordButton').addEventListener('click', async () => {
-            const resetEmail = document.getElementById('resetEmail').value;
-            if (!resetEmail) {
-                document.getElementById('resetError').style.display = 'block';
-                return;
-            }
-            try {
-                await sendPasswordResetEmail(auth, resetEmail);
-                alert('Email de redefinição de senha enviado. Verifique seu email.');
-            } catch (error) {
-                console.error(error);
+            const email = document.getElementById('resetEmail').value;
+            const resetErrorElement = document.getElementById('resetError');
+            
+            resetErrorElement.style.display = 'none';
+            
+            if (email) {
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    document.getElementById('resetPasswordForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+                    alert('Email de redefinição enviado.');
+                } catch (error) {
+                    resetErrorElement.style.display = 'block';
+                }
+            } else {
+                resetErrorElement.style.display = 'block';
             }
         });
         
-        document.getElementById('registerButton').addEventListener('click', async () => {
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            if (!name || !email || !password || password.length < 6) {
-                document.getElementById('registerError').style.display = 'block';
-                return;
-            }
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                await sendEmailVerification(user);
-                const trialEndDate = new Date();
-                trialEndDate.setDate(trialEndDate.getDate() + 1);
-                await setDoc(doc(db, 'users', user.uid), {
-                    name: name,
-                    email: email,
-                    trialEndDate: trialEndDate,
-                    paymentDate: null
-                });
-                document.getElementById('registerSuccess').style.display = 'block';
-            } catch (error) {
-                console.error(error);
-            }
+        document.getElementById('paymentButton').addEventListener('click', () => {
+            window.location.href = 'https://checkout.yampi.com.br/';
         });
+        
+        document.getElementById('paymentPopupButton').addEventListener('click', () => {
+            window.location.href = 'https://checkout.yampi.com.br/';
+        });
+        
+        document.getElementById('closeRedirectPopup').addEventListener('click', () => {
+            document.getElementById('redirectPopup').style.display = 'none';
+        });
+        
+        document.getElementById('closePaymentPopup').addEventListener('click', () => {
+            document.getElementById('paymentPopup').style.display = 'none';
+        });
+        
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('loginPassword');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+        });
+        
+        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('registerPassword');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+        });
+        
+        const ws = new WebSocket('wss://YOUR_SERVER_URL'); // Substitua com a URL do seu servidor WebSocket
+        
+        ws.onmessage = function(event) {
+            showMessage(event.data);
+        };
+        
+        ws.onopen = function() {
+            console.log('Conectado ao WebSocket');
+        };
+        
+        ws.onclose = function() {
+            console.log('Desconectado do WebSocket');
+        };
+        
+        ws.onerror = function(error) {
+            console.log('Erro no WebSocket:', error);
+        };
     </script>
 </body>
 </html>
