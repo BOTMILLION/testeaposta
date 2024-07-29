@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Seus estilos existentes aqui */
         .popup {
             display: none;
             position: fixed;
@@ -195,154 +196,172 @@
         
         const firebaseConfig = {
             apiKey: "AIzaSyDQZRg62a84f8KkvfFiz5HPTXL9lbDHCs4",
-            authDomain: "my-app-29b4f.firebaseapp.com",
-            projectId: "my-app-29b4f",
-            storageBucket: "my-app-29b4f.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+            authDomain: "site-v1.firebaseapp.com",
+            projectId: "site-v1",
+            storageBucket: "site-v1.appspot.com",
+            messagingSenderId: "591546326684",
+            appId: "1:591546326684:web:b644aeb056c5cb00d3c22e"
         };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const firestore = getFirestore(app);
-        
+
+        const loginButton = document.getElementById('loginButton');
+        const registerButton = document.getElementById('registerButton');
+        const resetPasswordButton = document.getElementById('resetPasswordButton');
+        const registerLink = document.getElementById('registerLink');
+        const loginLink = document.getElementById('loginLink');
+        const resetPasswordLink = document.getElementById('resetPasswordLink');
+        const backToLoginLink = document.getElementById('backToLoginLink');
+        const redirectPopup = document.getElementById('redirectPopup');
+        const closeRedirectPopup = document.getElementById('closeRedirectPopup');
+        const redirectNowButton = document.getElementById('redirectNowButton');
+        const registerPopup = document.getElementById('registerPopup');
+        const closeRegisterPopup = document.getElementById('closeRegisterPopup');
+        const messagesDiv = document.getElementById('messages');
+        const redirectTimer = document.getElementById('redirectTimer');
+        const registerTimer = document.getElementById('registerTimer');
         let timerInterval;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginButton = document.getElementById('loginButton');
-            const registerButton = document.getElementById('registerButton');
-            const registerLink = document.getElementById('registerLink');
-            const loginLink = document.getElementById('loginLink');
-            const resetPasswordLink = document.getElementById('resetPasswordLink');
-            const resetPasswordButton = document.getElementById('resetPasswordButton');
-            const backToLoginLink = document.getElementById('backToLoginLink');
-            const redirectNowButton = document.getElementById('redirectNowButton');
-            const closeRedirectPopup = document.getElementById('closeRedirectPopup');
-            const closeRegisterPopup = document.getElementById('closeRegisterPopup');
-            const emailVerificationError = document.getElementById('emailVerificationError');
-            const loginError = document.getElementById('loginError');
-            const registerError = document.getElementById('registerError');
-            const registerSuccess = document.getElementById('registerSuccess');
-            const registerPopup = document.getElementById('registerPopup');
-            const redirectPopup = document.getElementById('redirectPopup');
-            const redirectTimer = document.getElementById('redirectTimer');
-            const registerTimer = document.getElementById('registerTimer');
-            const messagesDiv = document.getElementById('messages');
+
+        loginButton.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
             
-            const togglePassword = document.getElementById('togglePassword');
-            const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
-            const loginPassword = document.getElementById('loginPassword');
-            const registerPassword = document.getElementById('registerPassword');
-            
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const resetPasswordForm = document.getElementById('resetPasswordForm');
-            
-            const updateTimer = (seconds) => {
-                if (timerInterval) clearInterval(timerInterval);
-                const start = Date.now();
-                const end = start + seconds * 1000;
-                timerInterval = setInterval(() => {
-                    const remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
-                    if (remaining === 0) {
-                        clearInterval(timerInterval);
-                    }
-                    redirectTimer.textContent = remaining;
-                }, 1000);
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showPopup(redirectPopup);
+                startRedirectTimer();
+            } catch (error) {
+                handleLoginError(error);
+            }
+        });
+
+        registerButton.addEventListener('click', async () => {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName').value;
+
+            if (password.length < 6) {
+                document.getElementById('registerError').style.display = 'block';
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await sendEmailVerification(user);
+
+                // Salvar nome e email no Firestore
+                await setDoc(doc(firestore, 'users', user.uid), {
+                    name: name,
+                    email: email
+                });
+
+                document.getElementById('registerError').style.display = 'none';
+                document.getElementById('registerSuccess').style.display = 'block';
+                startRegisterTimer();
+
+                showPopup(registerPopup);
+            } catch (error) {
+                handleRegisterError(error);
+            }
+        });
+
+        resetPasswordButton.addEventListener('click', async () => {
+            const email = document.getElementById('resetEmail').value;
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Verifique seu e-mail para instruções de redefinição de senha.');
+            } catch (error) {
+                document.getElementById('resetError').style.display = 'block';
+            }
+        });
+
+        registerLink.addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+
+        loginLink.addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        });
+
+        resetPasswordLink.addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'block';
+        });
+
+        backToLoginLink.addEventListener('click', () => {
+            document.getElementById('resetPasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+
+        closeRedirectPopup.addEventListener('click', () => {
+            redirectPopup.style.display = 'none';
+        });
+
+        redirectNowButton.addEventListener('click', () => {
+            window.location.href = 'https://seubet.com'; // URL do jogo ou redirecionamento
+        });
+
+        closeRegisterPopup.addEventListener('click', () => {
+            registerPopup.style.display = 'none';
+        });
+
+        function showPopup(popup) {
+            popup.style.display = 'block';
+        }
+
+        function startRedirectTimer() {
+            let timeLeft = 5;
+            redirectTimer.textContent = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                redirectTimer.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    window.location.href = 'https://seubet.com'; // URL do jogo ou redirecionamento
+                }
+            }, 1000);
+        }
+
+        function startRegisterTimer() {
+            let timeLeft = 259200; // 3 dias em segundos
+            const updateRegisterTimer = () => {
+                const days = Math.floor(timeLeft / (24 * 3600));
+                const hours = Math.floor((timeLeft % (24 * 3600)) / 3600);
+                const minutes = Math.floor((timeLeft % 3600) / 60);
+                const seconds = timeLeft % 60;
+                registerTimer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(registerInterval);
+                }
             };
 
-            loginButton.addEventListener('click', async () => {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                try {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    if (user.emailVerified) {
-                        redirectPopup.style.display = 'block';
-                        updateTimer(5);
-                    } else {
-                        emailVerificationError.style.display = 'block';
-                    }
-                } catch (error) {
-                    loginError.style.display = 'block';
-                }
-            });
+            updateRegisterTimer();
+            const registerInterval = setInterval(updateRegisterTimer, 1000);
+        }
 
-            registerButton.addEventListener('click', async () => {
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                if (password.length < 6) {
-                    registerError.style.display = 'block';
-                    return;
-                }
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    await sendEmailVerification(user);
-                    registerSuccess.style.display = 'block';
-                    registerPopup.style.display = 'block';
-                    updateTimer(3 * 24 * 60 * 60); // 3 dias
-                } catch (error) {
-                    registerError.style.display = 'block';
-                }
-            });
+        function handleLoginError(error) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Erro de login:', errorMessage);
+            document.getElementById('loginError').style.display = 'block';
+            document.getElementById('emailVerificationError').style.display = (errorCode === 'auth/invalid-email' || errorCode === 'auth/user-not-found') ? 'block' : 'none';
+        }
 
-            resetPasswordButton.addEventListener('click', async () => {
-                const email = document.getElementById('resetEmail').value;
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert('Email de redefinição enviado.');
-                } catch (error) {
-                    document.getElementById('resetError').style.display = 'block';
-                }
-            });
-
-            loginLink.addEventListener('click', () => {
-                registerForm.style.display = 'none';
-                loginForm.style.display = 'block';
-            });
-
-            registerLink.addEventListener('click', () => {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-            });
-
-            backToLoginLink.addEventListener('click', () => {
-                resetPasswordForm.style.display = 'none';
-                loginForm.style.display = 'block';
-            });
-
-            resetPasswordLink.addEventListener('click', () => {
-                loginForm.style.display = 'none';
-                resetPasswordForm.style.display = 'block';
-            });
-
-            redirectNowButton.addEventListener('click', () => {
-                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-            });
-
-            closeRedirectPopup.addEventListener('click', () => {
-                redirectPopup.style.display = 'none';
-            });
-
-            closeRegisterPopup.addEventListener('click', () => {
-                registerPopup.style.display = 'none';
-            });
-
-            const socket = new WebSocket('ws://localhost:3000');
-            socket.addEventListener('message', (event) => {
-                messagesDiv.textContent = event.data;
-            });
-
-            togglePassword.addEventListener('click', () => {
-                const type = loginPassword.type === 'password' ? 'text' : 'password';
-                loginPassword.type = type;
-            });
-
-            toggleRegisterPassword.addEventListener('click', () => {
-                const type = registerPassword.type === 'password' ? 'text' : 'password';
-                registerPassword.type = type;
-            });
-        });
+        function handleRegisterError(error) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Erro de registro:', errorMessage);
+            document.getElementById('registerError').style.display = 'block';
+        }
     </script>
 </body>
 </html>
