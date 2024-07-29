@@ -180,72 +180,47 @@
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+            if (!email || !password) {
+                document.getElementById('loginError').style.display = 'block';
+                return;
+            }
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                const user = auth.currentUser;
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                if (!user.emailVerified) {
+                    document.getElementById('emailVerificationError').style.display = 'block';
+                    return;
+                }
                 const isTrialActive = await updateUserTrialStatus(user.uid);
-                
-                if (isTrialActive) {
+                if (!isTrialActive) {
+                    document.getElementById('paymentPopup').style.display = 'block';
+                } else {
                     document.getElementById('redirectPopup').style.display = 'block';
-                    let seconds = 5;
-                    const timerElement = document.getElementById('redirectTimer');
-                    timerElement.textContent = seconds;
-                    const interval = setInterval(() => {
-                        seconds -= 1;
-                        timerElement.textContent = seconds;
-                        if (seconds <= 0) {
-                            clearInterval(interval);
+                    let countdown = 5;
+                    const redirectTimer = setInterval(() => {
+                        document.getElementById('redirectTimer').textContent = countdown;
+                        if (countdown === 0) {
+                            clearInterval(redirectTimer);
                             window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
                         }
+                        countdown--;
                     }, 1000);
-                } else {
-                    document.getElementById('paymentPopup').style.display = 'block';
+                    document.getElementById('redirectNowButton').addEventListener('click', () => {
+                        clearInterval(redirectTimer);
+                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                    });
                 }
             } catch (error) {
-                document.getElementById('loginError').style.display = 'block';
-                if (error.code === 'auth/user-not-found') {
-                    document.getElementById('emailVerificationError').style.display = 'block';
-                }
-                console.error('Erro ao fazer login:', error.message);
-            }
-        });
-        
-        document.getElementById('registerButton').addEventListener('click', async () => {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                const user = auth.currentUser;
-                await sendEmailVerification(user);
-                document.getElementById('registerPopup').style.display = 'block';
-                // Exibir temporizador do período grátis
-                const registerTimer = document.getElementById('registerTimer');
-                const trialEndDate = new Date();
-                trialEndDate.setDate(trialEndDate.getDate() + 3);
-                registerTimer.textContent = `Seu período grátis termina em: ${trialEndDate.toLocaleDateString()}`;
-                // Salvar data de término do período de teste no Firestore
-                await setDoc(doc(db, 'users', user.uid), { trialEndDate });
-            } catch (error) {
-                document.getElementById('registerError').style.display = 'block';
-                console.error('Erro ao cadastrar:', error.message);
-            }
-        });
-        
-        document.getElementById('resetPasswordButton').addEventListener('click', async () => {
-            const email = document.getElementById('resetEmail').value;
-            try {
-                await sendPasswordResetEmail(auth, email);
-                alert('Um e-mail para redefinição de senha foi enviado.');
-                document.getElementById('resetPasswordForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
-            } catch (error) {
-                document.getElementById('resetError').style.display = 'block';
-                console.error('Erro ao enviar e-mail de redefinição de senha:', error.message);
+                console.error(error);
             }
         });
         
         document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br';
+            window.location.href = 'https://checkout.yampi.com.br/checkout/pxBz1vS0pNYaWmzM';
+        });
+        
+        document.getElementById('paymentPopupButton').addEventListener('click', () => {
+            window.location.href = 'https://checkout.yampi.com.br/checkout/pxBz1vS0pNYaWmzM';
         });
         
         document.getElementById('registerLink').addEventListener('click', () => {
@@ -268,29 +243,45 @@
             document.getElementById('loginForm').style.display = 'block';
         });
         
-        document.getElementById('closeRegisterPopup').addEventListener('click', () => {
-            document.getElementById('registerPopup').style.display = 'none';
+        document.getElementById('resetPasswordButton').addEventListener('click', async () => {
+            const resetEmail = document.getElementById('resetEmail').value;
+            if (!resetEmail) {
+                document.getElementById('resetError').style.display = 'block';
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, resetEmail);
+                alert('Email de redefinição de senha enviado. Verifique seu email.');
+            } catch (error) {
+                console.error(error);
+            }
         });
         
-        document.getElementById('paymentPopupButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br';
+        document.getElementById('registerButton').addEventListener('click', async () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            if (!name || !email || !password || password.length < 6) {
+                document.getElementById('registerError').style.display = 'block';
+                return;
+            }
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                await sendEmailVerification(user);
+                const trialEndDate = new Date();
+                trialEndDate.setDate(trialEndDate.getDate() + 1);
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: name,
+                    email: email,
+                    trialEndDate: trialEndDate,
+                    paymentDate: null
+                });
+                document.getElementById('registerSuccess').style.display = 'block';
+            } catch (error) {
+                console.error(error);
+            }
         });
-        
-        function connectWebSocket() {
-            const socket = new WebSocket('wss://localhost:3000'); // Endereço do seu servidor WebSocket
-            socket.onmessage = function(event) {
-                showMessage(event.data);
-            };
-            socket.onopen = function() {
-                console.log('Conectado ao WebSocket');
-            };
-            socket.onclose = function() {
-                console.log('WebSocket desconectado. Tentando reconectar...');
-                setTimeout(connectWebSocket, 5000);
-            };
-        }
-        
-        connectWebSocket();
     </script>
 </body>
 </html>
