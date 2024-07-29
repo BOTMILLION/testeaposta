@@ -185,15 +185,22 @@
             const emailVerificationErrorDiv = document.getElementById('emailVerificationError');
             errorDiv.style.display = 'none';
             emailVerificationErrorDiv.style.display = 'none';
-
+            
             if (email === '' || password === '') {
+                errorDiv.textContent = 'Por favor, preencha todos os campos.';
                 errorDiv.style.display = 'block';
                 return;
             }
-
+            
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
+                
+                if (!user.emailVerified) {
+                    emailVerificationErrorDiv.textContent = 'Por favor, verifique seu e-mail antes de fazer login.';
+                    emailVerificationErrorDiv.style.display = 'block';
+                    return;
+                }
                 
                 const isTrialActive = await updateUserTrialStatus(user.uid);
                 
@@ -234,6 +241,7 @@
             successDiv.style.display = 'none';
 
             if (name === '' || email === '' || password === '' || password.length < 6) {
+                errorDiv.textContent = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -257,6 +265,7 @@
                 // Armazenar os dados do usuário no Firestore
                 await setDoc(doc(db, 'users', user.uid), userData);
 
+                successDiv.textContent = 'Cadastro realizado. Verifique o seu e-mail.';
                 successDiv.style.display = 'block';
             } catch (error) {
                 errorDiv.textContent = 'Erro ao registrar. Verifique seus dados.';
@@ -306,6 +315,7 @@
             errorDiv.style.display = 'none';
 
             if (email === '') {
+                errorDiv.textContent = 'Por favor, preencha o campo de email corretamente.';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -335,6 +345,19 @@
         ws.onclose = function () {
             console.log('Conexão WebSocket fechada.');
         };
+
+        // Lógica para alternar visibilidade da senha
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('loginPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('registerPassword');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        });
     </script>
 </body>
 </html>
