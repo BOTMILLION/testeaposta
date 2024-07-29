@@ -181,7 +181,6 @@
             <h2>Usuário cadastrado!</h2>
             <p>Para realizar o login, verifique o seu email.</p>
             <p>Este é o seu temporizador do período grátis de 3 dias.</p>
-            <p>Após esgotar, realize o pagamento para continuar utilizando nossos serviços.</p>
             <p id="registerTimer" style="font-size: 16px; font-weight: bold;"></p>
             <button class="button" id="closeRegisterPopup">FECHAR</button>
         </div>
@@ -195,181 +194,154 @@
         import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
         
         const firebaseConfig = {
-            apiKey: "AIzaSyDQZRg62a84f8KkvfFizkVJ8YdLwK6Jquw",
-            authDomain: "projeto-web-xxx.firebaseapp.com",
-            projectId: "projeto-web-xxx",
-            storageBucket: "projeto-web-xxx.appspot.com",
+            apiKey: "AIzaSyDQZRg62a84f8KkvfFiz5HPTXL9lbDHCs4",
+            authDomain: "my-app-29b4f.firebaseapp.com",
+            projectId: "my-app-29b4f",
+            storageBucket: "my-app-29b4f.appspot.com",
             messagingSenderId: "1234567890",
             appId: "1:1234567890:web:abcdef123456"
         };
-        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const firestore = getFirestore(app);
         
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const resetPasswordForm = document.getElementById('resetPasswordForm');
-        const registerPopup = document.getElementById('registerPopup');
-        const redirectPopup = document.getElementById('redirectPopup');
-        const messagesContainer = document.getElementById('messages');
-        const redirectTimer = document.getElementById('redirectTimer');
-        const registerTimer = document.getElementById('registerTimer');
-        let countdownTimer;
+        let timerInterval;
         
-        document.getElementById('loginButton').addEventListener('click', async () => {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const loginError = document.getElementById('loginError');
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginButton = document.getElementById('loginButton');
+            const registerButton = document.getElementById('registerButton');
+            const registerLink = document.getElementById('registerLink');
+            const loginLink = document.getElementById('loginLink');
+            const resetPasswordLink = document.getElementById('resetPasswordLink');
+            const resetPasswordButton = document.getElementById('resetPasswordButton');
+            const backToLoginLink = document.getElementById('backToLoginLink');
+            const redirectNowButton = document.getElementById('redirectNowButton');
+            const closeRedirectPopup = document.getElementById('closeRedirectPopup');
+            const closeRegisterPopup = document.getElementById('closeRegisterPopup');
             const emailVerificationError = document.getElementById('emailVerificationError');
+            const loginError = document.getElementById('loginError');
+            const registerError = document.getElementById('registerError');
+            const registerSuccess = document.getElementById('registerSuccess');
+            const registerPopup = document.getElementById('registerPopup');
+            const redirectPopup = document.getElementById('redirectPopup');
+            const redirectTimer = document.getElementById('redirectTimer');
+            const registerTimer = document.getElementById('registerTimer');
+            const messagesDiv = document.getElementById('messages');
             
-            loginError.style.display = 'none';
-            emailVerificationError.style.display = 'none';
+            const togglePassword = document.getElementById('togglePassword');
+            const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+            const loginPassword = document.getElementById('loginPassword');
+            const registerPassword = document.getElementById('registerPassword');
             
-            if (email && password) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const resetPasswordForm = document.getElementById('resetPasswordForm');
+            
+            const updateTimer = (seconds) => {
+                if (timerInterval) clearInterval(timerInterval);
+                const start = Date.now();
+                const end = start + seconds * 1000;
+                timerInterval = setInterval(() => {
+                    const remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+                    if (remaining === 0) {
+                        clearInterval(timerInterval);
+                    }
+                    redirectTimer.textContent = remaining;
+                }, 1000);
+            };
+
+            loginButton.addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
                 try {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     if (user.emailVerified) {
-                        loginForm.style.display = 'none';
                         redirectPopup.style.display = 'block';
-                        let countdown = 5;
-                        redirectTimer.textContent = countdown;
-                        countdownTimer = setInterval(() => {
-                            countdown -= 1;
-                            redirectTimer.textContent = countdown;
-                            if (countdown <= 0) {
-                                clearInterval(countdownTimer);
-                                window.location.href = "https://seubet.com";
-                            }
-                        }, 1000);
+                        updateTimer(5);
                     } else {
                         emailVerificationError.style.display = 'block';
                     }
                 } catch (error) {
                     loginError.style.display = 'block';
                 }
-            } else {
-                loginError.style.display = 'block';
-            }
-        });
-        
-        document.getElementById('registerButton').addEventListener('click', async () => {
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const registerError = document.getElementById('registerError');
-            const registerSuccess = document.getElementById('registerSuccess');
-            
-            registerError.style.display = 'none';
-            registerSuccess.style.display = 'none';
-            
-            if (name && email && password.length >= 6) {
+            });
+
+            registerButton.addEventListener('click', async () => {
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                if (password.length < 6) {
+                    registerError.style.display = 'block';
+                    return;
+                }
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     await sendEmailVerification(user);
+                    registerSuccess.style.display = 'block';
                     registerPopup.style.display = 'block';
-                    let countdown = 3 * 24 * 60 * 60; // 3 dias em segundos
-                    registerTimer.textContent = formatTime(countdown);
-                    countdownTimer = setInterval(() => {
-                        countdown -= 1;
-                        registerTimer.textContent = formatTime(countdown);
-                        if (countdown <= 0) {
-                            clearInterval(countdownTimer);
-                            registerTimer.textContent = 'Tempo de uso gratuito expirado.';
-                        }
-                    }, 1000);
+                    updateTimer(3 * 24 * 60 * 60); // 3 dias
                 } catch (error) {
                     registerError.style.display = 'block';
                 }
-            } else {
-                registerError.style.display = 'block';
-            }
-        });
-        
-        document.getElementById('resetPasswordButton').addEventListener('click', async () => {
-            const email = document.getElementById('resetEmail').value;
-            const resetError = document.getElementById('resetError');
-            
-            resetError.style.display = 'none';
-            
-            if (email) {
+            });
+
+            resetPasswordButton.addEventListener('click', async () => {
+                const email = document.getElementById('resetEmail').value;
                 try {
                     await sendPasswordResetEmail(auth, email);
-                    alert('Email de redefinição enviado. Verifique seu inbox.');
-                    resetPasswordForm.style.display = 'none';
-                    loginForm.style.display = 'block';
+                    alert('Email de redefinição enviado.');
                 } catch (error) {
-                    resetError.style.display = 'block';
+                    document.getElementById('resetError').style.display = 'block';
                 }
-            } else {
-                resetError.style.display = 'block';
-            }
-        });
-        
-        document.getElementById('registerLink').addEventListener('click', () => {
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-        });
-        
-        document.getElementById('loginLink').addEventListener('click', () => {
-            registerForm.style.display = 'none';
-            loginForm.style.display = 'block';
-        });
-        
-        document.getElementById('resetPasswordLink').addEventListener('click', () => {
-            loginForm.style.display = 'none';
-            resetPasswordForm.style.display = 'block';
-        });
-        
-        document.getElementById('backToLoginLink').addEventListener('click', () => {
-            resetPasswordForm.style.display = 'none';
-            loginForm.style.display = 'block';
-        });
-        
-        document.getElementById('closeRegisterPopup').addEventListener('click', () => {
-            registerPopup.style.display = 'none';
-        });
-        
-        document.getElementById('closeRedirectPopup').addEventListener('click', () => {
-            redirectPopup.style.display = 'none';
-        });
-        
-        document.getElementById('redirectNowButton').addEventListener('click', () => {
-            window.location.href = "https://seubet.com";
-        });
-        
-        function formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            seconds %= 3600;
-            const minutes = Math.floor(seconds / 60);
-            seconds %= 60;
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-        
-        const socket = new WebSocket('ws://localhost:3000');
-        
-        socket.addEventListener('message', (event) => {
-            const message = JSON.parse(event.data);
-            const messageElement = document.createElement('div');
-            messageElement.textContent = message.text;
-            messagesContainer.innerHTML = '';
-            messagesContainer.appendChild(messageElement);
-        });
-        
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.yampi.com.br';
-        });
-        
-        document.getElementById('togglePassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('loginPassword');
-            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-        });
-        
-        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('registerPassword');
-            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+            });
+
+            loginLink.addEventListener('click', () => {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            });
+
+            registerLink.addEventListener('click', () => {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            });
+
+            backToLoginLink.addEventListener('click', () => {
+                resetPasswordForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            });
+
+            resetPasswordLink.addEventListener('click', () => {
+                loginForm.style.display = 'none';
+                resetPasswordForm.style.display = 'block';
+            });
+
+            redirectNowButton.addEventListener('click', () => {
+                window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+            });
+
+            closeRedirectPopup.addEventListener('click', () => {
+                redirectPopup.style.display = 'none';
+            });
+
+            closeRegisterPopup.addEventListener('click', () => {
+                registerPopup.style.display = 'none';
+            });
+
+            const socket = new WebSocket('ws://localhost:3000');
+            socket.addEventListener('message', (event) => {
+                messagesDiv.textContent = event.data;
+            });
+
+            togglePassword.addEventListener('click', () => {
+                const type = loginPassword.type === 'password' ? 'text' : 'password';
+                loginPassword.type = type;
+            });
+
+            toggleRegisterPassword.addEventListener('click', () => {
+                const type = registerPassword.type === 'password' ? 'text' : 'password';
+                registerPassword.type = type;
+            });
         });
     </script>
 </body>
