@@ -62,7 +62,6 @@
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
             <div id="emailVerificationError" style="color: red; display: none;">Por favor, verifique seu e-mail antes de fazer login.</div>
             <button class="custom-button" id="loginButton">ENTRAR</button>
-            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
             <div class="info-text">
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
             </div>
@@ -111,7 +110,10 @@
             <button class="button" id="paymentPopupButton">REALIZAR PAGAMENTO</button>
         </div>
         
-        <button class="custom-button hidden" id="gameButton">IR PARA O JOGO</button>
+        <div id="postLoginButtons" class="hidden">
+            <button class="custom-button" id="gameButton">IR PARA O JOGO</button>
+            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
+        </div>
         
         <div id="messages"></div>
     </div>
@@ -190,14 +192,14 @@
                 
                 const isTrialActive = await updateUserTrialStatus(user.uid);
                 
+                document.getElementById('loginForm').style.display = 'none';
+                
                 if (isTrialActive) {
-                    document.getElementById('gameButton').classList.remove('hidden');
+                    document.getElementById('postLoginButtons').classList.remove('hidden');
                     document.getElementById('paymentButton').classList.add('hidden');
                 } else {
                     document.getElementById('paymentPopup').classList.remove('hidden');
                 }
-                
-                document.getElementById('loginForm').style.display = 'none';
                 
             } catch (error) {
                 if (error.code === 'auth/user-not-found') {
