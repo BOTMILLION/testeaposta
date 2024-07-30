@@ -192,8 +192,6 @@
                 
                 const isTrialActive = await updateUserTrialStatus(user.uid);
                 
-                document.getElementById('loginForm').style.display = 'none';
-                
                 if (isTrialActive) {
                     document.getElementById('postLoginButtons').classList.remove('hidden');
                     document.getElementById('paymentButton').classList.add('hidden');
