@@ -192,10 +192,12 @@
                 
                 if (isTrialActive) {
                     document.getElementById('gameButton').classList.remove('hidden');
-                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('paymentButton').classList.add('hidden');
                 } else {
                     document.getElementById('paymentPopup').classList.remove('hidden');
                 }
+                
+                document.getElementById('loginForm').style.display = 'none';
                 
             } catch (error) {
                 if (error.code === 'auth/user-not-found') {
@@ -212,11 +214,15 @@
         });
         
         document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://yampi.com.br';
+            window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
         });
         
         document.getElementById('paymentPopupButton').addEventListener('click', () => {
-            window.location.href = 'https://yampi.com.br';
+            window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
+        });
+        
+        document.getElementById('gameButton').addEventListener('click', () => {
+            window.location.href = 'https://botmillion.github.io/telm/';
         });
         
         document.getElementById('registerLink').addEventListener('click', (e) => {
