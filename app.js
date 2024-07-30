@@ -94,7 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (userSnapshot.exists()) {
                     const userData = userSnapshot.data();
                     if (checkTrialOrSubscriptionStatus(userData)) {
-                        startRedirect(userData.subscriptionEnd || userData.trialEnd);
+                        loginButton.textContent = 'IR PARA O JOGO';
+                        loginButton.removeEventListener('click', handleLogin);
+                        loginButton.addEventListener('click', () => {
+                            window.location.href = REDIRECT_URL;
+                        });
                     } else {
                         showPaymentPopup();
                     }
@@ -214,64 +218,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 await sendPasswordResetEmail(auth, email);
+                alert('E-mail de redefinição de senha enviado. Verifique seu e-mail.');
+                resetError.style.display = 'none';
                 resetPasswordPopup.style.display = 'none';
-                alert('E-mail de recuperação enviado!');
             } catch (error) {
                 handleError('resetError', error.message);
             }
         });
 
-        // Manipular o fechamento do pop-up de recuperação de senha
+        // Fechar o pop-up de reset de senha
         closeResetPopup.addEventListener('click', () => {
             resetPasswordPopup.style.display = 'none';
         });
 
-        // Manipular o logout
-        logoutButton.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = HOME_URL;
-            }).catch((error) => {
-                console.error('Erro ao sair:', error);
-            });
-        });
-
-        // Manipular o status da assinatura
-        const checkTrialOrSubscriptionStatus = (userData) => {
-            const now = Timestamp.now().toDate();
-            const trialEnd = userData.trialEnd.toDate();
-            const subscriptionEnd = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
-
-            if (userData.isPaid) {
-                if (subscriptionEnd && now < subscriptionEnd) {
-                    subscriptionStatus.textContent = `Sua assinatura é válida até ${subscriptionEnd.toLocaleDateString()}.`;
-                    return true;
-                } else {
-                    showPaymentPopup();
-                    return false;
-                }
-            } else {
-                if (now < trialEnd) {
-                    trialStatus.textContent = `Seu período de teste termina em ${formatDistanceToNow(trialEnd, { addSuffix: true })}.`;
-                    return true;
-                } else {
-                    showPaymentPopup();
-                    return false;
-                }
-            }
-        };
-
-        // Manipular o fechamento do pop-up de pagamento
+        // Fechar o pop-up de pagamento
         closePopupButton.addEventListener('click', () => {
             paymentPopup.style.display = 'none';
         });
-    }
 
-    // Função para exibir erros
-    const handleError = (elementId, errorMessage) => {
-        const errorElement = document.getElementById(elementId);
-        if (errorElement) {
-            errorElement.textContent = errorMessage;
+        // Verificar o status de teste ou assinatura do usuário
+        const checkTrialOrSubscriptionStatus = (userData) => {
+            const now = new Date();
+            const trialEnd = userData.trialEnd ? userData.trialEnd.toDate() : null;
+            const subscriptionEnd = userData.subscriptionEnd ? userData.subscriptionEnd.toDate() : null;
+
+            if (trialEnd && now <= trialEnd) {
+                const timeLeft = formatDistanceToNow(trialEnd, { addSuffix: true });
+                trialStatus.textContent = `Seu período de teste termina em ${timeLeft}.`;
+                return true;
+            } else if (subscriptionEnd && now <= subscriptionEnd) {
+                const timeLeft = formatDistanceToNow(subscriptionEnd, { addSuffix: true });
+                trialStatus.textContent = `Sua assinatura é válida até ${timeLeft}.`;
+                return true;
+            } else {
+                trialStatus.textContent = 'Seu período de teste ou assinatura expirou.';
+                return false;
+            }
+        };
+
+        // Mostrar erro no formulário
+        const handleError = (elementId, message) => {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
             errorElement.style.display = 'block';
-        }
-    };
+        };
+    }
 });
