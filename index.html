@@ -25,8 +25,9 @@
             font-size: 16px;
             font-weight: bold;
         }
-        #gameButton, #checkoutButton {
+        .custom-button {
             display: none;
+            margin-bottom: 15px; /* Adiciona um espaçamento entre os botões */
         }
     </style>
 </head>
@@ -182,8 +183,8 @@
             } catch (error) {
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     errorDiv.textContent = 'E-mail ou senha incorretos.';
-                } else if (error.code === 'auth/user-disabled') {
-                    errorDiv.textContent = 'Usuário desativado.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorDiv.textContent = 'E-mail inválido.';
                 } else {
                     errorDiv.textContent = 'Erro ao fazer login. Tente novamente.';
                 }
@@ -293,11 +294,11 @@
         });
         
         document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e'; // Ajuste para o link correto do checkout
+            window.location.href = 'https://yampi.com.br/checkout'; // Ajuste para o link correto do checkout
         });
         
         document.getElementById('gameButton').addEventListener('click', () => {
-            window.location.href = 'https://botmillion.github.io/telm/'; // Link do jogo
+            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL'; // Link do jogo
         });
 
         document.getElementById('checkoutButton').addEventListener('click', () => {
