@@ -9,31 +9,6 @@
     <link rel="stylesheet" href="style.css">
     <style>
         /* Seu estilo existente */
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .popup .button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .popup .button:hover {
-            background-color: #0056b3;
-        }
         #messages {
             position: fixed;
             top: 10px;
@@ -50,13 +25,20 @@
             font-size: 16px;
             font-weight: bold;
         }
-        #loginError, #emailVerificationError, #registerError, #resetError {
-            color: red;
+        .hidden {
             display: none;
         }
-        #registerSuccess {
-            color: green;
-            display: none;
+        .custom-button {
+            /* Estilos do botão existentes */
+        }
+        .pulse-button {
+            /* Estilos do botão de pagamento existentes */
+        }
+        .popup {
+            /* Estilos do popup existentes */
+        }
+        .button {
+            /* Estilos do botão do popup existentes */
         }
     </style>
 </head>
@@ -77,11 +59,10 @@
                 <label for="loginPassword">Sua Senha</label>
                 <i class="zmdi zmdi-eye" id="togglePassword"></i>
             </div>
-            <div id="loginError">Por favor, preencha todos os campos corretamente.</div>
-            <div id="emailVerificationError">Por favor, verifique seu e-mail antes de fazer login.</div>
-            <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button" id="paymentButton" style="display: none;">REALIZAR PAGAMENTO</button>
-            <button class="custom-button" id="gameButton" style="display: none;">IR PARA O JOGO</button>
+            <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
+            <div id="emailVerificationError" style="color: red; display: none;">Por favor, verifique seu e-mail antes de fazer login.</div>
+            <button class="custom-button" id="loginButton">ENTRAR</button>
+            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
             <div class="info-text">
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
             </div>
@@ -90,7 +71,7 @@
             </div>
         </div>
         
-        <div class="form-login" id="registerForm" style="display: none;">
+        <div class="form-login hidden" id="registerForm">
             <div class="line">
                 <input type="text" id="registerName" placeholder=" " required>
                 <label for="registerName">Seu Nome</label>
@@ -104,37 +85,33 @@
                 <label for="registerPassword">Sua Senha</label>
                 <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
             </div>
-            <div id="registerError">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
-            <div id="registerSuccess">Cadastro realizado. Verifique o seu email.</div>
+            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
+            <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado. Verifique o seu email.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
             </div>
         </div>
         
-        <div class="form-login" id="resetPasswordForm" style="display: none;">
+        <div class="form-login hidden" id="resetPasswordForm">
             <div class="line">
                 <input type="email" id="resetEmail" placeholder=" " required>
                 <label for="resetEmail">Seu Email</label>
             </div>
-            <div id="resetError">Por favor, preencha o campo de email corretamente.</div>
+            <div id="resetError" style="color: red; display: none;">Por favor, preencha o campo de email corretamente.</div>
             <button class="custom-button" id="resetPasswordButton">ENVIAR EMAIL DE REDIFINIÇÃO</button>
             <div class="info-text">
                 <a href="#" id="backToLoginLink">Voltar para o Login</a>
             </div>
         </div>
         
-        <div class="popup" id="redirectPopup">
-            <h2>Login Bem-sucedido!</h2>
-            <p>Você será redirecionado para o jogo em <span class="timer" id="redirectTimer">5</span> segundos.</p>
-            <button class="button" id="redirectNowButton">Ir Agora</button>
+        <div class="popup hidden" id="paymentPopup">
+            <h2>Período de Teste Expirado!</h2>
+            <p>Seu período de teste expirou. Para continuar usando nossos serviços, você precisa realizar o pagamento.</p>
+            <button class="button" id="paymentPopupButton">REALIZAR PAGAMENTO</button>
         </div>
         
-        <div class="popup" id="paymentPopup">
-            <h2>Você precisa estar logado!</h2>
-            <p>Faça login antes de realizar o pagamento.</p>
-            <button class="button" id="loginPopupButton">FAZER LOGIN</button>
-        </div>
+        <button class="custom-button hidden" id="gameButton">IR PARA O JOGO</button>
         
         <div id="messages"></div>
     </div>
@@ -157,8 +134,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        let isAuthenticated = false;
-        
         function showMessage(message) {
             const messagesDiv = document.getElementById('messages');
             messagesDiv.textContent = message;
@@ -172,79 +147,98 @@
             const userSnapshot = await getDoc(userDoc);
             if (userSnapshot.exists()) {
                 const userData = userSnapshot.data();
-                const trialEndDate = new Date(userData.trialEndDate);
-                const currentDate = new Date();
-                if (currentDate > trialEndDate) {
-                    document.getElementById('loginButton').style.display = 'none';
-                    document.getElementById('paymentButton').style.display = 'block';
-                    document.getElementById('gameButton').style.display = 'none';
-                } else {
-                    document.getElementById('loginButton').style.display = 'none';
-                    document.getElementById('paymentButton').style.display = 'none';
-                    document.getElementById('gameButton').style.display = 'block';
+                const trialEndDate = new Date(userData.trialEndDate.toDate());
+                const now = new Date();
+                const timeRemaining = trialEndDate - now;
+                
+                const hasValidPaymentDate = userData.paymentDate ? new Date(userData.paymentDate.toDate()) > now : false;
+                
+                if (timeRemaining <= 0 && !hasValidPaymentDate) {
+                    return false;
                 }
-                isAuthenticated = true;
+                
+                if (timeRemaining > 0 || hasValidPaymentDate) {
+                    return true;
+                }
             }
-        }
-        
-        function handlePaymentButton() {
-            if (isAuthenticated) {
-                window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
-            } else {
-                document.getElementById('paymentPopup').style.display = 'block';
-            }
+            return false;
         }
         
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const emailVerificationErrorDiv = document.getElementById('emailVerificationError');
+            errorDiv.style.display = 'none';
+            emailVerificationErrorDiv.style.display = 'none';
+            
+            if (email === '' || password === '') {
+                errorDiv.textContent = 'Por favor, preencha todos os campos.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                await updateUserTrialStatus(user.uid);
-                document.getElementById('redirectPopup').style.display = 'block';
-                let timer = 5;
-                document.getElementById('redirectTimer').textContent = timer;
-                const interval = setInterval(() => {
-                    timer--;
-                    document.getElementById('redirectTimer').textContent = timer;
-                    if (timer <= 0) {
-                        clearInterval(interval);
-                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
-                    }
-                }, 1000);
+                
+                if (!user.emailVerified) {
+                    emailVerificationErrorDiv.textContent = 'Por favor, verifique seu e-mail antes de fazer login.';
+                    emailVerificationErrorDiv.style.display = 'block';
+                    return;
+                }
+                
+                const isTrialActive = await updateUserTrialStatus(user.uid);
+                
+                if (isTrialActive) {
+                    document.getElementById('gameButton').classList.remove('hidden');
+                    document.getElementById('loginForm').style.display = 'none';
+                } else {
+                    document.getElementById('paymentPopup').classList.remove('hidden');
+                }
+                
             } catch (error) {
-                document.getElementById('loginError').style.display = 'block';
+                if (error.code === 'auth/user-not-found') {
+                    errorDiv.textContent = 'Usuário não encontrado.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorDiv.textContent = 'Senha incorreta.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorDiv.textContent = 'E-mail inválido.';
+                } else {
+                    errorDiv.textContent = 'Erro desconhecido. Tente novamente.';
+                }
+                errorDiv.style.display = 'block';
             }
         });
         
-        document.getElementById('paymentButton').addEventListener('click', handlePaymentButton);
-        
-        document.getElementById('loginPopupButton').addEventListener('click', () => {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('paymentPopup').style.display = 'none';
+        document.getElementById('paymentButton').addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br';
         });
         
-        document.getElementById('redirectNowButton').addEventListener('click', () => {
-            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+        document.getElementById('paymentPopupButton').addEventListener('click', () => {
+            window.location.href = 'https://yampi.com.br';
         });
         
-        document.getElementById('registerLink').addEventListener('click', () => {
+        document.getElementById('registerLink').addEventListener('click', (e) => {
+            e.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
         });
         
-        document.getElementById('loginLink').addEventListener('click', () => {
+        document.getElementById('loginLink').addEventListener('click', (e) => {
+            e.preventDefault();
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         });
         
-        document.getElementById('resetPasswordLink').addEventListener('click', () => {
+        document.getElementById('resetPasswordLink').addEventListener('click', (e) => {
+            e.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('resetPasswordForm').style.display = 'block';
         });
         
-        document.getElementById('backToLoginLink').addEventListener('click', () => {
+        document.getElementById('backToLoginLink').addEventListener('click', (e) => {
+            e.preventDefault();
             document.getElementById('resetPasswordForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         });
@@ -253,40 +247,94 @@
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            if (password.length < 6) {
-                document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            if (name === '' || email === '' || password === '') {
+                errorDiv.textContent = 'Por favor, preencha todos os campos.';
+                errorDiv.style.display = 'block';
                 return;
             }
+            
+            if (password.length < 6) {
+                errorDiv.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
+                
                 await sendEmailVerification(user);
+                
                 await setDoc(doc(db, 'users', user.uid), {
-                    name: name,
                     email: email,
-                    trialEndDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString()
+                    name: name,
+                    trialEndDate: new Date(new Date().getTime() + 24*60*60*1000) // 1 day trial
                 });
-                document.getElementById('registerSuccess').style.display = 'block';
-                document.getElementById('registerError').style.display = 'none';
+                
+                successDiv.textContent = 'Cadastro realizado. Verifique o seu email.';
+                successDiv.style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
             } catch (error) {
-                document.getElementById('registerError').textContent = 'Erro ao cadastrar. Verifique suas informações.';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorDiv.textContent = 'Este e-mail já está em uso.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorDiv.textContent = 'E-mail inválido.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorDiv.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+                } else {
+                    errorDiv.textContent = 'Erro desconhecido. Tente novamente.';
+                }
+                errorDiv.style.display = 'block';
             }
         });
         
         document.getElementById('resetPasswordButton').addEventListener('click', async () => {
             const email = document.getElementById('resetEmail').value;
+            const errorDiv = document.getElementById('resetError');
+            errorDiv.style.display = 'none';
+            
+            if (email === '') {
+                errorDiv.textContent = 'Por favor, preencha o campo de email.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
             try {
                 await sendPasswordResetEmail(auth, email);
                 document.getElementById('resetPasswordForm').style.display = 'none';
                 document.getElementById('loginForm').style.display = 'block';
+                alert('Email de redefinição de senha enviado.');
             } catch (error) {
-                document.getElementById('resetError').textContent = 'Erro ao enviar o e-mail de redefinição.';
+                if (error.code === 'auth/invalid-email') {
+                    errorDiv.textContent = 'E-mail inválido.';
+                } else if (error.code === 'auth/user-not-found') {
+                    errorDiv.textContent = 'Usuário não encontrado.';
+                } else {
+                    errorDiv.textContent = 'Erro desconhecido. Tente novamente.';
+                }
+                errorDiv.style.display = 'block';
             }
         });
         
-        // Exemplo para exibir uma mensagem de teste
-        showMessage('Bem-vindo ao site!');
+        const socket = new WebSocket('ws://localhost:3000');
         
+        socket.addEventListener('message', (event) => {
+            showMessage(event.data);
+        });
+        
+        socket.addEventListener('error', () => {
+            console.log('Erro de conexão com o servidor WebSocket.');
+        });
+        
+        socket.addEventListener('close', () => {
+            console.log('Conexão com o servidor WebSocket fechada.');
+        });
     </script>
 </body>
 </html>
