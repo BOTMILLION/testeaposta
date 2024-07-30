@@ -25,7 +25,7 @@
             font-size: 16px;
             font-weight: bold;
         }
-        #gameButton {
+        #gameButton, #checkoutButton {
             display: none;
         }
     </style>
@@ -94,6 +94,7 @@
         </div>
         
         <button class="custom-button" id="gameButton">IR PARA O JOGO</button>
+        <button class="custom-button" id="checkoutButton">REALIZAR PAGAMENTO</button>
         <div id="messages"></div>
     </div>
     
@@ -174,6 +175,7 @@
                 if (isTrialActive) {
                     document.getElementById('loginForm').style.display = 'none';
                     document.getElementById('gameButton').style.display = 'block';
+                    document.getElementById('checkoutButton').style.display = 'block';
                 } else {
                     document.getElementById('paymentPopup').style.display = 'block';
                 }
@@ -294,6 +296,14 @@
             window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e'; // Ajuste para o link correto do checkout
         });
         
+        document.getElementById('gameButton').addEventListener('click', () => {
+            window.location.href = 'https://botmillion.github.io/telm/'; // Link do jogo
+        });
+
+        document.getElementById('checkoutButton').addEventListener('click', () => {
+            window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e'; // Novo link do checkout
+        });
+        
         document.getElementById('togglePassword').addEventListener('click', () => {
             const passwordField = document.getElementById('loginPassword');
             const type = passwordField.type === 'password' ? 'text' : 'password';
@@ -309,10 +319,6 @@
         const socket = new WebSocket('ws://localhost:3000');
         socket.addEventListener('message', function (event) {
             showMessage(event.data);
-        });
-
-        document.getElementById('gameButton').addEventListener('click', () => {
-            window.location.href = 'https://botmillion.github.io/telm/L'; // Link do jogo
         });
     </script>
 </body>
