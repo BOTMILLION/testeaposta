@@ -50,6 +50,14 @@
             font-size: 16px;
             font-weight: bold;
         }
+        #loginError, #emailVerificationError, #registerError, #resetError {
+            color: red;
+            display: none;
+        }
+        #registerSuccess {
+            color: green;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -69,10 +77,11 @@
                 <label for="loginPassword">Sua Senha</label>
                 <i class="zmdi zmdi-eye" id="togglePassword"></i>
             </div>
-            <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
-            <div id="emailVerificationError" style="color: red; display: none;">Por favor, verifique seu e-mail antes de fazer login.</div>
+            <div id="loginError">Por favor, preencha todos os campos corretamente.</div>
+            <div id="emailVerificationError">Por favor, verifique seu e-mail antes de fazer login.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
+            <button class="custom-button" id="paymentButton" style="display: none;">REALIZAR PAGAMENTO</button>
+            <button class="custom-button" id="gameButton" style="display: none;">IR PARA O JOGO</button>
             <div class="info-text">
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
             </div>
@@ -95,8 +104,8 @@
                 <label for="registerPassword">Sua Senha</label>
                 <i class="zmdi zmdi-eye" id="toggleRegisterPassword"></i>
             </div>
-            <div id="registerError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
-            <div id="registerSuccess" style="color: green; display: none;">Cadastro realizado. Verifique o seu email.</div>
+            <div id="registerError">Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.</div>
+            <div id="registerSuccess">Cadastro realizado. Verifique o seu email.</div>
             <button class="custom-button" id="registerButton">CADASTRAR</button>
             <div class="info-text">
                 Já tem uma conta? <a href="#" id="loginLink">Login</a>
@@ -108,7 +117,7 @@
                 <input type="email" id="resetEmail" placeholder=" " required>
                 <label for="resetEmail">Seu Email</label>
             </div>
-            <div id="resetError" style="color: red; display: none;">Por favor, preencha o campo de email corretamente.</div>
+            <div id="resetError">Por favor, preencha o campo de email corretamente.</div>
             <button class="custom-button" id="resetPasswordButton">ENVIAR EMAIL DE REDIFINIÇÃO</button>
             <div class="info-text">
                 <a href="#" id="backToLoginLink">Voltar para o Login</a>
@@ -122,9 +131,9 @@
         </div>
         
         <div class="popup" id="paymentPopup">
-            <h2>Período de Teste Expirado!</h2>
-            <p>Seu período de teste expirou. Para continuar usando nossos serviços, você precisa realizar o pagamento.</p>
-            <button class="button" id="paymentPopupButton">REALIZAR PAGAMENTO</button>
+            <h2>Você precisa estar logado!</h2>
+            <p>Faça login antes de realizar o pagamento.</p>
+            <button class="button" id="loginPopupButton">FAZER LOGIN</button>
         </div>
         
         <div id="messages"></div>
@@ -148,6 +157,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
+        let isAuthenticated = false;
+        
         function showMessage(message) {
             const messagesDiv = document.getElementById('messages');
             messagesDiv.textContent = message;
@@ -161,203 +172,121 @@
             const userSnapshot = await getDoc(userDoc);
             if (userSnapshot.exists()) {
                 const userData = userSnapshot.data();
-                const trialEndDate = new Date(userData.trialEndDate.toDate());
-                const now = new Date();
-                const timeRemaining = trialEndDate - now;
-                
-                const hasValidPaymentDate = userData.paymentDate ? new Date(userData.paymentDate.toDate()) > now : false;
-                
-                if (timeRemaining <= 0 && !hasValidPaymentDate) {
-                    return false;
+                const trialEndDate = new Date(userData.trialEndDate);
+                const currentDate = new Date();
+                if (currentDate > trialEndDate) {
+                    document.getElementById('loginButton').style.display = 'none';
+                    document.getElementById('paymentButton').style.display = 'block';
+                    document.getElementById('gameButton').style.display = 'none';
+                } else {
+                    document.getElementById('loginButton').style.display = 'none';
+                    document.getElementById('paymentButton').style.display = 'none';
+                    document.getElementById('gameButton').style.display = 'block';
                 }
-                
-                if (timeRemaining > 0 || hasValidPaymentDate) {
-                    return true;
-                }
+                isAuthenticated = true;
             }
-            return false;
+        }
+        
+        function handlePaymentButton() {
+            if (isAuthenticated) {
+                window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e';
+            } else {
+                document.getElementById('paymentPopup').style.display = 'block';
+            }
         }
         
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-            const emailVerificationErrorDiv = document.getElementById('emailVerificationError');
-            errorDiv.style.display = 'none';
-            emailVerificationErrorDiv.style.display = 'none';
-            
-            if (email === '' || password === '') {
-                errorDiv.textContent = 'Por favor, preencha todos os campos.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                
-                if (!user.emailVerified) {
-                    emailVerificationErrorDiv.textContent = 'Por favor, verifique seu e-mail antes de fazer login.';
-                    emailVerificationErrorDiv.style.display = 'block';
-                    return;
-                }
-                
-                const isTrialActive = await updateUserTrialStatus(user.uid);
-                
-                if (isTrialActive) {
-                    document.getElementById('redirectPopup').style.display = 'block';
-                    let countdown = 3;
-                    document.getElementById('redirectTimer').textContent = countdown;
-                    const interval = setInterval(() => {
-                        countdown--;
-                        document.getElementById('redirectTimer').textContent = countdown;
-                        if (countdown <= 0) {
-                            clearInterval(interval);
-                            window.location.href = 'https://botmillion.github.io/telm/';
-                        }
-                    }, 1000);
-                } else {
-                    document.getElementById('paymentPopup').style.display = 'block';
-                }
+                await updateUserTrialStatus(user.uid);
+                document.getElementById('redirectPopup').style.display = 'block';
+                let timer = 5;
+                document.getElementById('redirectTimer').textContent = timer;
+                const interval = setInterval(() => {
+                    timer--;
+                    document.getElementById('redirectTimer').textContent = timer;
+                    if (timer <= 0) {
+                        clearInterval(interval);
+                        window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+                    }
+                }, 1000);
             } catch (error) {
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    errorDiv.textContent = 'E-mail ou senha incorretos.';
-                } else if (error.code === 'auth/user-disabled') {
-                    errorDiv.textContent = 'Usuário desativado.';
-                } else {
-                    errorDiv.textContent = 'Erro ao fazer login. Tente novamente.';
-                }
-                errorDiv.style.display = 'block';
+                document.getElementById('loginError').style.display = 'block';
             }
+        });
+        
+        document.getElementById('paymentButton').addEventListener('click', handlePaymentButton);
+        
+        document.getElementById('loginPopupButton').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('paymentPopup').style.display = 'none';
+        });
+        
+        document.getElementById('redirectNowButton').addEventListener('click', () => {
+            window.location.href = 'https://vaidebet.com/ptb/games/livecasino/detail/normal/18198/evol_TopCard000000001_BRL';
+        });
+        
+        document.getElementById('registerLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+        
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+        
+        document.getElementById('resetPasswordLink').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('resetPasswordForm').style.display = 'block';
+        });
+        
+        document.getElementById('backToLoginLink').addEventListener('click', () => {
+            document.getElementById('resetPasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
         });
         
         document.getElementById('registerButton').addEventListener('click', async () => {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            const errorDiv = document.getElementById('registerError');
-            const successDiv = document.getElementById('registerSuccess');
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-
-            if (name === '' || email === '' || password === '' || password.length < 6) {
-                errorDiv.textContent = 'Por favor, preencha todos os campos corretamente e certifique-se de que a senha tenha pelo menos 6 caracteres.';
-                errorDiv.style.display = 'block';
+            if (password.length < 6) {
+                document.getElementById('registerError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
                 return;
             }
-
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
-                // Enviar e-mail de verificação
                 await sendEmailVerification(user);
-
-                // Dados do usuário a serem armazenados
-                const userData = {
-                    name,
-                    email,
-                    createdAt: new Date(), // Data em que o usuário foi criado
-                    paymentDate: null, // Data de pagamento ainda não definida
-                    trialEndDate: new Date(new Date().setDate(new Date().getDate() + 3)), // 3 dias de teste
-                };
-
-                // Armazenar os dados do usuário no Firestore
-                await setDoc(doc(db, 'users', user.uid), userData);
-
-                successDiv.textContent = 'Cadastro realizado. Verifique o seu e-mail.';
-                successDiv.style.display = 'block';
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: name,
+                    email: email,
+                    trialEndDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString()
+                });
+                document.getElementById('registerSuccess').style.display = 'block';
+                document.getElementById('registerError').style.display = 'none';
             } catch (error) {
-                errorDiv.textContent = 'Erro ao registrar. Verifique seus dados.';
-                errorDiv.style.display = 'block';
+                document.getElementById('registerError').textContent = 'Erro ao cadastrar. Verifique suas informações.';
             }
-        });
-        
-        document.getElementById('paymentButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e'; // URL de pagamento
-        });
-        
-        document.getElementById('paymentPopupButton').addEventListener('click', () => {
-            window.location.href = 'https://checkout.suitpay.app/italo-oliveria/bcbe785c836badbb1c18c24a0c1ac51e'; // URL de pagamento
-        });
-        
-        document.getElementById('redirectNowButton').addEventListener('click', () => {
-            window.location.href = 'https://botmillion.github.io/telm/';
-        });
-        
-        document.getElementById('registerLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-        });
-        
-        document.getElementById('loginLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        });
-        
-        document.getElementById('resetPasswordLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('resetPasswordForm').style.display = 'block';
-        });
-        
-        document.getElementById('backToLoginLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('resetPasswordForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
         });
         
         document.getElementById('resetPasswordButton').addEventListener('click', async () => {
             const email = document.getElementById('resetEmail').value;
-            const errorDiv = document.getElementById('resetError');
-            errorDiv.style.display = 'none';
-
-            if (email === '') {
-                errorDiv.textContent = 'Por favor, preencha o campo de email corretamente.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert('E-mail de redefinição de senha enviado.');
                 document.getElementById('resetPasswordForm').style.display = 'none';
                 document.getElementById('loginForm').style.display = 'block';
             } catch (error) {
-                errorDiv.textContent = 'Erro ao enviar o e-mail de redefinição.';
-                errorDiv.style.display = 'block';
+                document.getElementById('resetError').textContent = 'Erro ao enviar o e-mail de redefinição.';
             }
         });
         
-        // Lógica para exibir mensagens do Telegram
-        const ws = new WebSocket('ws://localhost:3000'); // Altere o URL para o WebSocket do seu servidor
-
-        ws.onmessage = function (event) {
-            showMessage(event.data);
-        };
+        // Exemplo para exibir uma mensagem de teste
+        showMessage('Bem-vindo ao site!');
         
-        ws.onopen = function () {
-            console.log('Conexão WebSocket aberta.');
-        };
-
-        ws.onclose = function () {
-            console.log('Conexão WebSocket fechada.');
-        };
-
-        // Lógica para alternar visibilidade da senha
-        document.getElementById('togglePassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('loginPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-        });
-
-        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
-            const passwordField = document.getElementById('registerPassword');
-            const type = passwordField.type === 'password' ? 'text' : 'password';
-            passwordField.type = type;
-        });
     </script>
 </body>
 </html>
