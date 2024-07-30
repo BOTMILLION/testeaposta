@@ -26,8 +26,11 @@
             font-weight: bold;
         }
         .custom-button {
-            display: none;
-            margin-bottom: 15px; /* Adiciona um espaçamento entre os botões */
+            display: block; /* Exibido sempre */
+            margin-bottom: 15px; /* Espaçamento entre os botões */
+        }
+        .form-login {
+            text-align: center;
         }
     </style>
 </head>
@@ -51,7 +54,9 @@
             <div id="loginError" style="color: red; display: none;">Por favor, preencha todos os campos corretamente.</div>
             <div id="emailVerificationError" style="color: red; display: none;">Por favor, verifique seu e-mail antes de fazer login.</div>
             <button class="custom-button" id="loginButton">LOGIN</button>
-            <button class="custom-button pulse-button" id="paymentButton">REALIZAR PAGAMENTO</button>
+            <button class="custom-button" id="paymentButton">REALIZAR PAGAMENTO</button>
+            <button class="custom-button" id="gameButton">IR PARA O JOGO</button>
+            <button class="custom-button" id="checkoutButton">REALIZAR PAGAMENTO</button>
             <div class="info-text">
                 Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a>
             </div>
@@ -60,7 +65,7 @@
             </div>
         </div>
         
-        <div class="form-login" id="registerForm" style="display: none;">
+        <div class="form-login hidden" id="registerForm">
             <div class="line">
                 <input type="text" id="registerName" placeholder=" " required>
                 <label for="registerName">Seu Nome</label>
@@ -82,7 +87,7 @@
             </div>
         </div>
         
-        <div class="form-login" id="resetPasswordForm" style="display: none;">
+        <div class="form-login hidden" id="resetPasswordForm">
             <div class="line">
                 <input type="email" id="resetEmail" placeholder=" " required>
                 <label for="resetEmail">Seu Email</label>
@@ -94,8 +99,6 @@
             </div>
         </div>
         
-        <button class="custom-button" id="gameButton">IR PARA O JOGO</button>
-        <button class="custom-button" id="checkoutButton">REALIZAR PAGAMENTO</button>
         <div id="messages"></div>
     </div>
     
@@ -174,14 +177,14 @@
                 const isTrialActive = await updateUserTrialStatus(user.uid);
                 
                 if (isTrialActive) {
-                    document.getElementById('loginForm').style.display = 'none';
-                    document.getElementById('gameButton').style.display = 'block';
-                    document.getElementById('checkoutButton').style.display = 'block';
+                    document.getElementById('gameButton').classList.remove('hidden');
+                    document.getElementById('checkoutButton').classList.remove('hidden');
                 } else {
-                    document.getElementById('paymentPopup').style.display = 'block';
+                    document.getElementById('paymentButton').classList.remove('hidden');
                 }
+                
             } catch (error) {
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                if (error.code === 'auth/wrong-password') {
                     errorDiv.textContent = 'E-mail ou senha incorretos.';
                 } else if (error.code === 'auth/invalid-email') {
                     errorDiv.textContent = 'E-mail inválido.';
