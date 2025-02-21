@@ -1,0 +1,17 @@
+{
+    "name": "regialex/vantflix",
+    "description": "Vantflix Filmes e Séries Desenvolvido por Zendblest.com",
+    "autoload": {
+        "psr-4": {
+            "Regialex\\Vantflix\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "zendblest.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.9"
+    }
+}
