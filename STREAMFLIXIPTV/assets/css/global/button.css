@@ -1,0 +1,106 @@
+.btn:focus, .btn-close:focus, button:focus{
+    outline: none!important;
+    box-shadow: none!important;
+}
+.btn-one, .btn-two, .btn-three, .btn-four{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.btn-one{
+    background-color: var(--btn-one-background) !important;
+    color: var(--btn-one-color);
+    font-weight: 400;
+}
+.btn-one:hover, .btn-one:focus{
+    background-color: var(--btn-one-hover-background) !important;
+    color: var(--btn-one-hover-color);
+    font-weight: 400;
+    transition: 0.5s;
+}
+
+.btn-two{
+    background-color: var(--btn-two-background) !important;
+    color: var(--btn-two-color);
+    font-weight: 400;
+}
+.btn-two:hover, .btn-two:focus{
+    background-color: var(--btn-two-hover-background) !important;
+    color: var(--btn-two-hover-color);
+    font-weight: 400;
+    transition: 0.5s;
+}
+
+.btn-three{
+    background-color: var(--btn-three-background) !important;
+    color: var(--btn-three-color);
+    font-weight: 400;
+}
+.btn-three:hover, .btn-three:focus{
+    background-color: var(--btn-three-hover-background) !important;
+    color: var(--btn-three-hover-color);
+    font-weight: 400;
+    transition: 0.5s;
+}
+
+.btn-four{
+    background-color: var(--btn-four-background) !important;
+    color: var(--btn-four-color);
+    font-weight: 400;
+}
+.btn-four:hover, .btn-four:focus{
+    background-color: var(--btn-four-hover-background) !important;
+    color: var(--btn-four-hover-color);
+    font-weight: 400;
+    transition: 0.5s;
+}
+.btn-five{
+    background-color: var(--btn-five-background) !important;
+    color: var(--btn-five-color);
+    font-weight: 400;
+}
+.btn-five:hover, .btn-five:focus{
+    background-color: var(--btn-five-hover-background) !important;
+    color: var(--btn-five-hover-color);
+    font-weight: 400;
+    transition: 0.5s;
+}
+.btn-one i, .btn-two i, .btn-three i, .btn-four i, .btn-five i{
+    margin-right: 7px;
+}
+.list-group-item{
+    background-color: var(--list-group-item-background);
+    border-color: var(--list-group-item-border);
+    color: var(--list-group-item-color);
+}
+.btn-outline-secondary{
+    border-color: var(--btn-one-background) !important;
+    color: var(--text-color) !important;
+    background-color: transparent !important;
+    
+}
+.btn-outline-secondary:hover{
+    color: var(--text-color-hover) !important;
+    transition: 0.3s;
+}
+.btn-outline-secondary i{
+    margin-right: 7px;
+}
+.buttons-perfil-group{
+    padding-top: 10px;
+    display: flex;
+    justify-content: end;
+    width: 100%;
+}
+@media screen and (max-width:767px){
+    .buttons-perfil-group{
+        padding-top: 20px;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .buttons-perfil-group button{
+        width: 100%;
+        margin: 0px;
+        margin-bottom: 10px;
+    }     
+}

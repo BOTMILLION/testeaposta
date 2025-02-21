@@ -1,0 +1,11 @@
+1 = ACESSAR A PASTA CONFIG
+2 = ABRIR O ARQUIVO DATABASE.PHP
+3 = COLOCAR AS INFORMAÇÕES DO SEU BANCO DE DADOS
+4 = IMPORTAR O ARQUIVO banco de dados.sql EM SEU PHPMYADMIN
+5 = ACESSAR PAINEL ADMINISTRADOR
+
+seusite.com/user/login
+
+email => agencia@midiadigitalvs.com.br
+senha => 102030
+

@@ -1,0 +1,12 @@
+.card-page-title{
+    background-color: var(--card-background-one);
+    color: var(--card-color-one);
+    margin-bottom: 20px;
+}
+.card-page-title h6{
+    margin-bottom: 0px;
+    font-weight: 600;
+}
+.card-page-title small{
+    display: block; 
+}

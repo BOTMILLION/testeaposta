@@ -1,0 +1,52 @@
+.perfil-selecionar{
+    padding-top: 200px;
+    padding-bottom: 20px;
+}
+.perfil-selecionar .box{
+    display: inline-grid;
+    grid-template-columns: repeat(5,1fr);
+    justify-content: center;
+    align-content: center;
+    gap: 5px;
+    width: 100%;
+}
+.perfil-selecionar .box button{
+    border: none;
+    text-align: center;
+    background-color: var(--perfil-selecionar-background);
+    color: var(--perfil-selecionar-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 10px;
+}
+.perfil-selecionar .box button:hover{
+    background-color: var(--perfil-selecionar-background-hover);
+    transition: 0.3s;
+}
+.perfil-selecionar .box button img{
+    width: 100%;
+    max-width: 128px;
+    margin-bottom: 5px;
+}    
+.perfil-selecionar .box button small{
+    display: block;
+}
+
+
+@media screen and (max-width: 991px){
+    .perfil-selecionar{
+        padding-top: 100px;
+    }
+    .perfil-selecionar .box{
+        grid-template-columns: repeat(3,1fr);
+    }
+}
+
+@media screen and (max-width: 767px){
+    .perfil-selecionar .box{
+        grid-template-columns: repeat(2,1fr);
+    }
+}

@@ -1,0 +1,8 @@
+/* MODAL */
+.modal .modal-content{
+    background-color: var(--modal-background);
+}
+.modal .modal-content .modal-header,
+.modal .modal-content .modal-footer{
+    border-color: var(--modal-border);
+}

@@ -1,0 +1,238 @@
+.stream-list{
+    display: inline-grid;
+    grid-template-columns: repeat(10,1fr);
+    width: 100%;
+    gap: 10px;
+}
+.stream-list .item{
+    border-radius: 12px;
+    padding: 0px;
+    background-color: transparent;
+    border: 2px solid var(--stream-list-border);
+    text-align: center;
+}
+.stream-list .item img{
+    border-radius: 10px;
+}
+
+#stream_lista i{
+    width: 20px;
+    margin-right: 4px;
+}
+.splide-lista{
+    padding-bottom: 20px;
+}
+.splide-lista .splide-title{
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.splide-lista .splide-item-image{
+    border-radius: 12px;
+    padding: 0px;
+    background-color: transparent;
+    border: 2px solid var(--stream-list-border);
+    text-align: center;
+}
+.splide-lista .splide-item-image img{
+    border-radius: 10px;
+}
+
+.modal-stream-info .loading-info{
+    height: 200px;
+    width: 100%;
+}
+.modal-stream-info .loading-info .icon-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}
+.modal-stream-info .loading-info i{
+    font-size: 80px;
+    color: var(--modal-stream-icon-loading-color);
+}
+.modal-stream-info .top-load-info{
+    display: none;
+}
+.modal-stream-info .top{
+    display: flex;
+    flex-direction: column;
+}
+.modal-stream-info .left{
+    text-align: center;
+    margin: auto;
+}
+.modal-stream-info .left .img-load{
+    width: 180px;
+    background-color: var(--modal-stream-img-background);
+    border-radius: 10px;
+    margin: auto;
+}
+.modal-stream-info .left .img-load img{
+    border-radius: 10px;
+    width: 100%;
+}
+.modal-stream-info .top .buttons-group{
+    width: 100%;
+}
+.modal-stream-info .top .buttons-group button{
+    width: 300px;
+    margin: auto;
+}
+.modal-stream-info .top .right{
+    padding-left: 10px;
+    padding-top: 10px;
+    text-align: center;
+}
+.temporadas-episodios-box{
+    margin-top: 20px;
+    display: none;
+}
+.temporadas-episodios-box .episodio-item{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    height: 100px;
+    width: 100%;
+    border-bottom: 1px solid var(--modal-stream-list-border);
+}
+.temporadas-episodios-box .episodio-item:last-child{
+    border-bottom: none;
+}
+.temporadas-episodios-box .episodio-item:hover{
+    transition: 0.5s;
+    background-color: var(--modal-stream-episodio-hover);
+}
+.temporadas-episodios-box .episodio-item:hover .thumb{
+    transition: 0.5s;
+    background-color: var(--modal-stream-episodio-thumb-hover);
+}
+.temporadas-episodios-box .episodio-item .thumb{
+    background-color: var(--modal-stream-img-background);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+    color: var(--text-color);
+    height: 70px;
+    width: 70px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+.modal-player .modal-content{
+    background-color: var(--modal-player-background);
+}
+.modal-player .modal-header{
+    border-bottom: none;
+}
+.modal-player .modal-header i{
+    color: var(--modal-player-icon-color);
+    cursor: pointer;
+}
+.modal-player .modal-body{
+    width: 100%;
+    height: calc(100vh - 63px) !important;
+}
+.modal-player #jw-player{
+    width: 100%;
+    height: 100% !important;
+}
+/*
+    STREAM PLAY
+*/
+.container-player{
+    max-width: 1320px;
+    margin-top: -13px;
+}
+.container-player-info{
+    max-width: 1320px;
+}
+.container-player-temp{
+    max-width: 1320px;
+}
+.movie-tv-info {
+    padding-top: 10px;
+}
+.movie-tv-info .info-box{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.accordion-episodios .accordion-item{
+    background-color: var(--accordion-episodios-background) !important;
+    
+}
+.accordion-episodios .accordion-button{
+    background-color: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--accordion-episodios-item-border) !important;
+    color: var(--text-color);
+}
+.accordion-episodios .accordion-button:hover{
+    background-color: var(--accordion-episodios-item-hover) !important;
+    transition: 0.5s;
+}
+.accordion-episodios .accordion-button:not(.collapsed){
+    box-shadow: none !important;
+}
+.accordion-episodios .list-group-item:hover{
+    background-color: var(--accordion-episodios-item-hover) !important;
+    transition: 0.5s;
+}
+
+@media screen and (max-width: 1920px){
+    .stream-list{
+        grid-template-columns: repeat(8,1fr);
+    }
+}
+
+@media screen and (max-width: 1700px){
+    .stream-list{
+        grid-template-columns: repeat(7,1fr);
+    }
+    .premium-box{
+        grid-template-columns: repeat(3,1fr);
+    }
+}
+
+@media screen and (max-width: 1500px){
+    .stream-list{
+        grid-template-columns: repeat(6,1fr);
+    }
+    .premium-box{
+        grid-template-columns: repeat(2,1fr);
+    }
+    .container-player{
+        padding: 0;
+    }
+}
+
+@media screen and (max-width: 1200px){
+    .stream-list{
+        grid-template-columns: repeat(5,1fr);
+    }
+}
+
+@media screen and (max-width: 991px){
+    .modal-stream-info .left .img-load{
+        width: 160px;
+    }
+}
+
+@media screen and (max-width: 767px){
+    .stream-list{
+        grid-template-columns: repeat(4,1fr);
+    }
+    .premium-box{
+        grid-template-columns: repeat(1,1fr);
+    }
+}
+
+@media screen and (max-width: 567px){
+    .stream-list{
+        grid-template-columns: repeat(3,1fr);
+    }
+}

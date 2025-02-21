@@ -1,0 +1,1 @@
+<?php require_once $_SERVER['DOCUMENT_ROOT'].'/view_controller/user/logout.php';?>

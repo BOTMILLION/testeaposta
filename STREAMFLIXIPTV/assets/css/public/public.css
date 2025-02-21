@@ -1,0 +1,38 @@
+.section-0{
+    padding-top: 120px;
+    max-width: 120rem;
+    text-align: center;
+}
+.section-0 h1{
+    max-width: 600px;
+    font-size: 50px;
+    font-weight: 900;
+    text-align: center;
+    margin: auto;
+    color: var(--text-color-white);
+}
+.section-0{
+    padding-bottom: 20px;
+}
+.section-0 p{
+    color: var(--text-color-white);
+    font-size: 20px;
+}
+.section-1 {
+    width: 100%;
+}
+.section-1 h1{
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--text-color-white);
+}
+@media screen and (max-width: 567px){
+    .section-0{
+        padding-top: 120px;
+        max-width: 22rem;
+        margin: auto;
+    }
+    .section-0 h1{
+        font-size: 40px;
+    }
+}
